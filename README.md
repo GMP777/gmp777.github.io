@@ -25,7 +25,7 @@
         <h1>悠久传奇</h1>
         <a href="https://github.com/GMP777/gmp777.github.io/wiki/%E6%82%A0%E4%B9%85%E4%BC%A0%E5%A5%87%E6%96%B0%E6%9C%8D%E6%BB%A1V" target="_blank">新服满V自用攻略</a>
         <h2>钻石计算</h2>
-        https://gmp777.github.io/jsq1.html" target="_blank">v.1.0版本</a><br/>
+        <a href="https://gmp777.github.io/jsq1.html" target="_blank">v.1.0版本</a><br/>
         <a href="https://gmp777.github.io/jsq2.html" target="_blank">v.2.0版本</a>
         <h2>888钻石消耗多少道具</h2>
         <a href="https://gmp777.github.io/888.html" target="_blank">v.0.0版本</a>
