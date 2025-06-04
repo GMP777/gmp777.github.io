@@ -5,34 +5,141 @@
     <title>抽奖所需钻石计算</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            background: #f5f5f5;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            padding: 50px;
         }
-        input, button {
+
+        .cheque {
+            background: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            width: 600px;
+            padding: 30px 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .cheque h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
             font-size: 16px;
-            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #007b83;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e6f7ff;
+            border-left: 5px solid #007b83;
+            font-size: 18px;
+            white-space: pre-line;
+        }
+
+        .sig {
+            text-align: right;
+            margin-top: 40px;
+            font-style: italic;
+            color: #666;
+        }
+
+        .cheque-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-weight: bold;
+            font-size: 20px;
+            color: #007b83;
         }
     </style>
 </head>
 <body>
-    <h2>抽奖所需钻石计算</h2>
-    <label for="draws">请输入抽数：</label><br>
-    <input type="number" id="draws" min="1" placeholder="例如：100"><br>
-    <button onclick="calculateDiamonds()">计算</button>
+    <div class="cheque">
+        <div class="cheque-logo">钻石银行支票</div>
+        <h2>众神宝藏抽奖</h2>
 
-    <p id="result"></p>
+        <label for="draws">请输入抽数：</label>
+        <input type="number" id="draws" min="1" placeholder="例如：100">
+        <button onclick="calculateDiamonds()">开具支票</button>
+
+        <div class="result" id="result" style="display: none;"></div>
+
+        <div class="sig">支票签发人：GMP777</div>
+    </div>
 
     <script>
         function calculateDiamonds() {
             const draws = parseInt(document.getElementById('draws').value);
+            const resultDiv = document.getElementById('result');
+
             if (isNaN(draws) || draws <= 0) {
-                document.getElementById('result').textContent = "请输入有效的抽数。";
+                resultDiv.textContent = "请输入有效的抽数。";
+                resultDiv.style.display = "block";
                 return;
             }
 
             const diamondsPerDraw = 500000 / 50;
             const totalDiamonds = draws * diamondsPerDraw;
-            document.getElementById('result').textContent = `${draws} 抽需要 ${totalDiamonds.toLocaleString()} 钻石。`;
+            const chineseUpper = numberToChinese(totalDiamonds);
+
+            resultDiv.innerHTML = 
+                `抽数：${draws} 抽\n` +
+                `阿拉伯钻石：${totalDiamonds.toLocaleString()} 钻石\n` +
+                `中文钻石：${chineseUpper}`;
+            resultDiv.style.display = "block";
+        }
+
+        // 数字转中文大写金额函数
+        function numberToChinese(n) {
+            const fraction = ['角', '分'];
+            const digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
+            const unit = [['元', '万', '亿'], ['', '拾', '佰', '仟']];
+            n = Math.abs(n);
+            let s = '';
+
+            for (let i = 0; i < fraction.length; i++) {
+                s += (digit[Math.floor(n * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
+            }
+            s = s || '整';
+            n = Math.floor(n);
+
+            for (let i = 0; i < unit[0].length && n > 0; i++) {
+                let p = '';
+                for (let j = 0; j < unit[1].length && n > 0; j++) {
+                    p = digit[n % 10] + unit[1][j] + p;
+                    n = Math.floor(n / 10);
+                }
+                s = p.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + s;
+            }
+
+            return s.replace(/(零.)*零元/, '元')
+                    .replace(/(零.)+/g, '零')
+                    .replace(/^整$/, '零元整');
         }
     </script>
 </body>
