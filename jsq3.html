@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>翅膀进阶材料计算器</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+      margin: 0;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #005fd9;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      white-space: pre-line;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 0;
+        box-shadow: none;
+        padding: 15px;
+      }
+
+      input, button {
+        font-size: 15px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>翅膀进阶材料计算器</h2>
+
+    <label for="blessing">祝福值总量</label>
+    <input type="number" id="blessing" placeholder="例如：1000">
+
+    <label for="perTry">每次消耗材料数量</label>
+    <input type="number" id="perTry" placeholder="例如：2">
+
+    <label for="owned">已拥有材料数量</label>
+    <input type="number" id="owned" placeholder="例如：5">
+
+    <button onclick="calculate()">计算</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function toChineseNumber(num) {
+      const units = ["", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿"];
+      const digits = "零壹贰叁肆伍陆柒捌玖";
+      const str = num.toString();
+      let result = "";
+      let zero = false;
+      for (let i = 0; i < str.length; i++) {
+        const n = parseInt(str[i]);
+        const u = units[str.length - 1 - i];
+        if (n === 0) {
+          if (!zero) {
+            result += "零";
+            zero = true;
+          }
+        } else {
+          result += digits[n] + u;
+          zero = false;
+        }
+      }
+      result = result.replace(/零+/g, "零").replace(/零$/, "");
+      return result + "元宝";
+    }
+
+    function calculate() {
+      const blessing = parseInt(document.getElementById("blessing").value);
+      const perTry = parseInt(document.getElementById("perTry").value);
+      const owned = parseInt(document.getElementById("owned").value) || 0;
+      const perBlessing = 100;
+      const pricePerItem = 60000;
+
+      if (isNaN(blessing) || isNaN(perTry) || perTry <= 0) {
+        document.getElementById("result").innerText = "请输入有效的祝福值和材料数量";
+        return;
+      }
+
+      const operations = Math.ceil(blessing / perBlessing);
+      const totalMaterials = operations * perTry;
+      const toBuy = Math.max(totalMaterials - owned, 0);
+      const totalCost = toBuy * pricePerItem;
+      const chinesePrice = toChineseNumber(totalCost);
+
+      // 70%、80%阶段计算
+      const seventyTotal = Math.ceil(totalMaterials * 0.7);
+      const eightyTotal = Math.ceil(totalMaterials * 0.8);
+      const seventyToBuy = Math.max(seventyTotal - owned, 0);
+      const eightyToBuy = Math.max(eightyTotal - owned, 0);
+      const seventyCost = seventyToBuy * pricePerItem;
+      const eightyCost = eightyToBuy * pricePerItem;
+      const seventyCostChinese = toChineseNumber(seventyCost);
+      const eightyCostChinese = toChineseNumber(eightyCost);
+      
+    document.getElementById("result").innerHTML =
+        `需要进阶操作次数：<strong>${operations}</strong> 次<br>` +
+        `每次消耗材料：<strong>${perTry}</strong> 个<br>` +
+          `共需材料：<strong>${totalMaterials}</strong> 个<br>` +
+         `已拥有材料：<strong>${owned}</strong> 个<br>` +
+         `还需购买材料：<strong>${toBuy}</strong> 个<br>` +
+         `需花费元宝：<strong>${totalCost.toLocaleString()}</strong> 元宝<br>` +
+         `中文金额：<strong>${chinesePrice}</strong>` +
+
+         `<hr style="margin: 20px 0;">` +
+         `<div style="text-align:left; font-size: 15px; opacity: 0.85;">
+           <strong>进阶预估（70% / 80%）</strong><br><br>
+          70% 材料数量：${seventyTotal} 个，需购买：${seventyToBuy} 个，元宝：${seventyCost.toLocaleString()}（${seventyCostChinese}）<br>
+          80% 材料数量：${eightyTotal} 个，需购买：${eightyToBuy} 个，元宝：${eightyCost.toLocaleString()}（${eightyCostChinese}）
+     </div>`;
+    }
+  </script>
+</body>
+</html>
