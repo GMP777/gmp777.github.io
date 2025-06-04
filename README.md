@@ -2,7 +2,6 @@
 <html lang="zh-CN">
     <head>
       <meta charset="UTF-8">
-      <title>GMP777's tool</title>
     </head>
     <body>
         <h1>钻石计算</h1>
