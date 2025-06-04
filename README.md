@@ -37,7 +37,8 @@
         <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.0.0版本</a>
         <footer>
             <div>
-            <a href="https://github.com/GMP777/gmp777.github.io">GMP777@github</a>
+                <a href="https://github.com/GMP777/gmp777.github.io">GMP777@github</a>
+                <code>代码为ChatGPT提供</code>
             </div>
         </footer>
     </body>
