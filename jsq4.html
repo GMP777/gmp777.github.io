@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>道装材料计算</title>
+  <style>
+    body {
+      font-family: "微软雅黑", sans-serif;
+      padding: 40px;
+      background: #f8f8f8;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+    }
+    select, input {
+      font-size: 16px;
+      padding: 6px 12px;
+      margin: 10px;
+    }
+    .result {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #444;
+    }
+    .result span {
+      color: #d33;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>道装材料计算</h1>
+
+  <label for="level">目标道装阶数：</label>
+  <select id="level" onchange="calculate()">
+    <option value="1">1阶</option>
+    <option value="2">2阶</option>
+    <option value="3">3阶</option>
+    <option value="4">4阶</option>
+    <option value="5">5阶</option>
+    <option value="6">6阶</option>
+    <option value="7">7阶</option>
+    <option value="8">8阶</option>
+    <option value="9">9阶</option>
+    <option value="10" selected>10阶</option>
+  </select>
+  <br>
+
+  <label for="owned">已拥有伏魔元石数量（可选）：</label>
+  <input type="number" id="owned" min="0" placeholder="例如 1000" oninput="calculate()">
+  
+  <div class="result" id="output"></div>
+
+  <script>
+    function calculate() {
+      const level = parseInt(document.getElementById('level').value);
+      const ownedStones = parseInt(document.getElementById('owned').value) || 0;
+
+      const stonePerItem = 30;
+      const diamondPerStone = 50000;
+
+      const firstStageEquivalent = Math.pow(3, level - 1);
+      const totalStones = firstStageEquivalent * stonePerItem;
+
+      // 扣除已拥有
+      const stonesNeeded = Math.max(totalStones - ownedStones, 0);
+      const totalDiamonds = stonesNeeded * diamondPerStone;
+
+      const formatNumber = n => n.toLocaleString('zh-CN');
+
+      document.getElementById('output').innerHTML = `
+        <p>目标阶数：<span>${level}阶道装</span></p>
+        <p>所需伏魔元石总数：<span>${formatNumber(totalStones)} 个</span></p>
+        <p>已拥有伏魔元石：<span>${formatNumber(ownedStones)} 个</span></p>
+        <p>还需伏魔元石：<span>${formatNumber(stonesNeeded)} 个</span></p>
+        <p>还需钻石总数：<span>${formatNumber(totalDiamonds)} 钻石</span></p>
+      `;
+    }
+
+    // 初始计算
+    calculate();
+  </script>
+
+</body>
+</html>
