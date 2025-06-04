@@ -1,7 +1,6 @@
 <html lang="zh-CN">
     <head>
         <meta charset="UTF-8">
-        <title>GMP777's Tool</title>
         <style>
             footer {
                 text-align: center;
