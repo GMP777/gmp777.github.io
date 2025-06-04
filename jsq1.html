@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>钻石计算器v.1.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "微软雅黑", sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .item label {
+      flex: 1;
+      font-size: 16px;
+      min-width: 50%;
+    }
+
+    .item input {
+      flex: 1;
+      min-width: 45%;
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #007BFF;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #d9534f;
+    }
+
+    @media (max-width: 480px) {
+      .item {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .item label,
+      .item input {
+        min-width: 100%;
+      }
+
+      .item label {
+        margin-bottom: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>悠久传奇钻石计算</h1>
+
+    <div class="item">
+      <label for="cola">可乐（10 钻石）</label>
+      <input type="number" id="cola" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="juice">橙汁（20 钻石）</label>
+      <input type="number" id="juice" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="lighter">打火机（50 钻石）</label>
+      <input type="number" id="lighter" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="speaker">小音响（100 钻石）</label>
+      <input type="number" id="speaker" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="mouse">鼠标（200 钻石）</label>
+      <input type="number" id="mouse" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="headphones">耳机（500 钻石）</label>
+      <input type="number" id="headphones" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="watch">手表（1000 钻石）</label>
+      <input type="number" id="watch" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="phone">手机（2000 钻石）</label>
+      <input type="number" id="phone" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="motorcycle">摩托车（5000 钻石）</label>
+      <input type="number" id="motorcycle" min="0" value="0">
+    </div>
+
+    <div class="item">
+      <label for="ferrari">法拉利（10000 钻石）</label>
+      <input type="number" id="ferrari" min="0" value="0">
+    </div>
+
+    <button onclick="calculateTotal()">计算总钻石</button>
+
+    <div id="result">总钻石：0</div>
+  </div>
+
+  <script>
+    function calculateTotal() {
+      const prices = {
+        cola: 10,
+        juice: 20,
+        lighter: 50,
+        speaker: 100,
+        mouse: 200,
+        headphones: 500,
+        watch: 1000,
+        phone: 2000,
+        motorcycle: 5000,
+        ferrari: 10000
+      };
+
+      let total = 0;
+
+      for (let key in prices) {
+        const quantity = parseInt(document.getElementById(key).value) || 0;
+        total += quantity * prices[key];
+      }
+
+      document.getElementById("result").innerText = `总钻石：${total}`;
+    }
+  </script>
+</body>
+</html>
