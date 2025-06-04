@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>钻石兑换道具计算器</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "微软雅黑", sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #333;
+    }
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #222;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .item-label {
+      width: 60%;
+      font-size: 1rem;
+      color: #333;
+    }
+    .item-input {
+      width: 35%;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 2rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
+    }
+    .success {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .fail {
+      color: #dc3545;
+      font-weight: bold;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>888钻石需要多少道具</h1>
+
+    <div class="input-group">
+      <p><label for="targetDiamonds">目标钻石数量：</label></p>
+      <input type="number" id="targetDiamonds" placeholder="例如：888" min="0" />
+    </div>
+
+    <div id="item-list"></div>
+
+    <button onclick="calculateUsage()">计算所需道具</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // 从低到高排序的道具列表
+    const items = [
+      { name: '可乐', price: 10 },
+      { name: '橙汁', price: 20 },
+      { name: '打火机', price: 50 },
+      { name: '小音响', price: 100 },
+      { name: '鼠标', price: 200 },
+      { name: '耳机', price: 500 },
+      { name: '手表', price: 1000 },
+      { name: '手机', price: 2000 },
+      { name: '摩托车', price: 5000 },
+      { name: '法拉利', price: 10000 }
+    ];
+
+    function createItemList() {
+      const container = document.getElementById('item-list');
+      items.forEach((item, i) => {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+
+        const label = document.createElement('div');
+        label.className = 'item-label';
+        label.textContent = `${item.name}（${item.price}钻石）`;
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = '0';
+        input.value = '0';
+        input.id = `item-${i}`;
+        input.className = 'item-input';
+
+        row.appendChild(label);
+        row.appendChild(input);
+        container.appendChild(row);
+      });
+    }
+
+    createItemList();
+
+    function calculateUsage() {
+      let target = parseInt(document.getElementById("targetDiamonds").value) || 0;
+      if (target <= 0) {
+        document.getElementById("result").innerHTML = "<p class='fail'>请输入有效的钻石数量。</p>";
+        return;
+      }
+
+      let available = [];
+      for (let i = 0; i < items.length; i++) {
+        let qty = parseInt(document.getElementById(`item-${i}`).value) || 0;
+        available.push(qty);
+      }
+
+      let needed = Array(items.length).fill(0);
+      let remaining = target;
+
+      // 从高价值道具开始扣除
+      for (let i = items.length - 1; i >= 0; i--) {
+        let count = Math.min(Math.floor(remaining / items[i].price), available[i]);
+        needed[i] = count;
+        remaining -= count * items[i].price;
+      }
+
+      let result = "";
+      let totalUsed = 0;
+
+      if (remaining === 0) {
+        result += `<p class="success">✅ 成功兑换所需钻石！</p>`;
+      } else {
+        result += `<p class="fail">❌ 道具不足，无法兑换目标钻石。还差 ${remaining} 钻石。</p>`;
+      }
+
+      result += `<ul>`;
+      items.forEach((item, i) => {
+        if (needed[i] > 0) {
+          result += `<li>${item.name}：使用 ${needed[i]} 个（共价值 ${needed[i] * item.price} 钻石）</li>`;
+          totalUsed += needed[i] * item.price;
+        }
+      });
+      result += `</ul>`;
+      result += `<p>💎 总共使用 ${totalUsed} 钻石的道具。</p>`;
+
+      document.getElementById("result").innerHTML = result;
+    }
+  </script>
+</body>
+</html>
