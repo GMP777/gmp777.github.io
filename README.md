@@ -37,7 +37,7 @@
         <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.0.0版本</a>
         <footer>
             <div>
-            <a href="https://gmp777.github.io/">GMP777</a>
+            <a href="https://github.com/GMP777/gmp777.github.io">GMP777@github</a>
             </div>
         </footer>
     </body>
