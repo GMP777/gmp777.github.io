@@ -30,7 +30,7 @@
         <h2>🥤888钻石消耗多少道具</h2>
         <a href="https://gmp777.github.io/888.html" target="_blank">v.0.0版本</a>
         <h2>🏆抽奖所需钻石计算</h2>
-        v.0.0版本</a>
+        <a href="https://gmp777.github.io/roll.html" target="_blank">v.0.0版本</a>
         <h2>🪶翅膀进阶计算</h2>
         <a href="https://gmp777.github.io/jsq3.html" target="_blank">v.0.0版本</a>
         <h2>☯️道装制作材料计算</h2>
