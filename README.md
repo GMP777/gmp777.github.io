@@ -38,7 +38,8 @@
         <footer>
             <div>
                 <a href="https://github.com/GMP777/gmp777.github.io">GMP777@github</a>
-                <p>代码为<a href="https://chatgpt.com/" target="_blank">ChatGPT</a>提供</p>
+                <br/>
+                代码为<a href="https://chatgpt.com/" target="_blank">ChatGPT</a>提供
             </div>
         </footer>
     </body>
