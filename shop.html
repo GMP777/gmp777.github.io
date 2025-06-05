@@ -1,94 +1,116 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>商城元宝购买计算</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>道具元宝计算器</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
       max-width: 600px;
       margin: auto;
+      box-sizing: border-box;
+      text-align: center; /* 文字居中 */
     }
     h2 {
-      text-align: center;
-    }
-    .item {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
     }
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
     }
-    input[type="number"] {
+    select, input[type="number"] {
       width: 100%;
-      padding: 8px;
+      max-width: 400px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
       box-sizing: border-box;
-      margin-bottom: 5px;
+      margin: 0 auto 20px auto; /* 水平居中，底部间距 */
+      display: block;
+      transition: border-color 0.3s ease;
+      text-align: center; /* 输入内容居中 */
+    }
+    select:focus, input[type="number"]:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
     }
     .result {
       margin-top: 30px;
-      font-size: 18px;
+      font-size: 1.3rem;
       font-weight: bold;
+      word-break: break-word;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center; /* 结果文字居中 */
     }
-    .details {
-      margin-top: 10px;
-      font-size: 16px;
+    @media (max-width: 480px) {
+      body {
+        padding: 15px 10px;
+        max-width: 100%;
+      }
+      h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+      }
+      label {
+        font-size: 1rem;
+        margin-bottom: 6px;
+      }
+      select, input[type="number"] {
+        max-width: 100%;
+        padding: 8px 10px;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+      }
+      .result {
+        font-size: 1.1rem;
+        margin-top: 20px;
+      }
     }
-    footer {
-  text-align: center;
-  font-size: 14px;
-  padding: 15px 10px;
-  background-color: #f8f8f8;
-  color: #333;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
-}
-
-footer a {
-  color: #007aff; /* iPhone蓝色链接风格 */
-  text-decoration: none;
-  margin: 0 5px;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
   </style>
 </head>
 <body>
-  <h2>商城元宝购买计算</h2>
-  <div class="item">
-    <label for="item1-total">极阀仙丹（3000万/个）</label>
-    <input type="number" id="item1-total" placeholder="总需求数量" min="0">
-    <input type="number" id="item1-owned" placeholder="已拥有数量" min="0">
-  </div>
-  <div class="item">
-    <label for="item2-total">生肖石·无疆（120万/个）</label>
-    <input type="number" id="item2-total" placeholder="总需求数量" min="0">
-    <input type="number" id="item2-owned" placeholder="已拥有数量" min="0">
-  </div>
-  <div class="item">
-    <label for="item3-total">日月精华（2万/个）</label>
-    <input type="number" id="item3-total" placeholder="总需求数量" min="0">
-    <input type="number" id="item3-owned" placeholder="已拥有数量" min="0">
-  </div>
+  <h2>道具元宝计算器</h2>
+
+  <label for="item-select">选择道具</label>
+  <select id="item-select">
+    <option value="item1">极阀仙丹（3000万/个）</option>
+    <option value="item2">生肖石·无疆（120万/个）</option>
+    <option value="item3">日月精华（2万/个）</option>
+  </select>
+
+  <label for="total-input">总需求数量</label>
+  <input type="number" id="total-input" min="0" value="0" />
+
+  <label for="owned-input">已拥有数量</label>
+  <input type="number" id="owned-input" min="0" value="0" />
+
   <div class="result">
-    <div>还需购买数量：<span id="needed"></span></div>
-    <div>最终元宝总计：<span id="total"></span>（<span id="total-cn"></span>）</div>
+    还需购买数量：<span id="need-count">0</span> 个<br />
+    最终元宝总计：<span id="total"></span>（<span id="total-cn"></span>）
   </div>
 
   <script>
-    const item1Total = document.getElementById('item1-total');
-    const item1Owned = document.getElementById('item1-owned');
-    const item2Total = document.getElementById('item2-total');
-    const item2Owned = document.getElementById('item2-owned');
-    const item3Total = document.getElementById('item3-total');
-    const item3Owned = document.getElementById('item3-owned');
+    const prices = {
+      item1: 30000000,
+      item2: 1200000,
+      item3: 20000,
+    };
+
+    const select = document.getElementById('item-select');
+    const totalInput = document.getElementById('total-input');
+    const ownedInput = document.getElementById('owned-input');
+    const needCountSpan = document.getElementById('need-count');
     const totalSpan = document.getElementById('total');
     const totalCnSpan = document.getElementById('total-cn');
-    const neededSpan = document.getElementById('needed');
 
     function convertToChinese(num) {
       const cnNums = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
@@ -126,38 +148,29 @@ footer a:hover {
       return str.replace(/(零)+/g, "零").replace(/零+$/g, "").replace(/^一十/, "十");
     }
 
-    function calculateTotal() {
-      const count1 = Math.max((parseInt(item1Total.value) || 0) - (parseInt(item1Owned.value) || 0), 0);
-      const count2 = Math.max((parseInt(item2Total.value) || 0) - (parseInt(item2Owned.value) || 0), 0);
-      const count3 = Math.max((parseInt(item3Total.value) || 0) - (parseInt(item3Owned.value) || 0), 0);
+    function calculate() {
+      const key = select.value;
+      const totalNum = Math.max(parseInt(totalInput.value) || 0, 0);
+      const ownedNum = Math.max(parseInt(ownedInput.value) || 0, 0);
+      const needNum = Math.max(totalNum - ownedNum, 0);
+      const price = prices[key];
+      const totalPrice = needNum * price;
 
-      const total = count1 * 30000000 + count2 * 1200000 + count3 * 20000;
-
-      totalSpan.textContent = total.toLocaleString();
-      totalCnSpan.textContent = convertToChinese(total) + '元宝';
-      neededSpan.textContent = `极阀仙丹 ${count1} 个，生肖石·无疆 ${count2} 个，日月精华 ${count3} 个`;
+      needCountSpan.textContent = needNum;
+      totalSpan.textContent = totalPrice.toLocaleString();
+      totalCnSpan.textContent = totalPrice > 0 ? convertToChinese(totalPrice) + "元宝" : "零元宝";
     }
 
-    item1Total.addEventListener('input', calculateTotal);
-    item1Owned.addEventListener('input', calculateTotal);
-    item2Total.addEventListener('input', calculateTotal);
-    item2Owned.addEventListener('input', calculateTotal);
-    item3Total.addEventListener('input', calculateTotal);
-    item3Owned.addEventListener('input', calculateTotal);
+    select.addEventListener('change', () => {
+      totalInput.value = 0;
+      ownedInput.value = 0;
+      calculate();
+    });
 
-    calculateTotal(); // 初始调用
+    totalInput.addEventListener('input', calculate);
+    ownedInput.addEventListener('input', calculate);
+
+    calculate();
   </script>
- <footer>
-    <div>
-      <a href="https://gmp777.github.io/">GMP777</a> |
-      <a href="https://gmp777.github.io/jsq1.html">钻石计算 v1.0</a> |
-      <a href="https://gmp777.github.io/jsq2.html">钻石计算 v2.0</a> |
-      <a href="https://gmp777.github.io/888.html">888钻石道具计算</a> |
-      <a href="https://gmp777.github.io/roll.html">抽奖钻石计算</a> |
-      <a href="https://gmp777.github.io/jsq3.html">翅膀进阶计算</a> | 
-      <a href="https://gmp777.github.io/jsq4.html">制作道装材料计算</a> | 
-      <a href="https://gmp777.github.io/shop.html">商城元宝购买计算</a>
-    </div>
-  </footer>
 </body>
 </html>
