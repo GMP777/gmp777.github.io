@@ -35,6 +35,8 @@
         <a href="https://gmp777.github.io/jsq3.html" target="_blank">v.1.0版本</a><code>更新：2025-06-05 15:01:10</code>
         <h2>☯️道装制作材料计算</h2>
         <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.0.0版本</a>
+        <h2>🪙元宝商城计算</h2>
+        <a href="https://gmp777.github.io/shop.html" target="_blank">v.0.0版本</a><code>更新：2025-06-05 15:28:15</code>
         <footer>
             <div>
                 <a href="https://github.com/GMP777/gmp777.github.io">GMP777@github</a> | 代码为<a href="https://chatgpt.com/" target="_blank">ChatGPT</a>提供
