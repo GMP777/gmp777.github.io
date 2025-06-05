@@ -32,7 +32,7 @@
         <h2>🏆抽奖所需钻石计算</h2>
         <a href="https://gmp777.github.io/roll.html" target="_blank">v.0.0版本</a>
         <h2>🪶翅膀进阶计算</h2>
-        <a href="https://gmp777.github.io/jsq3.html" target="_blank">v.0.0版本</a>
+        <a href="https://gmp777.github.io/jsq3.html" target="_blank">v.1.0版本</a><code>更新：2025-06-05 15:01:10</code>
         <h2>☯️道装制作材料计算</h2>
         <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.0.0版本</a>
         <footer>
