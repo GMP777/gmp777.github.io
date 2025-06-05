@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+<title>宝石合成器</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 650px; margin: 1rem auto; padding: 1rem; background: #f9f9f9; }
+  h1 { text-align: center; }
+  label { display: block; margin-top: 1rem; }
+  input[type=number] { width: 100%; padding: 0.5rem; font-size: 1rem; margin-top: 0.3rem; }
+  button { margin-top: 1rem; padding: 0.7rem 1.5rem; font-size: 1rem; cursor: pointer; }
+  .result { margin-top: 1.5rem; background: #fff; padding: 1rem; border-radius: 5px; box-shadow: 0 0 5px #ccc; }
+  .missing { color: red; }
+  .can-make { margin-top: 1rem; }
+</style>
+</head>
+<body>
+
+<h1>宝石合成器</h1>
+
+<div>
+  <label>你拥有的9级宝石数量：
+    <input type="number" id="haveLv9" min="0" value="0" />
+  </label>
+
+  <label>你拥有的10级宝石数量：
+    <input type="number" id="haveLv10" min="0" value="0" />
+  </label>
+
+  <label>你拥有的凤凰胆数量：
+    <input type="number" id="haveDan" min="0" value="0" />
+  </label>
+
+  <label>目标宝石等级（10~15）：
+    <input type="number" id="targetLevel" min="10" max="15" value="10" />
+  </label>
+
+  <button onclick="calculate()">计算合成材料及最高合成数</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+  const phoenixDanCost = {
+    10: 6,
+    11: 10,
+    12: 15,
+    13: 20,
+    14: 25,
+    15: 30
+  };
+
+  // 计算合成到指定等级宝石所需基础材料（9级、10级宝石和凤凰胆）
+  function recursiveRequirements(level) {
+    if(level === 9) {
+      return { lv9: 1, lv10: 0, dan: 0 };
+    } else if(level === 10) {
+      // 9级宝石和凤凰胆
+      return { lv9: 2, lv10: 0, dan: phoenixDanCost[10] };
+    } else {
+      const prev = recursiveRequirements(level - 1);
+      return {
+        lv9: prev.lv9 * 2,
+        lv10: prev.lv10 * 2,
+        dan: prev.dan * 2 + phoenixDanCost[level]
+      };
+    }
+  }
+
+  // 计算合成一个目标等级宝石所需材料，考虑9级和10级宝石可以互补使用
+  // 优先用10级宝石满足10级宝石需求，剩余10级宝石拆成9级宝石补充9级需求
+  function calculateNeededWithComplement(targetLevel, haveLv9, haveLv10, haveDan) {
+    const total = recursiveRequirements(targetLevel);
+
+    // 先满足10级宝石需求，用已有10级宝石抵扣
+    let neededLv10 = total.lv10;
+    let usedLv10 = Math.min(neededLv10, haveLv10);
+    neededLv10 -= usedLv10;
+
+    // 用剩余10级宝石拆成9级宝石补充9级宝石需求（1个10级=2个9级）
+    let remainLv10 = haveLv10 - usedLv10;
+    let neededLv9 = total.lv9 - remainLv10 * 2;
+
+    // 9级宝石抵扣
+    let usedLv9 = Math.min(neededLv9 > 0 ? neededLv9 : 0, haveLv9);
+    neededLv9 = (neededLv9 > 0 ? neededLv9 : 0) - usedLv9;
+
+    // 凤凰胆抵扣
+    let neededDan = total.dan;
+    let usedDan = Math.min(neededDan, haveDan);
+    neededDan -= usedDan;
+
+    // 确保需求不为负数
+    neededLv9 = Math.max(0, neededLv9);
+    neededLv10 = Math.max(0, neededLv10);
+    neededDan = Math.max(0, neededDan);
+
+    return {
+      needLv9: neededLv9,
+      needLv10: neededLv10,
+      needDan: neededDan
+    };
+  }
+
+  // 计算当前材料最多可以合成多少个各等级宝石
+  // 使用10级宝石拆成9级宝石补充9级宝石需求
+  function maxCombinableWithComplement(haveLv9, haveLv10, haveDan) {
+    const results = [];
+
+    for(let level = 15; level >= 10; level--) {
+      const cost = recursiveRequirements(level);
+      const maxByDan = cost.dan > 0 ? Math.floor(haveDan / cost.dan) : 9999999;
+      let maxCount = 0;
+
+      // 试探从maxByDan到0，找最大能合成数量
+      for(let count = maxByDan; count >= 0; count--) {
+        // 10级宝石需求总量
+        const totalLv10Needed = cost.lv10 * count;
+
+        // 10级宝石优先满足10级宝石需求
+        const usedLv10 = Math.min(totalLv10Needed, haveLv10);
+        const remainLv10Needed = totalLv10Needed - usedLv10;
+
+        // 剩余10级宝石拆成9级宝石补充9级宝石需求
+        const remainLv10 = haveLv10 - usedLv10;
+
+        // 9级宝石总需求加上10级宝石不足部分转成的9级宝石需求
+        const totalLv9Needed = cost.lv9 * count + remainLv10Needed * 2;
+
+        if(totalLv9Needed <= haveLv9 + remainLv10 * 2) {
+          maxCount = count;
+          break;
+        }
+      }
+
+      if(maxCount > 0) {
+        results.push({
+          level: level,
+          count: maxCount,
+          cost: cost
+        });
+      }
+    }
+    return results;
+  }
+
+  function calculate() {
+    const haveLv9 = Math.max(0, parseInt(document.getElementById('haveLv9').value) || 0);
+    const haveLv10 = Math.max(0, parseInt(document.getElementById('haveLv10').value) || 0);
+    const haveDan = Math.max(0, parseInt(document.getElementById('haveDan').value) || 0);
+    const targetLevel = parseInt(document.getElementById('targetLevel').value);
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '';
+
+    if(targetLevel < 10 || targetLevel > 15) {
+      resultDiv.innerHTML = '<p class="missing">目标等级必须在10~15之间。</p>';
+      return;
+    }
+
+    const needed = calculateNeededWithComplement(targetLevel, haveLv9, haveLv10, haveDan);
+
+    let missingText = `<h3>合成1个${targetLevel}级宝石还需要：</h3><ul>`;
+    if(needed.needLv9 > 0) missingText += `<li class="missing">缺少9级宝石：${needed.needLv9} 个</li>`;
+    if(needed.needLv10 > 0) missingText += `<li class="missing">缺少10级宝石：${needed.needLv10} 个</li>`;
+    if(needed.needDan > 0) missingText += `<li class="missing">缺少凤凰胆：${needed.needDan} 个</li>`;
+    if(needed.needLv9 === 0 && needed.needLv10 === 0 && needed.needDan === 0) missingText += '<li>材料足够，不缺少任何东西。</li>';
+    missingText += '</ul>';
+
+    const maxs = maxCombinableWithComplement(haveLv9, haveLv10, haveDan);
+
+    let maxText = '<h3>根据当前材料，最多能合成：</h3>';
+    if(maxs.length === 0) {
+      maxText += '<p class="missing">无法合成任意等级宝石。</p>';
+    } else {
+      maxs.forEach(item => {
+        maxText += `<div class="can-make">
+          <strong>${item.count} 个 ${item.level} 级宝石</strong><br>
+          每个宝石材料需求：
+          <ul>
+            <li>9级宝石：${item.cost.lv9}</li>
+            <li>10级宝石：${item.cost.lv10}</li>
+            <li>凤凰胆：${item.cost.dan}</li>
+          </ul>
+        </div>`;
+      });
+    }
+
+    resultDiv.innerHTML = missingText + maxText;
+  }
+</script>
+<!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
+</body>
+</html>
