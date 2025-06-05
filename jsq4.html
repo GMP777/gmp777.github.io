@@ -1,156 +1,182 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>道装材料计算器</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+  <title>道装合成器</title>
   <style>
+    * { box-sizing: border-box; }
     body {
-      font-family: "微软雅黑", sans-serif;
-      padding: 40px;
-      background: #f8f8f8;
-      text-align: center;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
     }
-    h1 {
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h2 {
+      text-align: center;
       color: #333;
     }
-    select, input {
-      font-size: 16px;
-      padding: 6px 12px;
-      margin: 10px;
-    }
-    .result {
-      margin-top: 30px;
-      font-size: 18px;
-      color: #444;
-    }
-    .result span {
-      color: #d33;
+    label {
+      display: block;
+      margin-top: 16px;
       font-weight: bold;
     }
-  footer {
-  text-align: center;
-  font-size: 14px;
-  padding: 15px 10px;
-  background-color: #f8f8f8;
-  color: #333;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
-}
-
-footer a {
-  color: #007aff; /* iPhone蓝色链接风格 */
-  text-decoration: none;
-  margin: 0 5px;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3e9143;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e9f5e9;
+      border-left: 5px solid #4CAF50;
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+    @media (max-width: 600px) {
+      body { padding: 10px; }
+      .container { padding: 16px; margin-top: 10px; }
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2>道装合成器</h2>
 
-  <h1>道装材料计算器</h1>
+    <label for="currentLevel">你当前拥有的道装阶数（仅一套）：</label>
+    <select id="currentLevel">
+      <script>
+        for (let i = 1; i <= 10; i++) {
+          document.write(`<option value="${i}">${i}阶</option>`);
+        }
+      </script>
+    </select>
 
-  <label for="level">目标道装阶数：</label>
-  <select id="level" onchange="calculate()">
-    <option value="1">1阶</option>
-    <option value="2">2阶</option>
-    <option value="3">3阶</option>
-    <option value="4">4阶</option>
-    <option value="5">5阶</option>
-    <option value="6">6阶</option>
-    <option value="7">7阶</option>
-    <option value="8">8阶</option>
-    <option value="9">9阶</option>
-    <option value="10" selected>10阶</option>
-  </select>
-  <br>
+    <label for="targetLevel">你想合成的目标道装阶数：</label>
+    <select id="targetLevel">
+      <script>
+        for (let i = 1; i <= 10; i++) {
+          document.write(`<option value="${i}">${i}阶</option>`);
+        }
+      </script>
+    </select>
 
-  <label for="owned">已拥有伏魔元石数量（可选）：</label>
-  <input type="number" id="owned" min="0" placeholder="例如 30" oninput="calculate()">
-  
-  <div class="result" id="output"></div>
+    <label for="fumo">你拥有的伏魔元石数量：</label>
+    <input type="number" id="fumo" value="0" min="0" />
+
+    <label for="jade">你拥有的神级灵玉数量：</label>
+    <input type="number" id="jade" value="0" min="0" />
+
+    <button onclick="calculate()">计算</button>
+
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
 
   <script>
-    function numberToChinese(num) {
-      const units = ['', '拾', '佰', '仟'];
-      const bigUnits = ['', '万', '亿', '兆'];
-      const nums = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
-      if (num === 0) return '零';
-
-      let str = '';
-      let unitPos = 0;
-
-      while (num > 0) {
-        let section = num % 10000;
-        if (section !== 0) {
-          let sectionStr = '';
-          let zero = false;
-
-          for (let i = 0; i < 4; i++) {
-            let digit = section % 10;
-            if (digit === 0) {
-              if (!zero && sectionStr !== '') {
-                sectionStr = nums[0] + sectionStr;
-              }
-              zero = true;
-            } else {
-              sectionStr = nums[digit] + units[i] + sectionStr;
-              zero = false;
-            }
-            section = Math.floor(section / 10);
-          }
-          str = sectionStr.replace(/零+$/g, '') + bigUnits[unitPos] + str;
-        } else if (!str.startsWith('零')) {
-          str = '零' + str;
-        }
-
-        unitPos++;
-        num = Math.floor(num / 10000);
-      }
-
-      return str.replace(/零+/g, '零').replace(/零$/, '');
+    function formatDiamond(num) {
+      return num >= 10000
+        ? (num / 10000).toFixed(2).replace(/\.00$/, '') + ' 万钻石'
+        : num.toLocaleString() + ' 钻石';
     }
 
     function calculate() {
-      const level = parseInt(document.getElementById('level').value);
-      const ownedStones = parseInt(document.getElementById('owned').value) || 0;
+      const currentLevel = parseInt(document.getElementById('currentLevel').value);
+      const targetLevel = parseInt(document.getElementById('targetLevel').value);
+      const ownedFumo = parseInt(document.getElementById('fumo').value) || 0;
+      const ownedJade = parseInt(document.getElementById('jade').value) || 0;
 
-      const stonePerItem = 30;
-      const diamondPerStone = 50000;
+      const FUMO_PER_ITEM = 30;
+      const FUMO_PRICE = 50000;
+      const SPIRIT_JADE_PER_TIER = 10;
 
-      const firstStageEquivalent = Math.pow(3, level - 1);
-      const totalStones = firstStageEquivalent * stonePerItem;
+      if (targetLevel < currentLevel) {
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('result').innerHTML = `<strong>❌ 目标阶数必须高于当前阶数！</strong>`;
+        return;
+      }
 
-      const stonesNeeded = Math.max(totalStones - ownedStones, 0);
-      const totalDiamonds = stonesNeeded * diamondPerStone;
+      let requiredItems = {};
+      requiredItems[targetLevel] = 1;
 
-      const formatNumber = n => n.toLocaleString('zh-CN');
-      const chineseDiamonds = numberToChinese(totalDiamonds);
+      for (let i = targetLevel; i > 1; i--) {
+        requiredItems[i - 1] = (requiredItems[i - 1] || 0) + (requiredItems[i] * 3);
+      }
 
-      document.getElementById('output').innerHTML = `
-        <p>目标阶数：<span>${level}阶道装</span></p>
-        <p>所需伏魔元石总数：<span>${formatNumber(totalStones)} 个</span></p>
-        <p>已拥有伏魔元石：<span>${formatNumber(ownedStones)} 个</span></p>
-        <p>还需伏魔元石：<span>${formatNumber(stonesNeeded)} 个</span></p>
-        <p>还需钻石总数：<span>${formatNumber(totalDiamonds)} 钻石</span></p>
-        <p>中文大写：<span>${chineseDiamonds}钻石</span></p>
+      // 你已有一件当前阶的道装
+      if (requiredItems[currentLevel]) {
+        requiredItems[currentLevel] = Math.max(0, requiredItems[currentLevel] - 1);
+      }
+
+      const totalLevel1Items = requiredItems[1] || 0;
+      const totalFumoNeeded = totalLevel1Items * FUMO_PER_ITEM;
+      const remainingFumo = Math.max(0, totalFumoNeeded - ownedFumo);
+      const diamondNeeded = remainingFumo * FUMO_PRICE;
+
+      let totalJadeNeeded = 0;
+      for (let i = 6; i <= targetLevel; i++) {
+        if (requiredItems[i]) {
+          totalJadeNeeded += requiredItems[i] * SPIRIT_JADE_PER_TIER;
+        }
+      }
+      const remainingJade = Math.max(0, totalJadeNeeded - ownedJade);
+
+      const resultHTML = `
+        ✅ 当前持有 ${currentLevel}阶 道装 1 套<br>
+        ➜ 合成目标：${targetLevel}阶 道装<br><br>
+        需要一阶道装数量：<strong>${totalLevel1Items} 个</strong><br>
+        所需伏魔元石总数：<strong>${totalFumoNeeded} 个</strong><br>
+        你还缺伏魔元石：<strong>${remainingFumo} 个</strong><br>
+        预计钻石消耗：<strong>${formatDiamond(diamondNeeded)}</strong><br>
+        ${totalJadeNeeded > 0 ? `
+        <br>需要神级灵玉：<strong>${totalJadeNeeded} 个</strong><br>
+        你还缺神级灵玉：<strong>${remainingJade} 个</strong><br>` : ''}
       `;
-    }
 
-    calculate();
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').innerHTML = resultHTML;
+    }
   </script>
-  <footer>
-    <div>
-      <a href="https://gmp777.github.io/">GMP777</a> |
-      <a href="https://gmp777.github.io/jsq1.html">钻石计算 v1.0</a> |
-      <a href="https://gmp777.github.io/jsq2.html">钻石计算 v2.0</a> |
-      <a href="https://gmp777.github.io/888.html">888钻石道具计算</a> |
-      <a href="https://gmp777.github.io/roll.html">抽奖钻石计算</a> |
-      <a href="https://gmp777.github.io/jsq3.html">翅膀进阶计算</a> | 
-      <a href="https://gmp777.github.io/jsq4.html">制作道装材料计算</a>
-    </div>
-  </footer>
+  <!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
 </body>
 </html>
