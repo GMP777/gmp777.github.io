@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+    <title>生肖装备合成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>生肖装备合成器</h1>
+
+        <div class="form-group">
+            <label for="currentGrade">当前装备品阶：</label>
+            <select id="currentGrade">
+                <option value="生灵">生灵</option>
+                <option value="破法">破法</option>
+                <option value="不朽">不朽</option>
+                <option value="传说">传说</option>
+                <option value="史诗">史诗</option>
+                <option value="通天">通天</option>
+                <option value="九劫">九劫</option>
+                <option value="悟道">悟道</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="targetGrade">目标装备品阶：</label>
+            <select id="targetGrade">
+                <!-- 默认所有选项都禁用 -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="currentZodiac">当前生肖：</label>
+            <select id="currentZodiac">
+                <option value="子鼠">子鼠</option>
+                <option value="丑牛">丑牛</option>
+                <option value="寅虎">寅虎</option>
+                <option value="卯兔">卯兔</option>
+                <option value="辰龙">辰龙</option>
+                <option value="巳蛇">巳蛇</option>
+                <option value="午马">午马</option>
+                <option value="未羊">未羊</option>
+                <option value="申猴">申猴</option>
+                <option value="酉鸡">酉鸡</option>
+                <option value="戌狗">戌狗</option>
+                <option value="亥猪">亥猪</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="ownedMaterial">已拥有生肖石数量：</label>
+            <input type="number" id="ownedMaterial" value="0" min="0">
+        </div>
+
+        <div class="form-group">
+            <label for="ownedDan">已拥有造化丹数量：</label>
+            <input type="number" id="ownedDan" value="0" min="0">
+        </div>
+
+        <button onclick="calculateMaterials()">计算所需材料</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        // 品阶顺序及对应材料需求
+        const materialsRequired = {
+            "生灵": {
+                "破法": { "生肖石": 36, "生肖装备": 1 },
+            },
+            "破法": {
+                "不朽": { "生肖石": 108, "生肖装备": 1 },
+                "传说": { "生肖石": 324, "生肖装备": 1 },
+                "史诗": { "生肖石": 1092, "生肖装备": 1 },
+                "通天": { "生肖石": 3267, "生肖装备": 1 },
+                "九劫": { "生肖造化丹": 400, "生肖装备": 1 },
+            },
+            "不朽": {
+                "传说": { "生肖石": 324, "生肖装备": 1 },
+                "史诗": { "生肖石": 1092, "生肖装备": 1 },
+                "通天": { "生肖石": 3267, "生肖装备": 1 },
+                "九劫": { "生肖造化丹": 400, "生肖装备": 1 },
+            },
+            "传说": {
+                "史诗": { "生肖石": 1092, "生肖装备": 1 },
+                "通天": { "生肖石": 3267, "生肖装备": 1 },
+                "九劫": { "生肖造化丹": 400, "生肖装备": 1 },
+            },
+            "史诗": {
+                "通天": { "生肖石": 3267, "生肖装备": 1 },
+                "九劫": { "生肖造化丹": 400, "生肖装备": 1 },
+            },
+            "通天": {
+                "九劫": { "生肖造化丹": 400, "生肖装备": 1 },
+            },
+            "九劫": {
+                "悟道": { "生肖造化丹": 800, "生肖装备": 1 },
+            },
+        };
+
+        // 生肖石对应的生肖类型
+        const zodiacStones = {
+            "子鼠": "长寿",
+            "午马": "长寿",
+            "未羊": "长寿",
+            "申猴": "长寿",
+            "酉鸡": "长寿",
+            "丑牛": "喜乐",
+            "寅虎": "喜乐",
+            "卯兔": "喜乐",
+            "辰龙": "喜乐",
+            "巳蛇": "喜乐",
+            "戌狗": "永生",
+            "亥猪": "无疆"
+        };
+
+        // 根据当前品阶更新目标品阶的选择项
+        function updateTargetGradeOptions() {
+            const currentGrade = document.getElementById('currentGrade').value;
+            const targetGradeSelect = document.getElementById('targetGrade');
+            
+            // 清空目标品阶选择
+            targetGradeSelect.innerHTML = "";
+
+            // 根据当前品阶，启用可选择的目标品阶
+            const possibleGrades = Object.keys(materialsRequired[currentGrade]);
+            possibleGrades.forEach(grade => {
+                const option = document.createElement("option");
+                option.value = grade;
+                option.textContent = grade;
+                targetGradeSelect.appendChild(option);
+            });
+        }
+
+        // 计算所需材料
+        function calculateMaterials() {
+            const currentGrade = document.getElementById('currentGrade').value;
+            const targetGrade = document.getElementById('targetGrade').value;
+            const currentZodiac = document.getElementById('currentZodiac').value;
+            const ownedMaterial = parseInt(document.getElementById('ownedMaterial').value) || 0;
+            const ownedDan = parseInt(document.getElementById('ownedDan').value) || 0;
+
+            if (currentGrade === targetGrade) {
+                document.getElementById('result').innerText = "目标品阶和当前品阶相同，无需进化！";
+                return;
+            }
+
+            // 检查是否有有效的进化规则
+            if (materialsRequired[currentGrade] && materialsRequired[currentGrade][targetGrade]) {
+                const materials = materialsRequired[currentGrade][targetGrade];
+                let resultText = `从"${currentGrade}"的"${currentZodiac}"进化到"${targetGrade}"所需材料：\n`;
+
+                // 获取生肖石类型
+                const stoneType = zodiacStones[currentZodiac];
+
+                let remainingMaterial = 0;
+                let remainingDan = 0;
+
+                // 计算所需生肖石
+                if (materials["生肖石"]) {
+                    resultText += `生肖石·${stoneType}: ${materials["生肖石"]}个\n`;
+                    remainingMaterial = materials["生肖石"] - ownedMaterial;
+                }
+                // 计算所需生肖造化丹
+                if (materials["生肖造化丹"]) {
+                    resultText += `生肖造化丹: ${materials["生肖造化丹"]}个\n`;
+                    remainingDan = materials["生肖造化丹"] - ownedDan;
+                }
+                // 计算当前生肖装备
+                if (materials["生肖装备"]) {
+                    resultText += `当前生肖装备·${currentZodiac}: 1个\n`;
+                }
+
+                // 计算还缺少的材料数量
+                if (remainingMaterial > 0) {
+                    resultText += `你还缺少：${remainingMaterial}个生肖石。\n`;
+                } else if (remainingMaterial <= 0) {
+                    resultText += `你已足够，甚至多出材料！\n`;
+                }
+
+                if (remainingDan > 0) {
+                    resultText += `你还缺少：${remainingDan}个造化丹。\n`;
+                } else if (remainingDan <= 0) {
+                    resultText += `你已足够，甚至多出材料！\n`;
+                }
+
+                document.getElementById('result').innerText = resultText;
+            } else {
+                document.getElementById('result').innerText = "没有找到进化路径，可能是错误的品阶选择！";
+            }
+        }
+
+        // 初始化时更新目标品阶选择项
+        document.getElementById('currentGrade').addEventListener('change', updateTargetGradeOptions);
+
+        // 初始化页面时，确保目标品阶选择正确
+        updateTargetGradeOptions();
+
+    </script>
+<!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
+</body>
+</html>
