@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+<title>简阅攻略</title>
+<style>
+  body {
+    font-family: "微软雅黑", Arial, sans-serif;
+    font-size: 18px;
+    margin: 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+
+  h2 {
+    margin-bottom: 15px;
+  }
+
+  #giftSelect {
+    display: block;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 300px;
+    font-size: 18px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+
+  #contentBox {
+    margin: 20px auto 0 auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+    min-height: 180px;
+    max-width: 700px;
+    background: #fff;
+    border-radius: 6px;
+    box-sizing: border-box;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  .gift-item {
+    margin-bottom: 30px;
+  }
+
+  .gift-item p {
+    margin: 0 0 12px 0;
+    line-height: 1.6;
+  }
+
+  .speedrun {
+    margin-top: 10px;
+    font-style: italic;
+    color: #007acc;
+  }
+
+  .speedrun a {
+    color: #007acc;
+    text-decoration: underline;
+  }
+
+  .gift-item img {
+    max-width: 100%;
+    height: auto;
+    margin: 12px auto 0 auto;
+    display: block;
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+
+  @media (max-width: 480px) {
+    body {
+      font-size: 16px;
+      margin: 10px;
+    }
+    #giftSelect {
+      font-size: 16px;
+      width: 100%;
+    }
+    #contentBox {
+      padding: 15px;
+      min-height: 150px;
+      max-width: 100%;
+    }
+    .gift-item {
+      margin-bottom: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<select id="giftSelect" aria-label="封神之路选择">
+  <option value="">-- 查看更多 --</option>
+  <option value="day1">封神之路：第一天</option>
+  <option value="day2">封神之路：第二天</option>
+  <option value="day3">封神之路：第三天</option>
+  <option value="day4">封神之路：第四天</option>
+  <option value="day5">封神之路：第五天</option>
+  <option value="day6">封神之路：第六天</option>
+  <option value="day7">封神之路：第七天</option>
+</select>
+
+<div id="contentBox">简单的一句话概括攻略，有误差请自辩</div>
+
+<script>
+  const giftData = {
+    day1: {
+      text: "第一天任务：等级达到300级",
+      img: "https://example.com/images/gift1.png",
+      speedrun: '速通方式：到Boss大厅与等级相对应的地图刷升级丹'
+    },
+    day2: {
+      text: "第二天任务：狂切达到10阶10星",
+      img: "https://example.com/images/gift2.png",
+      speedrun: '速通方式：购买珠宝阁里第一天和第二天的元宝套餐</a>'
+    },
+    day3: {
+      text: "第三天任务：翅膀达到5阶",
+      img: "https://example.com/images/gift3.png",
+      speedrun: '速通方式：商城元宝购买羽毛材料升阶'
+    },
+    day4: {
+      text: "第四天任务：官位达到摧星撼月·神",
+      img: "https://example.com/images/gift4.png",
+      speedrun: '速通方式：找NPC用一百万元宝和一千钻石兑换'
+    },
+    day5: {
+      text: "第五天任务：宝石等级总和280级",
+      img: "https://example.com/images/gift5.png",
+      speedrun: '速通方式：第一大陆宝石秘境猛刷'
+    },
+    day6: {
+      text: "第六天任务：全身强化达到+12",
+      img: "https://example.com/images/gift6.png",
+      speedrun: '速通方式：商城元宝购买强化石和工匠之魂进行强化'
+    },
+    day7: {
+      text: "第七天任务：翅膀达到10阶",
+      img: "https://example.com/images/gift7.png",
+      speedrun: '速通方式：商城元宝购买羽毛材料升阶'
+    }
+  };
+
+  const select = document.getElementById('giftSelect');
+  const contentBox = document.getElementById('contentBox');
+
+  select.addEventListener('change', () => {
+    const val = select.value;
+    contentBox.innerHTML = '';
+
+    if (!val) {
+      contentBox.textContent = "请从上方菜单选择查看更多内容。";
+      return;
+    }
+
+    const gift = giftData[val];
+    if (gift) {
+      const div = document.createElement('div');
+      div.classList.add('gift-item');
+
+      const p = document.createElement('p');
+      p.textContent = gift.text;
+
+      const speedrunDiv = document.createElement('div');
+      speedrunDiv.classList.add('speedrun');
+      speedrunDiv.innerHTML = gift.speedrun;
+
+      const img = document.createElement('img');
+      img.src = gift.img;
+      img.alt = val;
+
+      div.appendChild(p);
+      div.appendChild(speedrunDiv); // 速通方式在图片上方
+      div.appendChild(img);         // 图片在最底部
+
+      contentBox.appendChild(div);
+    }
+  });
+</script>
+<!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
+</body>
+</html>
