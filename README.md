@@ -6,10 +6,10 @@
 | 💎钻石计算器 | <a href="https://gmp777.github.io/jsq1.html" target="_blank">v.1.0版本</a> | <a href="https://gmp777.github.io/jsq2.html" target="_blank">v.2.0版本</a> |
 | 🥤888钻石消耗多少道具 | <a href="https://gmp777.github.io/888.html" target="_blank">v.0.0版本</a> |  |
 | 🏆抽奖所需钻石计算 | <a href="https://gmp777.github.io/roll.html" target="_blank">v.0.0版本</a> |  |
-| 🪶翅膀进阶器 | <a href="https://gmp777.github.io/jsq3.html" target="_blank">v.1.0版本</a> | 更新：2025-06-05 15:01:10 |
-| ☯️道装合成器 | <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.1.0版本</a> | 更新：2025-06-05 23:32:07 |
-| 🪙元宝商城计算器 | <a href="https://gmp777.github.io/shop.html" target="_blank">v.0.0版本</a> | 更新：2025-06-05 15:28:15 |
-| 💎宝石合成器 | <a href="https://gmp777.github.io/jsq5.html" target="_blank">v.0.0版本</a> | 更新：2025-06-05 23:31:46 |
+| 🪶翅膀进阶器 | <a href="https://gmp777.github.io/jsq3.html" target="_blank">v.1.0版本</a> |2025-06-05 15:01:10 |
+| ☯️道装合成器 | <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.1.0版本</a> | 2025-06-05 23:32:07 |
+| 🪙元宝商城计算器 | <a href="https://gmp777.github.io/shop.html" target="_blank">v.0.0版本</a> |2025-06-05 15:28:15 |
+| 💎宝石合成器 | <a href="https://gmp777.github.io/jsq5.html" target="_blank">v.0.0版本</a> |2025-06-05 23:31:46 |
 | 🔥天命神装合成器 | <a href="https://gmp777.github.io/jsq6.html" target="_blank">v.1.0版本</a> |  |
 
 <!-- footer 容器 -->
