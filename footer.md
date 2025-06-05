@@ -1,26 +1,3 @@
-```css
-footer {
-  text-align: center;
-  font-size: 14px;
-  padding: 15px 10px;
-  background-color: #f8f8f8;
-  color: #333;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
-}
-
-footer a {
-  color: #007aff; /* iPhone蓝色链接风格 */
-  text-decoration: none;
-  margin: 0 5px;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-```
-
-```html
   <footer>
     <div>
       <a href="https://gmp777.github.io/">GMP777</a> |
@@ -33,4 +10,3 @@ footer a:hover {
       <a href="https://gmp777.github.io/shop.html">商城元宝购买计算</a>
     </div>
   </footer>
-```
