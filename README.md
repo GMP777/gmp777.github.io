@@ -39,8 +39,6 @@
     <body>
         <h1>悠久传奇</h1>
         <p>📖<a href="https://github.com/GMP777/gmp777.github.io/wiki/%E6%82%A0%E4%B9%85%E4%BC%A0%E5%A5%87%E6%96%B0%E6%9C%8D%E6%BB%A1V" target="_blank">新服满V自用攻略</a></p>
-        
-        <h2>💎钻石计算器</h2>
         <table>
             <tr>
                 <th>项目名称</th>
