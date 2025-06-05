@@ -6,5 +6,6 @@
       <a href="https://gmp777.github.io/roll.html">抽奖钻石计算</a> |
       <a href="https://gmp777.github.io/jsq3.html">翅膀进阶计算</a> | 
       <a href="https://gmp777.github.io/jsq4.html">制作道装材料计算</a> | 
-      <a href="https://gmp777.github.io/shop.html">商城元宝购买计算</a>
+      <a href="https://gmp777.github.io/shop.html">商城元宝购买计算</a> | 
+      <a href="https://gmp777.github.io/go.html">简阅攻略一览</a>
   </footer>
