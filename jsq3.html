@@ -217,16 +217,17 @@
       document.getElementById("toggleBtn").innerText = "折叠更多";
 
       // 更新预估表
-      let estimateHTML = "";
-for (let i = 10; i <= 90; i += 10) {
+let estimateHTML = "";
+for (let i = 10; i <= 100; i += 10) {
   const rate = i / 100;
-  const estOps = Math.ceil(operations * rate);
+  const expectedBlessing = Math.ceil(totalBlessing * rate);
+  const remainingBlessing = Math.max(expectedBlessing - currentBlessing, 0);
+  const estOps = Math.ceil(remainingBlessing / perBlessing);
   const estMaterials = estOps * perTry;
   const estToBuy = Math.max(estMaterials - owned, 0);
   const estCost = estToBuy * pricePerItem;
-  estimateHTML += `${i}% 材料数：${estMaterials}，需购买：${estToBuy}，元宝：${estCost.toLocaleString()}（${toChineseNumber(estCost)}）<br>`;
+  estimateHTML += `${i}% 祝福值预计需材料：${estMaterials}，需购买：${estToBuy}，元宝：${estCost.toLocaleString()}（${toChineseNumber(estCost)}）<br>`;
 }
-
       document.getElementById("estimate").innerHTML = estimateHTML;
     }
   </script>
