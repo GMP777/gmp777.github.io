@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 载入footer专用CSS -->
+<link rel="stylesheet" href="footer.css" />
   <title>钻石兑换道具计算器</title>
   <style>
     * {
@@ -81,25 +83,6 @@
     .success { color: #28a745; font-weight: bold; }
     .fail { color: #dc3545; font-weight: bold; }
     ul { padding-left: 1.2rem; }
-    footer {
-  text-align: center;
-  font-size: 14px;
-  padding: 15px 10px;
-  background-color: #f8f8f8;
-  color: #333;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
-}
-
-footer a {
-  color: #007aff; /* iPhone蓝色链接风格 */
-  text-decoration: none;
-  margin: 0 5px;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
   </style>
 </head>
 <body>
@@ -222,16 +205,23 @@ footer a:hover {
       document.getElementById("result").innerHTML = result;
     }
   </script>
-  <footer>
-    <div>
-      <a href="https://gmp777.github.io/">GMP777</a> |
-      <a href="https://gmp777.github.io/jsq1.html">钻石计算 v1.0</a> |
-      <a href="https://gmp777.github.io/jsq2.html">钻石计算 v2.0</a> |
-      <a href="https://gmp777.github.io/888.html">888钻石道具计算</a> |
-      <a href="https://gmp777.github.io/roll.html">抽奖钻石计算</a> |
-      <a href="https://gmp777.github.io/jsq3.html">翅膀进阶计算</a> | 
-      <a href="https://gmp777.github.io/jsq4.html">制作道装材料计算</a>
-    </div>
-  </footer>
+<footer id="footer">加载中...</footer>  
+
+<!-- 引入marked.js解析Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.md')
+    .then(res => {
+      if (!res.ok) throw new Error('加载Markdown失败');
+      return res.text();
+    })
+    .then(md => {
+      footer.innerHTML = marked.parse(md);
+    })
+    .catch(err => {
+      footer.textContent = '加载footer内容失败：' + err.message;
+    });
+</script>
 </body>
 </html>
