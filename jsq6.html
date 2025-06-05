@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+<title>天命神装合成器</title>
+<style>
+  /* 样式同之前，略 */
+  body {
+    font-family: "Microsoft Yahei", Arial, sans-serif;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 10px;
+    background: #f7f7f7;
+    color: #333;
+  }
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+  }
+  label {
+    display: block;
+    margin: 12px 0 6px;
+    font-weight: bold;
+  }
+  select, button {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  button {
+    background-color: #3498db;
+    color: white;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+  button:hover {
+    background-color: #2980b9;
+  }
+  #result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #dff0d8;
+    border: 1px solid #3c763d;
+    border-radius: 4px;
+    font-size: 1.1rem;
+  }
+  @media (max-width: 480px) {
+    body {
+      margin: 10px;
+      padding: 5px;
+    }
+  }
+</style>
+</head>
+<body>
+  <h1>天命神装合成器</h1>
+  <label for="startStage">起始阶数（1-10）</label>
+  <select id="startStage">
+    <option value="1">1阶</option>
+    <option value="2">2阶</option>
+    <option value="3">3阶</option>
+    <option value="4">4阶</option>
+    <option value="5">5阶</option>
+    <option value="6">6阶</option>
+    <option value="7">7阶</option>
+    <option value="8">8阶</option>
+    <option value="9">9阶</option>
+    <option value="10">10阶</option>
+  </select>
+
+  <label for="endStage">目标阶数（起始阶数以上）</label>
+  <select id="endStage">
+    <option value="2">2阶</option>
+    <option value="3">3阶</option>
+    <option value="4">4阶</option>
+    <option value="5">5阶</option>
+    <option value="6">6阶</option>
+    <option value="7">7阶</option>
+    <option value="8">8阶</option>
+    <option value="9">9阶</option>
+    <option value="10">10阶</option>
+  </select>
+
+  <button id="calcBtn">计算需要的天命宝钻数量</button>
+
+  <div id="result"></div>
+
+<script>
+(() => {
+  const startStageSelect = document.getElementById("startStage");
+  const endStageSelect = document.getElementById("endStage");
+  const resultDiv = document.getElementById("result");
+
+  startStageSelect.addEventListener("change", () => {
+    const start = Number(startStageSelect.value);
+    endStageSelect.innerHTML = "";
+    for (let i = start + 1; i <= 10; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = i + "阶";
+      endStageSelect.appendChild(opt);
+    }
+  });
+
+  startStageSelect.dispatchEvent(new Event("change"));
+
+  // 基础宝钻需求（普通部件）
+  const baseCostMap = {
+    1: 0,    
+    2: 200,
+    3: 400,
+    4: 700,
+    5: 1200,
+    6: 2400,
+    7: 3200,
+    8: 3200,
+    9: 5000,
+    10: 6000,
+  };
+
+  function getPartCosts(stage) {
+    let normalCost = baseCostMap[stage];
+    let soldierCost = normalCost;
+    // 2阶~5阶（含）兵甲宝钻是普通部件的两倍
+    if (stage >= 2 && stage <= 5) {
+      soldierCost = normalCost * 2;
+    } else if (stage === 9) {
+      soldierCost = 6500;
+    } else if (stage === 10) {
+      soldierCost = 7500;
+    }
+    // 7阶、8阶兵甲和普通部件相同
+    return { normalCost, soldierCost };
+  }
+
+  function calculateCost(from, to) {
+    if (from >= to) return 0;
+    let totalCost = 0;
+    for (let stage = from + 1; stage <= to; stage++) {
+      const { normalCost, soldierCost } = getPartCosts(stage);
+      const hasSoldier = stage >= 2;
+      // 盔(1) + 戒(2) + 带(1) + 链(1) + 镯(2) + 靴(1) = 8件普通部件
+      const normalPartsCount = 8;
+      // 兵(1) + 甲(1) = 2件兵甲部件
+      const soldierPartsCount = hasSoldier ? 2 : 0;
+      const stepCost = normalCost * normalPartsCount + soldierCost * soldierPartsCount;
+      totalCost += stepCost;
+    }
+    return totalCost;
+  }
+
+  document.getElementById("calcBtn").addEventListener("click", () => {
+    const from = Number(startStageSelect.value);
+    const to = Number(endStageSelect.value);
+    if (from >= to) {
+      resultDiv.textContent = "目标阶数必须大于起始阶数！";
+      return;
+    }
+    const cost = calculateCost(from, to);
+    resultDiv.innerHTML = `
+      从 <strong>${from}阶</strong> 升级到 <strong>${to}阶</strong> <br/>
+      需要天命宝钻总数：<strong>${cost.toLocaleString()}</strong> 个
+      <br/><br/>
+      说明：计算包含整套10个部件的宝钻消耗，已根据兵甲和普通部件不同消耗规则计算。
+    `;
+  });
+})();
+</script>
+  <!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
+</body>
+</html>
