@@ -1,6 +1,9 @@
 > 说明：
+> 
 把你footer样式写在footer.css，放在同目录或你指定路径。
+> 
 footer.md是你的Markdown文件路径，也放好。
+> 
 直接把上面代码拷贝到你的HTML <head>（<link>部分）和 <body>底部（<footer>和<script>部分）即可。
 
 ```html
