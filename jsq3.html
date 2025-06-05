@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
   <title>翅膀进阶计算器</title>
   <style>
     body {
@@ -85,27 +87,7 @@
       font-size: 15px;
       line-height: 1.8;
     }
-
-    footer {
-      text-align: center;
-      font-size: 14px;
-      padding: 15px 10px;
-      background-color: #f8f8f8;
-      color: #333;
-      border-top: 1px solid #ddd;
-      width: 100%;
-    }
-
-    footer a {
-      color: #007aff;
-      text-decoration: none;
-      margin: 0 5px;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
+    
     @media (max-width: 900px) {
       body {
         flex-direction: column;
@@ -147,16 +129,6 @@
     <h2 style="text-align:center;">进化预估（10%~90%）</h2>
     <div class="estimate-table" id="estimate"></div>
   </div>
-
-  <footer>
-      <a href="https://gmp777.github.io/">GMP777</a> |
-      <a href="https://gmp777.github.io/jsq1.html">钻石计算 v1.0</a> |
-      <a href="https://gmp777.github.io/jsq2.html">钻石计算 v2.0</a> |
-      <a href="https://gmp777.github.io/888.html">888钻石道具计算</a> |
-      <a href="https://gmp777.github.io/roll.html">抽奖钻石计算</a> |
-      <a href="https://gmp777.github.io/jsq3.html">翅膀进阶计算</a> | 
-      <a href="https://gmp777.github.io/jsq4.html">制作道装材料计算</a>
-  </footer>
 
   <script>
     function toChineseNumber(num) {
@@ -231,6 +203,23 @@ for (let i = 10; i <= 100; i += 10) {
       document.getElementById("estimate").innerHTML = estimateHTML;
     }
   </script>
+<!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
 
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
 </body>
 </html>
