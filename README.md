@@ -14,7 +14,7 @@
 | 🪙元宝商城计算器 | <a href="https://gmp777.github.io/shop.html" target="_blank">v.0.0版本</a> |2025-06-05 15:28:15 |
 | 💎宝石合成器 | <a href="https://gmp777.github.io/jsq5.html" target="_blank">v.1.0版本</a> |2025-06-05 23:31:46 |
 | 🔥天命神装合成器 | <a href="https://gmp777.github.io/jsq6.html" target="_blank">v.1.0版本</a> | 2025-06-05 |
-|🐉十二生肖装备合成器| <a href="https://gmp777.github.io/12.html" target="_blank">v.0.0版本</a> |2025-06-06 01:07:12 |
+|🐉十二生肖装备合成器| <a href="https://gmp777.github.io/12.html" target="_blank">v.1.0版本</a> |2025-06-06 01:07:12 |
 
 <!-- footer 容器 -->
 <footer id="footer">加载中...</footer>
