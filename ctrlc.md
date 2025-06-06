@@ -1,3 +1,28 @@
+# v.3.0
+
+```html
+  <!-- footer-->
+  <footer id="footer-container">加载中...</footer>
+
+  <script>
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        const container = document.getElementById('footer-container');
+        container.innerHTML = html;
+
+        // 调用 footer.html 中定义的函数隐藏当前页链接文字
+        if (typeof hideCurrentPageLinkText === 'function') {
+          hideCurrentPageLinkText();
+        }
+      })
+      .catch(() => {
+        document.getElementById('footer-container').textContent = '加载 footer 失败';
+      });
+  </script>
+  <!-- footer -->
+```
+
 # v.2.0
 
 ```html
