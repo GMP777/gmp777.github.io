@@ -27,7 +27,7 @@
 # 隐藏当前页面链接
 
 ```html
-<!-- footer容器 -->
+<!-- footer -->
 <footer id="footer">加载中...</footer>
 
 <!-- 脚本：加载footer.html并隐藏当前页对应链接 -->
@@ -59,4 +59,5 @@
       footer.textContent = '加载 footer 内容失败：' + err.message;
     });
 </script>
+<!-- footer -->
 ```
