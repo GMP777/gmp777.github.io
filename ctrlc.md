@@ -1,3 +1,24 @@
+# v.2.0
+
+```html
+<link rel="stylesheet" href="footer.css" />
+
+<div id="footer-container">加载中...</div>
+
+<script>
+  fetch('footer.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('footer-container').innerHTML = html;
+    })
+    .catch(() => {
+      document.getElementById('footer-container').textContent = '加载 footer 失败';
+    });
+</script>
+```
+
+# v.0.0
+
 ```html
 <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
@@ -24,7 +45,7 @@
 </script>
 ```
 
-# 隐藏当前页面链接
+# v.1.0.隐藏当前页面链接
 
 ```html
 <!-- footer -->
