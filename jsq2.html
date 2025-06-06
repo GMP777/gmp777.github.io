@@ -186,23 +186,18 @@
       document.getElementById("result").innerText = `总钻石：${total}`;
     }
   </script>
-<!-- footer 容器 -->
-<footer id="footer">加载中...</footer>
-
-<!-- 载入 footer.html 内容 -->
+<!-- 载入 footer-->
+<div id="footer-container">加载中...</div>
 <script>
-  const footer = document.getElementById('footer');
   fetch('footer.html')
-    .then(res => {
-      if (!res.ok) throw new Error('加载 footer 失败');
-      return res.text();
-    })
+    .then(res => res.text())
     .then(html => {
-      footer.innerHTML = html;
+      document.getElementById('footer-container').innerHTML = html;
     })
-    .catch(err => {
-      footer.textContent = '加载 footer 内容失败：' + err.message;
+    .catch(() => {
+      document.getElementById('footer-container').textContent = '加载 footer 失败';
     });
 </script>
+<!-- 载入 footer-->
 </body>
 </html>
