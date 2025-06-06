@@ -98,6 +98,18 @@
         border-top: 1px solid #ccc;
       }
     }
+
+    /* Footer 样式 */
+    #footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: relative;
+      width: 100%;
+      bottom: 0;
+    }
+
   </style>
 </head>
 <body>
@@ -129,6 +141,25 @@
     <h2 style="text-align:center;">进化预估（10%~100%）</h2>
     <div class="estimate-table" id="estimate"></div>
   </div>
+
+  <!-- footer 容器 -->
+  <footer id="footer">加载中...</footer>
+
+  <!-- 载入 footer.html 内容 -->
+  <script>
+    const footer = document.getElementById('footer');
+    fetch('footer.html')
+      .then(res => {
+        if (!res.ok) throw new Error('加载 footer 失败');
+        return res.text();
+      })
+      .then(html => {
+        footer.innerHTML = html;
+      })
+      .catch(err => {
+        footer.textContent = '加载 footer 内容失败：' + err.message;
+      });
+  </script>
 
   <script>
     function toChineseNumber(num) {
@@ -198,23 +229,6 @@
       document.getElementById("estimate").innerHTML = estimateHTML;
     }
   </script>
-<!-- footer 容器 -->
-<footer id="footer">加载中...</footer>
 
-<!-- 载入 footer.html 内容 -->
-<script>
-  const footer = document.getElementById('footer');
-  fetch('footer.html')
-    .then(res => {
-      if (!res.ok) throw new Error('加载 footer 失败');
-      return res.text();
-    })
-    .then(html => {
-      footer.innerHTML = html;
-    })
-    .catch(err => {
-      footer.textContent = '加载 footer 内容失败：' + err.message;
-    });
-</script>
 </body>
 </html>
