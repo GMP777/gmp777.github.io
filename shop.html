@@ -175,19 +175,31 @@
     calculate();
   </script>
   <!-- footer-->
-  <footer id="footer-container">加载中...</footer>
+ <footer id="footer-container">加载中...</footer>
 
   <script>
+    function hideCurrentPageLinkText() {
+      const currentPath = window.location.pathname.replace(/\/+$/, '');
+      const links = document.querySelectorAll('.footer-content a');
+
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+          link.textContent = '';
+        }
+      });
+    }
+
     fetch('footer.html')
       .then(res => res.text())
       .then(html => {
         const container = document.getElementById('footer-container');
         container.innerHTML = html;
 
-        // 调用 footer.html 中定义的函数隐藏当前页链接文字
-        if (typeof hideCurrentPageLinkText === 'function') {
-          hideCurrentPageLinkText();
-        }
+        hideCurrentPageLinkText();
       })
       .catch(() => {
         document.getElementById('footer-container').textContent = '加载 footer 失败';
