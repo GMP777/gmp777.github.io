@@ -142,24 +142,19 @@
     <div class="estimate-table" id="estimate"></div>
   </div>
 
-  <!-- footer 容器 -->
-  <footer id="footer">加载中...</footer>
-
-  <!-- 载入 footer.html 内容 -->
-  <script>
-    const footer = document.getElementById('footer');
-    fetch('footer.html')
-      .then(res => {
-        if (!res.ok) throw new Error('加载 footer 失败');
-        return res.text();
-      })
-      .then(html => {
-        footer.innerHTML = html;
-      })
-      .catch(err => {
-        footer.textContent = '加载 footer 内容失败：' + err.message;
-      });
-  </script>
+<!-- 载入 footer-->
+<div id="footer-container">加载中...</div>
+<script>
+  fetch('footer.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('footer-container').innerHTML = html;
+    })
+    .catch(() => {
+      document.getElementById('footer-container').textContent = '加载 footer 失败';
+    });
+</script>
+<!-- 载入 footer-->
 
   <script>
     function toChineseNumber(num) {
