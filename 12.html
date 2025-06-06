@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 载入 footer 样式 -->
+    <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
     <title>生肖装备合成器</title>
     <style>
@@ -201,16 +201,21 @@
 
                 let remainingMaterial = 0;
                 let remainingDan = 0;
+                let hasError = false;
 
                 // 计算所需生肖石
                 if (materials["生肖石"]) {
                     resultText += `生肖石·${stoneType}: ${materials["生肖石"]}个\n`;
-                    remainingMaterial = materials["生肖石"] - ownedMaterial;
+                    if (ownedMaterial < materials["生肖石"]) {
+                        remainingMaterial = materials["生肖石"] - ownedMaterial;
+                    }
                 }
                 // 计算所需生肖造化丹
                 if (materials["生肖造化丹"]) {
                     resultText += `生肖造化丹: ${materials["生肖造化丹"]}个\n`;
-                    remainingDan = materials["生肖造化丹"] - ownedDan;
+                    if (ownedDan < materials["生肖造化丹"]) {
+                        remainingDan = materials["生肖造化丹"] - ownedDan;
+                    }
                 }
                 // 计算当前生肖装备
                 if (materials["生肖装备"]) {
@@ -220,13 +225,13 @@
                 // 计算还缺少的材料数量
                 if (remainingMaterial > 0) {
                     resultText += `你还缺少：${remainingMaterial}个生肖石。\n`;
-                } else if (remainingMaterial <= 0) {
+                } else if (remainingMaterial <= 0 && (ownedMaterial === 0 || remainingMaterial !== 0)) {
                     resultText += `你已足够，甚至多出材料！\n`;
                 }
 
                 if (remainingDan > 0) {
                     resultText += `你还缺少：${remainingDan}个造化丹。\n`;
-                } else if (remainingDan <= 0) {
+                } else if (remainingDan <= 0 && (ownedDan === 0 || remainingDan !== 0)) {
                     resultText += `你已足够，甚至多出材料！\n`;
                 }
 
