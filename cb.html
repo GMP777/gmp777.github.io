@@ -125,25 +125,6 @@
     <div id="result"></div>
   </div>
   
-<!-- footer 容器 -->
-<footer id="footer">加载中...</footer>
-
-<!-- 载入 footer.html 内容 -->
-<script>
-  const footer = document.getElementById('footer');
-  fetch('footer.html')
-    .then(res => {
-      if (!res.ok) throw new Error('加载 footer 失败');
-      return res.text();
-    })
-    .then(html => {
-      footer.innerHTML = html;
-    })
-    .catch(err => {
-      footer.textContent = '加载 footer 内容失败：' + err.message;
-    });
-</script>
-  
   <div class="sidebar" id="sidebar">
     <h2 style="text-align:center;">进化预估（10%~90%）</h2>
     <div class="estimate-table" id="estimate"></div>
@@ -222,5 +203,26 @@ for (let i = 10; i <= 100; i += 10) {
       document.getElementById("estimate").innerHTML = estimateHTML;
     }
   </script>
+
+  <div>
+    <!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
+  </div>
 </body>
 </html>
