@@ -4,18 +4,19 @@ footer {
   color: #333;
   font-size: 0.95em;
   line-height: 1.6;
-  /* background-color removed */
+  /* 无背景色 */
 }
 
-/* 使用 flex 容器包裹内容，允许换行 */
+/* flex 布局，居中，允许换行 */
 .footer-content {
   display: flex;
-  justify-content: center;  /* 居中对齐 */
-  flex-wrap: wrap;          /* 允许换行 */
-  gap: 0.5em;               /* 项目间间距 */
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5em;
   max-width: 960px;
   margin: 0 auto;
   padding: 0 1em;
+  align-items: center; /* 保持行高一致，避免参差不齐 */
 }
 
 /* 链接样式 */
@@ -30,14 +31,18 @@ footer a:hover {
   text-decoration: underline;
 }
 
-/* 响应式适配小屏幕 */
+/* 小屏幕响应式 */
 @media (max-width: 600px) {
   footer {
     font-size: 0.85em;
     padding: 1.2em 0.5em;
   }
 
-  /* 小屏时链接独占一行 */
+  .footer-content {
+    flex-direction: column;
+    gap: 0.3em;
+  }
+
   footer a {
     margin: 0.3em 0;
   }
