@@ -1,4 +1,3 @@
-/* footer 样式 */
 footer {
   text-align: center;
   padding: 1em;
@@ -8,22 +7,27 @@ footer {
   /* background-color removed */
 }
 
+/* 使用 flex 容器包裹内容，允许换行 */
+.footer-content {
+  display: flex;
+  justify-content: center;  /* 居中对齐 */
+  flex-wrap: wrap;          /* 允许换行 */
+  gap: 0.5em;               /* 项目间间距 */
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1em;
+}
+
 /* 链接样式 */
 footer a {
   color: #007acc;
   text-decoration: none;
-  margin: 0 0.5em;
+  margin: 0 0.3em;
+  white-space: nowrap; /* 防止链接内换行 */
 }
 
 footer a:hover {
   text-decoration: underline;
-}
-
-/* 可选容器限制宽度 */
-.footer-content {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1em;
 }
 
 /* 响应式适配小屏幕 */
@@ -33,8 +37,8 @@ footer a:hover {
     padding: 1.2em 0.5em;
   }
 
+  /* 小屏时链接独占一行 */
   footer a {
-    display: block;
     margin: 0.3em 0;
   }
 }
