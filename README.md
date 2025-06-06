@@ -1,6 +1,8 @@
 <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
 
+自己常用到的功能让Ai帮忙整了个网页工具，如果出现问题请怀疑是代码的问题。时不时让Ai维修两下……
+
 | 工具 | 版本 | 最新更新日期 |
 | --- | --- | --- |
 | 💎钻石计算器 | <a href="https://gmp777.github.io/jsq1.html" target="_blank">v.1.0版本</a>| 2025-06-04|
