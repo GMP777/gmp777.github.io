@@ -183,11 +183,12 @@
     }
   });
 </script>
-  <!-- footer-->
- <footer id="footer-container">加载中...</footer>
+<!-- footer -->
+<footer id="footer-container">加载中...</footer>
 
   <script>
-    function hideCurrentPageLinkText() {
+    // 隐藏当前页面对应的链接整个元素（不留空白）
+    function hideCurrentPageLink() {
       const currentPath = window.location.pathname.replace(/\/+$/, '');
       const links = document.querySelectorAll('.footer-content a');
 
@@ -197,7 +198,7 @@
 
         const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
         if (linkPath === currentPath) {
-          link.textContent = '';
+          link.style.display = 'none';
         }
       });
     }
@@ -208,12 +209,12 @@
         const container = document.getElementById('footer-container');
         container.innerHTML = html;
 
-        hideCurrentPageLinkText();
+        hideCurrentPageLink();
       })
       .catch(() => {
         document.getElementById('footer-container').textContent = '加载 footer 失败';
       });
   </script>
-  <!-- footer -->
+<!-- footer -->
 </body>
 </html>
