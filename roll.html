@@ -1,147 +1,217 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>抽奖所需钻石计算</title>
-    <style>
-        body {
-            background: #f5f5f5;
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            padding: 50px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+  <title>抽奖计算器</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
 
-        .cheque {
-            background: #fff;
-            border: 2px solid #333;
-            border-radius: 10px;
-            width: 600px;
-            padding: 30px 40px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-        }
+    body {
+      font-family: "微软雅黑", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #eef2f5;
+    }
 
-        .cheque h2 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
 
-        label {
-            display: block;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #333;
+    }
 
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            border: 1px solid #aaa;
-            border-radius: 5px;
-        }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #444;
+    }
 
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background: #007b83;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 16px;
+    }
 
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            background: #e6f7ff;
-            border-left: 5px solid #007b83;
-            font-size: 18px;
-            white-space: pre-line;
-        }
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      margin-bottom: 16px;
+      transition: background-color 0.3s;
+    }
 
-        .sig {
-            text-align: right;
-            margin-top: 40px;
-            font-style: italic;
-            color: #666;
-        }
+    button:hover {
+      background-color: #45a049;
+    }
 
-        .cheque-logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-weight: bold;
-            font-size: 20px;
-            color: #007b83;
-        }
-    </style>
+    .result {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-top: 8px;
+    }
+
+    hr {
+      margin: 24px 0;
+      border: none;
+      border-top: 1px solid #ccc;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px 12px;
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="cheque">
-        <div class="cheque-logo">钻石银行支票</div>
-        <h2>众神宝藏抽奖</h2>
+  <div class="container">
+    <h2>抽奖计算器</h2>
 
-        <label for="draws">请输入抽数：</label>
-        <input type="number" id="draws" min="1" placeholder="例如：1000">
-        <button onclick="calculateDiamonds()">开具支票</button>
+    <label for="drawTimes">想抽奖多少次？</label>
+    <input type="number" id="drawTimes" placeholder="输入抽奖次数，例如 10" />
+    <button onclick="calculateCost()">计算需要多少钻石</button>
+    <div class="result" id="costResult"></div>
 
-        <div class="result" id="result" style="display: none;"></div>
+    <hr />
 
-        <div class="sig">支票签发人：🕶<a href="https://gmp777.github.io/">GMP777</a></div>
-    </div>
+    <label for="diamondAmount">你拥有多少钻石？</label>
+    <input type="number" id="diamondAmount" placeholder="输入钻石数量，例如 50000" />
+    <button onclick="calculateDraws()">可以抽几次奖</button>
+    <div class="result" id="drawResult"></div>
 
-    <script>
-        function calculateDiamonds() {
-            const draws = parseInt(document.getElementById('draws').value);
-            const resultDiv = document.getElementById('result');
+    <hr />
 
-            if (isNaN(draws) || draws <= 0) {
-                resultDiv.textContent = "请输入有效的抽数。";
-                resultDiv.style.display = "block";
-                return;
-            }
+    <label for="currentDraws">你当前抽了多少次？</label>
+    <input type="number" id="currentDraws" placeholder="输入当前抽数，例如 3888" />
+    <button onclick="checkMilestone()">查看下一个奖励</button>
+    <div class="result" id="milestoneResult"></div>
+  </div>
 
-            const diamondsPerDraw = 500000 / 50;
-            const totalDiamonds = draws * diamondsPerDraw;
-            const chineseUpper = numberToChinese(totalDiamonds);
+  <script>
+    const costPerDraw = 10000;
+    const rewardMilestones = [1000, 1500, 2500, 3000, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000, 20000];
 
-            resultDiv.innerHTML = 
-                `抽数：${draws} 抽\n` +
-                `阿拉伯钻石：${totalDiamonds.toLocaleString()} 钻石\n` +
-                `中文钻石：${chineseUpper}`;
-            resultDiv.style.display = "block";
+    function formatNumber(num) {
+      return num.toLocaleString("zh-CN");
+    }
+
+    function toChineseNumber(num) {
+      const units = ['', '十', '百', '千', '万', '十万', '百万', '千万', '亿'];
+      const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+      if (num === 0) return '零';
+
+      let str = '';
+      const numStr = num.toString();
+      const len = numStr.length;
+      let zeroFlag = false;
+
+      for (let i = 0; i < len; i++) {
+        const digit = parseInt(numStr[i]);
+        const unitIndex = len - i - 1;
+
+        if (digit === 0) {
+          zeroFlag = true;
+        } else {
+          if (zeroFlag) {
+            str += '零';
+            zeroFlag = false;
+          }
+          str += digits[digit] + units[unitIndex];
         }
+      }
 
-        // 数字转中文大写金额函数
-        function numberToChinese(n) {
-            const fraction = ['角', '分'];
-            const digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
-            const unit = [['元', '万', '亿'], ['', '拾', '佰', '仟']];
-            n = Math.abs(n);
-            let s = '';
+      return str.replace(/^一十/, '十');
+    }
 
-            for (let i = 0; i < fraction.length; i++) {
-                s += (digit[Math.floor(n * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
-            }
-            s = s || '整';
-            n = Math.floor(n);
+    function calculateCost() {
+      const times = parseInt(document.getElementById("drawTimes").value);
+      if (isNaN(times) || times < 0) {
+        document.getElementById("costResult").innerText = "请输入有效的抽奖次数。";
+        return;
+      }
+      const cost = times * costPerDraw;
+      document.getElementById("costResult").innerText =
+        `抽 ${formatNumber(times)} 次（${toChineseNumber(times)}）需要 ${formatNumber(cost)} 钻石（${toChineseNumber(cost)}）。`;
+    }
 
-            for (let i = 0; i < unit[0].length && n > 0; i++) {
-                let p = '';
-                for (let j = 0; j < unit[1].length && n > 0; j++) {
-                    p = digit[n % 10] + unit[1][j] + p;
-                    n = Math.floor(n / 10);
-                }
-                s = p.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + s;
-            }
+    function calculateDraws() {
+      const diamonds = parseInt(document.getElementById("diamondAmount").value);
+      if (isNaN(diamonds) || diamonds < 0) {
+        document.getElementById("drawResult").innerText = "请输入有效的钻石数量。";
+        return;
+      }
+      const times = Math.floor(diamonds / costPerDraw);
+      const used = times * costPerDraw;
+      const remaining = diamonds - used;
+      document.getElementById("drawResult").innerText =
+        `你可以抽 ${formatNumber(times)} 次（${toChineseNumber(times)}），共消耗 ${formatNumber(used)} 钻石（${toChineseNumber(used)}），剩余 ${formatNumber(remaining)} 钻石（${toChineseNumber(remaining)}）。`;
+    }
 
-            return s.replace(/(零.)*零/, '')
-                    .replace(/(零.)+/g, '零')
-                    .replace(/^整$/, '零整');
-        }
-    </script>
+    function checkMilestone() {
+      const current = parseInt(document.getElementById("currentDraws").value);
+      const resultDiv = document.getElementById("milestoneResult");
+
+      if (isNaN(current) || current < 0) {
+        resultDiv.innerText = "请输入有效的抽奖次数。";
+        return;
+      }
+
+      const next = rewardMilestones.find(m => m > current);
+
+      if (next) {
+        const diff = next - current;
+        resultDiv.innerText =
+          `你当前已抽 ${formatNumber(current)} 次（${toChineseNumber(current)}），还差 ${formatNumber(diff)} 次（${toChineseNumber(diff)}）可达成下一个奖励：${formatNumber(next)} 次（${toChineseNumber(next)}）。`;
+      } else {
+        resultDiv.innerText = `你当前已抽 ${formatNumber(current)} 次（${toChineseNumber(current)}），已达成所有奖励要求！🎉`;
+      }
+    }
+  </script>
+    <!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
 </body>
-    
 </html>
