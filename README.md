@@ -5,6 +5,7 @@
 
 |悠久传奇| 版本 | 最新更新日期 |
 | --- | --- | --- |
+|📖简阅攻略|v.0.0|2025-06-05|
 | 💎钻石计算器 | <a href="https://gmp777.github.io/jsq1.html" target="_blank">v.1.0版本</a>| 2025-06-04|
 |💎钻石计算器|<a href="https://gmp777.github.io/jsq2.html" target="_blank">v.2.0版本</a> |2025-06-04|
 | 🥤888钻石消耗多少道具 | <a href="https://gmp777.github.io/888.html" target="_blank">v.0.0版本</a> | 2025-06-04 |
