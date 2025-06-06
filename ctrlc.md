@@ -1,3 +1,40 @@
+# v.4.0
+
+```html
+  <!-- footer-->
+ <footer id="footer-container">加载中...</footer>
+
+  <script>
+    function hideCurrentPageLinkText() {
+      const currentPath = window.location.pathname.replace(/\/+$/, '');
+      const links = document.querySelectorAll('.footer-content a');
+
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+          link.textContent = '';
+        }
+      });
+    }
+
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        const container = document.getElementById('footer-container');
+        container.innerHTML = html;
+
+        hideCurrentPageLinkText();
+      })
+      .catch(() => {
+        document.getElementById('footer-container').textContent = '加载 footer 失败';
+      });
+  </script>
+  <!-- footer -->
+  ```
+
 # v.3.0
 
 ```html
