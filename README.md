@@ -16,7 +16,7 @@
 | 💎宝石合成器 | <a href="https://gmp777.github.io/jsq5.html" target="_blank">v.1.0</a> |2025-06-05 23:31:46 |
 | 🔥天命神装合成器 | <a href="https://gmp777.github.io/tm.html" target="_blank">v.2.0</a> |2025-06-06 21:14:49|
 |🐉十二生肖装备合成器| <a href="https://gmp777.github.io/12.html" target="_blank">v.1.0</a> |2025-06-06 01:07:12 |
-|🔧footer自动载入链接|v.2.0|2025-06-07 02:49:24|
+|🔧footer自动载入链接|v.5.0|2025-06-07 03:06:34|
 
 <!-- footer -->
 <footer id="footer-container">加载中...</footer>
