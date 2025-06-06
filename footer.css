@@ -1,19 +1,40 @@
+/* footer 样式 */
 footer {
   text-align: center;
-  font-size: 14px;
-  padding: 15px 10px;
-  background-color: #f8f8f8;
+  padding: 1em;
   color: #333;
-  border-top: 1px solid #ddd;
-  margin-top: 40px;
+  font-size: 0.95em;
+  line-height: 1.6;
+  /* background-color removed */
 }
 
+/* 链接样式 */
 footer a {
-  color: #007aff; /* iPhone蓝色链接风格 */
+  color: #007acc;
   text-decoration: none;
-  margin: 0 5px;
+  margin: 0 0.5em;
 }
 
 footer a:hover {
   text-decoration: underline;
+}
+
+/* 可选容器限制宽度 */
+.footer-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1em;
+}
+
+/* 响应式适配小屏幕 */
+@media (max-width: 600px) {
+  footer {
+    font-size: 0.85em;
+    padding: 1.2em 0.5em;
+  }
+
+  footer a {
+    display: block;
+    margin: 0.3em 0;
+  }
 }
