@@ -18,16 +18,36 @@
 |🐉十二生肖装备合成器| <a href="https://gmp777.github.io/12.html" target="_blank">v.1.0</a> |2025-06-06 01:07:12 |
 |🔧footer自动载入链接|v.2.0|2025-06-07 02:49:24|
 
-<!-- 载入 footer-->
-<div id="footer-container">加载中...</div>
-<script>
-  fetch('footer.html')
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById('footer-container').innerHTML = html;
-    })
-    .catch(() => {
-      document.getElementById('footer-container').textContent = '加载 footer 失败';
-    });
-</script>
-<!-- 载入 footer-->
+<!-- footer -->
+<footer id="footer-container">加载中...</footer>
+
+  <script>
+    // 隐藏当前页面对应的链接整个元素（不留空白）
+    function hideCurrentPageLink() {
+      const currentPath = window.location.pathname.replace(/\/+$/, '');
+      const links = document.querySelectorAll('.footer-content a');
+
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+          link.style.display = 'none';
+        }
+      });
+    }
+
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        const container = document.getElementById('footer-container');
+        container.innerHTML = html;
+
+        hideCurrentPageLink();
+      })
+      .catch(() => {
+        document.getElementById('footer-container').textContent = '加载 footer 失败';
+      });
+  </script>
+<!-- footer -->
