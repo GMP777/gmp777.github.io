@@ -13,3 +13,18 @@
   <a href="https://gmp777.github.io/tm.html">🔥天命</a>
   <a href="https://gmp777.github.io/12.html">🐉生肖</a>
 </div>
+<script>
+  (function() {
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    const links = document.querySelectorAll('.footer-content a');
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+
+      const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+      if (linkPath === currentPath) {
+        link.style.display = 'none';
+      }
+    });
+  })();
+</script>
