@@ -1,6 +1,7 @@
 # v.5.0
 
 ```html
+<!-- footer -->
 <footer id="footer-container">加载中...</footer>
 
   <script>
@@ -32,6 +33,7 @@
         document.getElementById('footer-container').textContent = '加载 footer 失败';
       });
   </script>
+<!-- footer -->
 ```
 
 # v.4.0
