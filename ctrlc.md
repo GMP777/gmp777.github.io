@@ -1,10 +1,8 @@
 # v.2.0
 
 ```html
-<link rel="stylesheet" href="footer.css" />
-
+<!-- 载入 footer-->
 <div id="footer-container">加载中...</div>
-
 <script>
   fetch('footer.html')
     .then(res => res.text())
@@ -15,6 +13,7 @@
       document.getElementById('footer-container').textContent = '加载 footer 失败';
     });
 </script>
+<!-- 载入 footer-->
 ```
 
 # v.0.0
