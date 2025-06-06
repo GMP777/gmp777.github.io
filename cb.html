@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
   <title>翅膀进阶计算器</title>
   <style>
     body {
@@ -85,23 +87,12 @@
       font-size: 15px;
       line-height: 1.8;
     }
-    
-    @media (max-width: 900px) {
-      body {
-        flex-direction: column;
-      }
-
-      .sidebar {
-        border-left: none;
-        border-top: 1px solid #ccc;
-      }
-    }
   </style>
 </head>
 <body>
+
   <div class="container">
     <h1>翅膀进阶计算器</h1>
-    <a href="https://gmp777.github.io/">🏠GMP777</a>
 
     <label for="blessing">目标祝福值</label>
     <input type="number" id="blessing" placeholder="如：1000">
@@ -122,11 +113,30 @@
 
     <div id="result"></div>
   </div>
-  
+
   <div class="sidebar" id="sidebar">
-    <h2 style="text-align:center;">进化预估（10%~90%）</h2>
+    <h2 style="text-align:center;">进化预估（10%~100%）</h2>
     <div class="estimate-table" id="estimate"></div>
   </div>
+
+<!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
 
   <script>
     function toChineseNumber(num) {
@@ -187,17 +197,12 @@
       document.getElementById("toggleBtn").innerText = "折叠更多";
 
       // 更新预估表
-let estimateHTML = "";
-for (let i = 10; i <= 100; i += 10) {
-  const rate = i / 100;
-  const expectedBlessing = Math.ceil(totalBlessing * rate);
-  const remainingBlessing = Math.max(expectedBlessing - currentBlessing, 0);
-  const estOps = Math.ceil(remainingBlessing / perBlessing);
-  const estMaterials = estOps * perTry;
-  const estToBuy = Math.max(estMaterials - owned, 0);
-  const estCost = estToBuy * pricePerItem;
-  estimateHTML += `${i}% 祝福值预计需材料：${estMaterials}，需购买：${estToBuy}，元宝：${estCost.toLocaleString()}（${toChineseNumber(estCost)}）<br>`;
-}
+      let estimateHTML = "";
+      for (let i = 10; i <= 100; i += 10) {
+        const rate = i / 100;
+        const expectedBlessing = Math.ceil(totalBlessing * rate);
+        estimateHTML += `${i}% 祝福值：${expectedBlessing}<br>`;
+      }
       document.getElementById("estimate").innerHTML = estimateHTML;
     }
   </script>
