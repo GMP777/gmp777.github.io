@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+  <title>天命神装合成器</title>
+  <style>
+    body {
+      font-family: "Microsoft Yahei", sans-serif;
+      max-width: 720px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f0f0f0;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    .tab {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .tab button {
+      width: 48%;
+    }
+    .section {
+      display: none;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .active {
+      display: block;
+    }
+    #result, #output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #e8f5e9;
+      border-left: 6px solid #2e7d32;
+    }
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>天命神装合成器</h1>
+
+<div class="tab">
+  <button onclick="switchTab('wholeSet')">整套计算</button>
+  <button onclick="switchTab('singlePart')">单部位查询</button>
+</div>
+
+<!-- 整套计算功能 -->
+<div id="wholeSet" class="section active">
+  <label for="startStage">起始阶数：</label>
+  <select id="startStage"></select>
+
+  <label for="endStage">目标阶数：</label>
+  <select id="endStage"></select>
+
+  <button onclick="calculateSet()">计算整套消耗</button>
+
+  <div id="result"></div>
+</div>
+
+<!-- 单部位查询功能 -->
+<div id="singlePart" class="section">
+  <label for="part">选择部位：</label>
+  <select id="part">
+    <option value="盔">盔</option>
+    <option value="戒">戒</option>
+    <option value="带">带</option>
+    <option value="链">链</option>
+    <option value="镯">镯</option>
+    <option value="靴">靴</option>
+    <option value="兵">兵</option>
+    <option value="甲">甲</option>
+  </select>
+
+  <label for="startSingle">起始阶数：</label>
+  <select id="startSingle"></select>
+
+  <label for="endSingle">目标阶数：</label>
+  <select id="endSingle"></select>
+
+  <button onclick="calculatePart()">计算部位消耗</button>
+
+  <div id="output"></div>
+</div>
+
+<script>
+  const costTable = {
+    2: { normal: 200, soldier: 400 },
+    3: { normal: 400, soldier: 400 },
+    4: { normal: 700, soldier: 1400 },
+    5: { normal: 1200, soldier: 2400 },
+    6: { normal: 2400, soldier: 2400 },
+    7: { normal: 3200, soldier: 3200 },
+    8: { normal: 3200, soldier: 3200 },
+    9: { normal: 5000, soldier: 6500 },
+    10: { normal: 6000, soldier: 7500 }
+  };
+
+  function populateSelect(id, min = 1, max = 10) {
+    const select = document.getElementById(id);
+    select.innerHTML = "";
+    for (let i = min; i <= max; i++) {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${i}阶`;
+      select.appendChild(opt);
+    }
+  }
+
+  populateSelect("startStage");
+  populateSelect("endStage");
+  populateSelect("startSingle");
+  populateSelect("endSingle");
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function isSoldier(part) {
+    return part === "兵" || part === "甲";
+  }
+
+  function calculateSet() {
+    const start = parseInt(document.getElementById("startStage").value);
+    const end = parseInt(document.getElementById("endStage").value);
+    const resultDiv = document.getElementById("result");
+
+    if (end <= start) {
+      resultDiv.innerHTML = "<strong>目标阶数必须大于起始阶数。</strong>";
+      return;
+    }
+
+    let total = 0;
+    for (let i = start + 1; i <= end; i++) {
+      const c = costTable[i];
+      if (!c) continue;
+      const normal = c.normal * 8; // 8件部件：盔、戒×2、带、链、镯×2、靴
+      const soldier = (i >= 2) ? c.soldier * 2 : 0; // 兵 + 甲
+      total += normal + soldier;
+    }
+
+    resultDiv.innerHTML = `从 <strong>${start}阶</strong> 到 <strong>${end}阶</strong><br/>
+      整套装备需要天命宝钻总数：<strong>${total.toLocaleString()}</strong> 个`;
+  }
+
+  function calculatePart() {
+    const part = document.getElementById("part").value;
+    const start = parseInt(document.getElementById("startSingle").value);
+    const end = parseInt(document.getElementById("endSingle").value);
+    const outputDiv = document.getElementById("output");
+
+    if (end <= start) {
+      outputDiv.innerHTML = "<strong>目标阶数必须大于起始阶数。</strong>";
+      return;
+    }
+
+    let total = 0;
+    for (let i = start + 1; i <= end; i++) {
+      const c = costTable[i];
+      if (!c) continue;
+      total += isSoldier(part) ? c.soldier : c.normal;
+    }
+
+    outputDiv.innerHTML = `${part} 从 <strong>${start}阶</strong> 到 <strong>${end}阶</strong><br/>
+      需要天命宝钻：<strong>${total.toLocaleString()}</strong> 个`;
+  }
+</script>
+<!-- footer 容器 -->
+<footer id="footer">加载中...</footer>
+
+<!-- 载入 footer.html 内容 -->
+<script>
+  const footer = document.getElementById('footer');
+  fetch('footer.html')
+    .then(res => {
+      if (!res.ok) throw new Error('加载 footer 失败');
+      return res.text();
+    })
+    .then(html => {
+      footer.innerHTML = html;
+    })
+    .catch(err => {
+      footer.textContent = '加载 footer 内容失败：' + err.message;
+    });
+</script>
+</body>
+</html>
