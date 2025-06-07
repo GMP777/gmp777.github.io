@@ -31,7 +31,6 @@
       background-color: #f9f9f9;
       flex: 1;
       min-width: 300px;
-      display: none; /* 初始隐藏 */
     }
 
     h1 {
@@ -105,11 +104,8 @@
       color: white;
       text-align: center;
       padding: 10px;
-      position: relative;
       width: 100%;
-      bottom: 0;
     }
-
   </style>
 </head>
 <body>
@@ -131,7 +127,6 @@
 
     <div class="button-group">
       <button onclick="calculate()">计算</button>
-      <button onclick="toggleSidebar()" id="toggleBtn">展开更多</button>
     </div>
 
     <div id="result"></div>
@@ -190,14 +185,6 @@
       return result + "元宝";
     }
 
-    function toggleSidebar() {
-      const sidebar = document.getElementById("sidebar");
-      const btn = document.getElementById("toggleBtn");
-      const isShown = sidebar.style.display === "block";
-      sidebar.style.display = isShown ? "none" : "block";
-      btn.innerText = isShown ? "展开更多" : "折叠更多";
-    }
-
     function calculate() {
       const totalBlessing = parseInt(document.getElementById("blessing").value);
       const currentBlessing = parseInt(document.getElementById("currentBlessing").value) || 0;
@@ -229,10 +216,6 @@
         `还需购买材料：<strong>${toBuy}</strong> 个<br>` +
         `需花费元宝：<strong>${totalCost.toLocaleString()}</strong> 元宝<br>` +
         `中文金额：<strong>${chinesePrice}</strong>`;
-
-      // 显示右栏
-      document.getElementById("sidebar").style.display = "block";
-      document.getElementById("toggleBtn").innerText = "折叠更多";
 
       // 更新预估表
       let estimateHTML = "";
