@@ -1,186 +1,212 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>钻石计算器v.1.0</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
+  <title>钻石计算器v.1.5</title>
   <style>
     * {
       box-sizing: border-box;
     }
-
     body {
       font-family: "微软雅黑", sans-serif;
-      background-color: #f4f4f4;
+      background: #f4f4f4;
       margin: 0;
-      padding: 20px;
+      padding: 1rem;
     }
-
     .container {
       max-width: 600px;
       margin: auto;
-      background-color: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
-
     h1 {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
       color: #333;
-      font-size: 24px;
     }
-
-    .item {
+    .input-group, .mode-group {
+      margin-bottom: 1.5rem;
+    }
+    label {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #222;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .item-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
+      margin-bottom: 12px;
     }
-
-    .item label {
-      flex: 1;
-      font-size: 16px;
-      min-width: 50%;
+    .item-label {
+      width: 60%;
+      font-size: 1rem;
+      color: #333;
     }
-
-    .item input {
-      flex: 1;
-      min-width: 45%;
-      padding: 8px;
-      font-size: 16px;
+    .item-input {
+      width: 35%;
     }
-
     button {
-      margin-top: 20px;
       width: 100%;
       padding: 12px;
-      background-color: #007BFF;
+      font-size: 1.1rem;
+      background-color: #007bff;
       color: white;
-      font-size: 18px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      margin-top: 1rem;
+      transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #0056b3;
     }
-
     #result {
-      margin-top: 20px;
-      font-size: 20px;
-      text-align: center;
-      font-weight: bold;
-      color: #d9534f;
+      margin-top: 2rem;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
     }
-
-    @media (max-width: 480px) {
-      .item {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .item label,
-      .item input {
-        min-width: 100%;
-      }
-
-      .item label {
-        margin-bottom: 5px;
-      }
-    }
+    .success { color: #28a745; font-weight: bold; }
+    .fail { color: #dc3545; font-weight: bold; }
+    ul { padding-left: 1.2rem; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>钻石计算器v.1.0</h1>
+    <h1>钻石兑换道具计算器</h1>
 
-    <div class="item">
-      <label for="cola">可乐（10 钻石）</label>
-      <input type="number" id="cola" min="0" value="0">
+    <div class="input-group">
+      <label for="targetDiamonds">目标钻石数量：</label>
+      <input type="number" id="targetDiamonds" placeholder="例如：500000" min="0" />
     </div>
 
-    <div class="item">
-      <label for="juice">橙汁（20 钻石）</label>
-      <input type="number" id="juice" min="0" value="0">
+    <div class="mode-group">
+      <label for="mode">优先使用道具：</label>
+      <select id="mode">
+        <option value="high">优先使用高价值道具</option>
+        <option value="low">优先使用低价值道具</option>
+      </select>
     </div>
 
-    <div class="item">
-      <label for="lighter">打火机（50 钻石）</label>
-      <input type="number" id="lighter" min="0" value="0">
-    </div>
+    <div id="item-list"></div>
 
-    <div class="item">
-      <label for="speaker">小音响（100 钻石）</label>
-      <input type="number" id="speaker" min="0" value="0">
-    </div>
-
-    <div class="item">
-      <label for="mouse">鼠标（200 钻石）</label>
-      <input type="number" id="mouse" min="0" value="0">
-    </div>
-
-    <div class="item">
-      <label for="headphones">耳机（500 钻石）</label>
-      <input type="number" id="headphones" min="0" value="0">
-    </div>
-
-    <div class="item">
-      <label for="watch">手表（1000 钻石）</label>
-      <input type="number" id="watch" min="0" value="0">
-    </div>
-
-    <div class="item">
-      <label for="phone">手机（2000 钻石）</label>
-      <input type="number" id="phone" min="0" value="0">
-    </div>
-
-    <div class="item">
-      <label for="motorcycle">摩托车（5000 钻石）</label>
-      <input type="number" id="motorcycle" min="0" value="0">
-    </div>
-
-    <div class="item">
-      <label for="ferrari">法拉利（10000 钻石）</label>
-      <input type="number" id="ferrari" min="0" value="0">
-    </div>
-
-    <button onclick="calculateTotal()">计算总钻石</button>
-
-    <div id="result">总钻石：0</div>
+    <button onclick="calculateUsage()">计算所需道具</button>
+    <div id="result"></div>
   </div>
 
   <script>
-    function calculateTotal() {
-      const prices = {
-        cola: 10,
-        juice: 20,
-        lighter: 50,
-        speaker: 100,
-        mouse: 200,
-        headphones: 500,
-        watch: 1000,
-        phone: 2000,
-        motorcycle: 5000,
-        ferrari: 10000
-      };
+    const baseItems = [
+      { name: '可乐', price: 10 },
+      { name: '橙汁', price: 20 },
+      { name: '打火机', price: 50 },
+      { name: '小音响', price: 100 },
+      { name: '鼠标', price: 200 },
+      { name: '耳机', price: 500 },
+      { name: '手表', price: 1000 },
+      { name: '手机', price: 2000 },
+      { name: '摩托车', price: 5000 },
+      { name: '法拉利', price: 10000 }
+    ];
 
-      let total = 0;
+    function createItemList() {
+      const container = document.getElementById('item-list');
+      container.innerHTML = '';
+      baseItems.forEach((item, i) => {
+        const row = document.createElement('div');
+        row.className = 'item-row';
 
-      for (let key in prices) {
-        const quantity = parseInt(document.getElementById(key).value) || 0;
-        total += quantity * prices[key];
+        const label = document.createElement('div');
+        label.className = 'item-label';
+        label.textContent = `${item.name}（${item.price}钻石）`;
+
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = '0';
+        input.value = '0';
+        input.id = `item-${i}`;
+        input.className = 'item-input';
+
+        row.appendChild(label);
+        row.appendChild(input);
+        container.appendChild(row);
+      });
+    }
+
+    createItemList();
+
+    function calculateUsage() {
+      const target = parseInt(document.getElementById("targetDiamonds").value) || 0;
+      const mode = document.getElementById("mode").value;
+      if (target <= 0) {
+        document.getElementById("result").innerHTML = "<p class='fail'>请输入有效的钻石数量。</p>";
+        return;
       }
 
-      document.getElementById("result").innerText = `总钻石：${total}`;
+      const sortedItems = [...baseItems];
+      sortedItems.sort((a, b) => mode === 'high' ? b.price - a.price : a.price - b.price);
+
+      const available = baseItems.map((_, i) => parseInt(document.getElementById(`item-${i}`).value) || 0);
+      const indexMap = sortedItems.map(item => baseItems.findIndex(x => x.name === item.name));
+      const needed = Array(baseItems.length).fill(0);
+
+      let remaining = target;
+      let usedTotal = 0;
+
+      for (let idx of indexMap) {
+        const item = baseItems[idx];
+        const maxUse = Math.min(Math.floor(remaining / item.price), available[idx]);
+        needed[idx] += maxUse;
+        usedTotal += maxUse * item.price;
+        remaining -= maxUse * item.price;
+      }
+
+      for (let idx of indexMap) {
+        const item = baseItems[idx];
+        const extra = available[idx] - needed[idx];
+        if (remaining > 0 && extra > 0) {
+          const extraUse = Math.min(extra, Math.ceil(remaining / item.price));
+          needed[idx] += extraUse;
+          usedTotal += extraUse * item.price;
+          remaining -= extraUse * item.price;
+        }
+      }
+
+      let result = "";
+      if (usedTotal >= target) {
+        const pulls = Math.floor(usedTotal / 10000);
+        result += `<p class="success">✅ 成功兑换所需钻石！</p>`;
+        result += `<p>💎 实际兑换钻石：${usedTotal}，超出 ${usedTotal - target} 钻石</p>`;
+        result += `<p>🎉 可抽奖次数：${pulls} 次（每次抽奖消耗 10000 钻石）</p>`;
+      } else {
+        result += `<p class="fail">❌ 道具不足，无法兑换目标钻石。还差 ${target - usedTotal} 钻石。</p>`;
+      }
+
+      result += `<ul>`;
+      baseItems.forEach((item, i) => {
+        if (needed[i] > 0) {
+          result += `<li>${item.name}：使用 ${needed[i]} 个（价值 ${needed[i] * item.price} 钻石）</li>`;
+        }
+      });
+      result += `</ul>`;
+
+      document.getElementById("result").innerHTML = result;
     }
   </script>
-<!-- footer -->
+  <!-- footer -->
 <footer id="footer-container">加载中...</footer>
 
   <script>
