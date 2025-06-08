@@ -1,3 +1,10 @@
+# css
+
+```html
+<!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+```
+
 # v.5.0
 
 ```html
@@ -117,11 +124,6 @@
 ```
 
 # v.0.0
-
-```html
-<!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="footer.css" />
-```
 
 ```html
 <!-- footer 容器 -->
