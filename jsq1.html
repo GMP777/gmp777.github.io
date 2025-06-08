@@ -116,6 +116,39 @@
 
   <div id="total">总钻石：0（零）</div>
   <div id="draw">可抽奖次数：0 次（50 次抽奖需 500000 钻石）</div>
+    <!-- footer -->
+<footer id="footer-container">加载中...</footer>
+
+  <script>
+    // 隐藏当前页面对应的链接整个元素（不留空白）
+    function hideCurrentPageLink() {
+      const currentPath = window.location.pathname.replace(/\/+$/, '');
+      const links = document.querySelectorAll('.footer-content a');
+
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+          link.style.display = 'none';
+        }
+      });
+    }
+
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        const container = document.getElementById('footer-container');
+        container.innerHTML = html;
+
+        hideCurrentPageLink();
+      })
+      .catch(() => {
+        document.getElementById('footer-container').textContent = '加载 footer 失败';
+      });
+  </script>
+<!-- footer -->
 </main>
 
 <aside id="exchangeSummary">
@@ -290,38 +323,5 @@ document.getElementById("calcExchangeBtn").addEventListener("click", calculateAl
 createTable();
 calculateTotal();
 </script>
-  <!-- footer -->
-<footer id="footer-container">加载中...</footer>
-
-  <script>
-    // 隐藏当前页面对应的链接整个元素（不留空白）
-    function hideCurrentPageLink() {
-      const currentPath = window.location.pathname.replace(/\/+$/, '');
-      const links = document.querySelectorAll('.footer-content a');
-
-      links.forEach(link => {
-        const href = link.getAttribute('href');
-        if (!href) return;
-
-        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
-        if (linkPath === currentPath) {
-          link.style.display = 'none';
-        }
-      });
-    }
-
-    fetch('footer.html')
-      .then(res => res.text())
-      .then(html => {
-        const container = document.getElementById('footer-container');
-        container.innerHTML = html;
-
-        hideCurrentPageLink();
-      })
-      .catch(() => {
-        document.getElementById('footer-container').textContent = '加载 footer 失败';
-      });
-  </script>
-<!-- footer -->
 </body>
 </html>
