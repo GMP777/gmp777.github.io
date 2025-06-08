@@ -1,211 +1,295 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
-  <title>钻石计算器v.1.5</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: "微软雅黑", sans-serif;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 1rem;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.5rem;
-      color: #333;
-    }
-    .input-group, .mode-group {
-      margin-bottom: 1.5rem;
-    }
-    label {
-      font-weight: bold;
-      font-size: 1rem;
-      color: #222;
-    }
-    input[type="number"], select {
-      width: 100%;
-      padding: 8px;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .item-label {
-      width: 60%;
-      font-size: 1rem;
-      color: #333;
-    }
-    .item-input {
-      width: 35%;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1.1rem;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    #result {
-      margin-top: 2rem;
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #333;
-    }
-    .success { color: #28a745; font-weight: bold; }
-    .fail { color: #dc3545; font-weight: bold; }
-    ul { padding-left: 1.2rem; }
-  </style>
+<title>钻石计算器v.1.5.5</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    margin: 20px;
+    gap: 20px;
+    background: #f9f9f9;
+    color: #333;
+  }
+  main {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  }
+  #exchangeSummary {
+    width: 360px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    background: #fff;
+    height: fit-content;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+    overflow-y: auto;
+    font-size: 14px;
+  }
+  h1, h2 {
+    margin-top: 0;
+    color: #2c3e50;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 15px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: center;
+    font-size: 14px;
+  }
+  th {
+    background-color: #3498db;
+    color: white;
+  }
+  #total, #draw {
+    margin-top: 15px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #34495e;
+  }
+  ul {
+    padding-left: 20px;
+    margin: 0;
+  }
+  li {
+    margin-bottom: 14px;
+    line-height: 1.4;
+  }
+  .success {
+    color: #27ae60;
+    font-weight: 600;
+  }
+  .fail {
+    color: #c0392b;
+    font-weight: 600;
+  }
+  input[type="text"] {
+    width: 90px;
+    padding: 6px 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    outline-offset: 0;
+    transition: border-color 0.2s ease-in-out;
+  }
+  input[type="text"]:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 5px #2980b9;
+  }
+  button {
+    margin-top: 12px;
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: #2980b9;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #1c5980;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>钻石兑换道具计算器</h1>
+<main>
+  <h1>钻石计算器v.1.5.5</h1>
 
-    <div class="input-group">
-      <label for="targetDiamonds">目标钻石数量：</label>
-      <input type="number" id="targetDiamonds" placeholder="例如：500000" min="0" />
-    </div>
+  <table>
+    <thead>
+      <tr><th>道具</th><th>单价（钻石）</th><th>数量</th><th>小计</th></tr>
+    </thead>
+    <tbody id="itemTable"></tbody>
+  </table>
 
-    <div class="mode-group">
-      <label for="mode">优先使用道具：</label>
-      <select id="mode">
-        <option value="high">优先使用高价值道具</option>
-        <option value="low">优先使用低价值道具</option>
-      </select>
-    </div>
+  <div id="total">总钻石：0（零）</div>
+  <div id="draw">可抽奖次数：0 次（50 次抽奖需 500000 钻石）</div>
+</main>
 
-    <div id="item-list"></div>
+<aside id="exchangeSummary">
+  <h2>💎 固定钻石目标兑换方案</h2>
+  <button id="calcExchangeBtn">计算兑换方案</button>
+  <ul id="exchangeList">
+    <li>请先输入道具数量，然后点击上方按钮计算兑换方案。</li>
+  </ul>
+</aside>
 
-    <button onclick="calculateUsage()">计算所需道具</button>
-    <div id="result"></div>
-  </div>
+<script>
+const items = [
+  { name: "可乐", price: 10 },
+  { name: "橙汁", price: 20 },
+  { name: "打火机", price: 50 },
+  { name: "小音响", price: 100 },
+  { name: "鼠标", price: 200 },
+  { name: "耳机", price: 500 },
+  { name: "手表", price: 1000 },
+  { name: "手机", price: 2000 },
+  { name: "摩托车", price: 5000 },
+  { name: "法拉利", price: 10000 }
+];
 
-  <script>
-    const baseItems = [
-      { name: '可乐', price: 10 },
-      { name: '橙汁', price: 20 },
-      { name: '打火机', price: 50 },
-      { name: '小音响', price: 100 },
-      { name: '鼠标', price: 200 },
-      { name: '耳机', price: 500 },
-      { name: '手表', price: 1000 },
-      { name: '手机', price: 2000 },
-      { name: '摩托车', price: 5000 },
-      { name: '法拉利', price: 10000 }
-    ];
+// 兑换钻石目标（只显示这几个）
+const exchangeTargets = [100000, 500000, 1000000, 4000000, 10000000, 20000000];
 
-    function createItemList() {
-      const container = document.getElementById('item-list');
-      container.innerHTML = '';
-      baseItems.forEach((item, i) => {
-        const row = document.createElement('div');
-        row.className = 'item-row';
+// 数字转中文（简化版）
+function numberToChinese(num) {
+  if(num === 0) return "零";
+  const digitToCN = ["零","一","二","三","四","五","六","七","八","九"];
+  const unit = ["","十","百","千","万","十万","百万","千万","亿"];
+  let str = num.toString();
+  let res = "";
+  let zeroFlag = false;
+  for(let i=0; i<str.length; i++){
+    let n = +str[i];
+    let pos = str.length - i -1;
+    if(n === 0){
+      zeroFlag = true;
+    } else {
+      if(zeroFlag) { res += "零"; zeroFlag=false; }
+      res += digitToCN[n] + unit[pos];
+    }
+  }
+  return res.replace(/零+$/,"");
+}
 
-        const label = document.createElement('div');
-        label.className = 'item-label';
-        label.textContent = `${item.name}（${item.price}钻石）`;
+// 创建表格和监听输入
+function createTable(){
+  const tbody = document.getElementById("itemTable");
+  items.forEach((item, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.price}</td>
+      <td><input type="text" id="qty-${idx}" value="0" inputmode="numeric" pattern="[0-9]*" /></td>
+      <td id="subtotal-${idx}">0</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  const inputs = document.querySelectorAll("input[type='text']");
+  let debounceTimer;
+  inputs.forEach(input => {
+    input.addEventListener("input", () => {
+      input.value = input.value.replace(/[^\d]/g, "");
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        calculateTotal();
+      }, 300);
+    });
+  });
+}
 
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.min = '0';
-        input.value = '0';
-        input.id = `item-${i}`;
-        input.className = 'item-input';
+// 计算总钻石和抽奖次数（实时）
+function calculateTotal(){
+  let total = 0;
+  items.forEach((item, idx) => {
+    let qty = parseInt(document.getElementById(`qty-${idx}`).value) || 0;
+    const subtotal = qty * item.price;
+    document.getElementById(`subtotal-${idx}`).textContent = subtotal;
+    total += subtotal;
+  });
+  document.getElementById("total").textContent = `总钻石：${total}（${numberToChinese(total)}）`;
+  const draws = Math.floor(total / 500000);
+  document.getElementById("draw").textContent = `可抽奖次数：${draws} 次（50 次抽奖需 500000 钻石）`;
+}
 
-        row.appendChild(label);
-        row.appendChild(input);
-        container.appendChild(row);
+// 兑换计算（贪心+验证多重限制，按价值倒序用道具满足目标）
+function calcBestExchange(target, itemsAvailable) {
+  // 按单价倒序排序
+  const sorted = itemsAvailable.slice().sort((a,b)=>b.price - a.price);
+  let remain = target;
+  const countMap = {};
+  for(let i=0; i<sorted.length; i++){
+    let maxUse = Math.min(sorted[i].qty, Math.floor(remain / sorted[i].price));
+    if(maxUse > 0){
+      countMap[sorted[i].name] = maxUse;
+      remain -= maxUse * sorted[i].price;
+    }
+  }
+  // 如果还没达到target，考虑用最小的道具“补足”，只要最后能超过目标即可
+  if(remain > 0){
+    // 找最小价格道具（升序）
+    let minItem = itemsAvailable.reduce((min, cur) => cur.price < min.price ? cur : min, itemsAvailable[0]);
+    // 如果剩余钻石不为0，尝试用1个最小道具补足
+    if(minItem.qty > (countMap[minItem.name]||0)){
+      countMap[minItem.name] = (countMap[minItem.name]||0) + 1;
+      remain -= minItem.price;
+    }
+  }
+  // 计算总价
+  let sum = 0;
+  for(let name in countMap){
+    const item = items.find(i => i.name === name);
+    sum += item.price * countMap[name];
+  }
+  if(sum < target){
+    // 说明不足以兑换
+    return null;
+  }
+  return { sum, countMap, exceed: sum - target };
+}
+
+// 点击按钮计算兑换方案
+function calculateAllExchanges(){
+  // 读取当前所有道具的数量
+  const available = [];
+  items.forEach((item, idx) => {
+    let qtyInput = document.getElementById(`qty-${idx}`);
+    let qty = parseInt(qtyInput.value);
+    if(isNaN(qty) || qty < 0) qty = 0;
+    if(qty > 0){
+      available.push({
+        name: item.name,
+        price: item.price,
+        qty: qty
       });
     }
+  });
 
-    createItemList();
+  const ul = document.getElementById("exchangeList");
+  ul.innerHTML = "";
 
-    function calculateUsage() {
-      const target = parseInt(document.getElementById("targetDiamonds").value) || 0;
-      const mode = document.getElementById("mode").value;
-      if (target <= 0) {
-        document.getElementById("result").innerHTML = "<p class='fail'>请输入有效的钻石数量。</p>";
-        return;
-      }
+  if(available.length === 0){
+    ul.innerHTML = "<li>请先输入道具数量，然后点击上方按钮计算兑换方案。</li>";
+    return;
+  }
 
-      const sortedItems = [...baseItems];
-      sortedItems.sort((a, b) => mode === 'high' ? b.price - a.price : a.price - b.price);
-
-      const available = baseItems.map((_, i) => parseInt(document.getElementById(`item-${i}`).value) || 0);
-      const indexMap = sortedItems.map(item => baseItems.findIndex(x => x.name === item.name));
-      const needed = Array(baseItems.length).fill(0);
-
-      let remaining = target;
-      let usedTotal = 0;
-
-      for (let idx of indexMap) {
-        const item = baseItems[idx];
-        const maxUse = Math.min(Math.floor(remaining / item.price), available[idx]);
-        needed[idx] += maxUse;
-        usedTotal += maxUse * item.price;
-        remaining -= maxUse * item.price;
-      }
-
-      for (let idx of indexMap) {
-        const item = baseItems[idx];
-        const extra = available[idx] - needed[idx];
-        if (remaining > 0 && extra > 0) {
-          const extraUse = Math.min(extra, Math.ceil(remaining / item.price));
-          needed[idx] += extraUse;
-          usedTotal += extraUse * item.price;
-          remaining -= extraUse * item.price;
-        }
-      }
-
-      let result = "";
-      if (usedTotal >= target) {
-        const pulls = Math.floor(usedTotal / 10000);
-        result += `<p class="success">✅ 成功兑换所需钻石！</p>`;
-        result += `<p>💎 实际兑换钻石：${usedTotal}，超出 ${usedTotal - target} 钻石</p>`;
-        result += `<p>🎉 可抽奖次数：${pulls} 次（每次抽奖消耗 10000 钻石）</p>`;
-      } else {
-        result += `<p class="fail">❌ 道具不足，无法兑换目标钻石。还差 ${target - usedTotal} 钻石。</p>`;
-      }
-
-      result += `<ul>`;
-      baseItems.forEach((item, i) => {
-        if (needed[i] > 0) {
-          result += `<li>${item.name}：使用 ${needed[i]} 个（价值 ${needed[i] * item.price} 钻石）</li>`;
+  exchangeTargets.forEach(target => {
+    const res = calcBestExchange(target, available);
+    const li = document.createElement("li");
+    if(res === null){
+      li.innerHTML = `💎 <strong>${target.toLocaleString()}</strong> 钻石兑换：<span class="fail">无法兑换，现有道具钻石总额不足。</span>`;
+    } else {
+      const useStrArr = [];
+      // 保证显示顺序跟items一致
+      items.forEach(i => {
+        if(res.countMap[i.name]){
+          useStrArr.push(`${i.name} × ${res.countMap[i.name]}`);
         }
       });
-      result += `</ul>`;
-
-      document.getElementById("result").innerHTML = result;
+      const itemsStr = useStrArr.join("，");
+      li.innerHTML = `💎 <strong>${target.toLocaleString()}</strong> 钻石兑换：<span class="success">可兑换（总计 ${res.sum.toLocaleString()} 钻石，超出 ${res.exceed.toLocaleString()}）</span><br>使用：${itemsStr}`;
     }
-  </script>
+    ul.appendChild(li);
+  });
+}
+
+document.getElementById("calcExchangeBtn").addEventListener("click", calculateAllExchanges);
+
+createTable();
+calculateTotal();
+</script>
   <!-- footer -->
 <footer id="footer-container">加载中...</footer>
 
