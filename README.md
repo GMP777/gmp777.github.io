@@ -18,7 +18,7 @@
 |🐉十二生肖装备合成器| <a href="https://gmp777.github.io/12.html" target="_blank">v.1.0</a> |2025-06-06 01:07:12 |
 |🔧footer自动载入链接|v.5.0|2025-06-07 03:06:34|
 |🔨强化元宝计算器|<a href="https://gmp777.github.io/qh.html" target="_blank">v.0.0</a>|2025-06-10 01:10:46|
-
+|💰充值相关|<a href="https://gmp777.github.io/pay.html" target="_blank">v.0.0</a>|2025-06-10 02:20:39|
 <!-- footer -->
 <footer id="footer-container">加载中...</footer>
 
