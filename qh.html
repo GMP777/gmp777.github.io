@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+  <title>强化花费元宝计算器</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f5f5f5; }
+    table { border-collapse: collapse; width: 100%; background: white; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    select, button { padding: 8px 12px; margin-right: 10px; }
+    .result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>强化花费元宝计算器</h2>
+  <label>起始等级：
+    <select id="startLevel"></select>
+  </label>
+  <label>目标等级：
+    <select id="endLevel"></select>
+  </label>
+  <button onclick="calculate()">计算花费</button>
+
+  <div class="result" id="totalCost"></div>
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>等级</th><th>强化石</th><th>工匠之魂</th><th>成功率</th><th>花费元宝</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const levelData = {
+      "0":  { stone: 2, soul: 0, rate: "100%", cost: 20000 },
+      "1":  { stone: 4, soul: 0, rate: "95%",  cost: 40000 },
+      "2":  { stone: 6, soul: 0, rate: "90%",  cost: 60000 },
+      "3":  { stone: 8, soul: 0, rate: "85%",  cost: 80000 },
+      "4":  { stone: 10, soul: 0, rate: "80%",  cost: 100000 },
+      "5":  { stone: 12, soul: 0, rate: "75%",  cost: 120000 },
+      "6":  { stone: 14, soul: 0, rate: "70%",  cost: 140000 },
+      "7":  { stone: 16, soul: 0, rate: "65%",  cost: 160000 },
+      "8":  { stone: 18, soul: 0, rate: "60%",  cost: 180000 },
+      "9":  { stone: 20, soul: 0, rate: "50%",  cost: 200000 },
+      "10": { stone: 22, soul: 2, rate: "40%",  cost: 6220000 },
+      "11": { stone: 24, soul: 4, rate: "40%",  cost: 12240000 },
+      "12": { stone: 26, soul: 10, rate: "30%", cost: 30260000 },
+      "13": { stone: 28, soul: 20, rate: "30%", cost: 60280000 },
+      "14": { stone: 30, soul: 50, rate: "25%", cost: 150300000 },
+      "15": { stone: 3, soul: 0, rate: "100%", cost: 30000 },
+      "1s": { stone: 6, soul: 0, rate: "76%", cost: 60000 },
+      "2s": { stone: 9, soul: 0, rate: "72%", cost: 90000 },
+      "3s": { stone: 12, soul: 0, rate: "68%", cost: 120000 },
+      "4s": { stone: 15, soul: 0, rate: "65%", cost: 150000 },
+      "5s": { stone: 18, soul: 0, rate: "62%", cost: 180000 },
+      "6s": { stone: 21, soul: 0, rate: "59%", cost: 210000 },
+      "7s": { stone: 24, soul: 0, rate: "56%", cost: 240000 },
+      "8s": { stone: 27, soul: 0, rate: "53%", cost: 270000 },
+      "9s": { stone: 30, soul: 0, rate: "50%", cost: 300000 },
+      "10s": { stone: 33, soul: 4, rate: "40%", cost: 12330000 },
+      "11s": { stone: 36, soul: 10, rate: "40%", cost: 30360000 },
+    };
+
+    const levels = Object.keys(levelData);
+
+    const startSelect = document.getElementById("startLevel");
+    const endSelect = document.getElementById("endLevel");
+
+    levels.forEach(lv => {
+      const opt1 = new Option(lv, lv);
+      const opt2 = new Option(lv, lv);
+      startSelect.appendChild(opt1);
+      endSelect.appendChild(opt2);
+    });
+
+    function toChineseNumber(num) {
+      const units = ['元宝', '万', '亿'];
+      if (num >= 1e8) return (num / 1e8).toFixed(4) + '亿';
+      if (num >= 1e4) return (num / 1e4).toFixed(2) + '万';
+      return num + '元宝';
+    }
+
+    function calculate() {
+      const start = startSelect.value;
+      const end = endSelect.value;
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+
+      const startIndex = levels.indexOf(start);
+      const endIndex = levels.indexOf(end);
+      if (startIndex >= endIndex) {
+        alert("目标等级必须高于起始等级");
+        return;
+      }
+
+      let total = 0;
+      for (let i = startIndex; i < endIndex; i++) {
+        const lv = levels[i];
+        const info = levelData[lv];
+        total += info.cost;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${lv}</td><td>${info.stone}</td><td>${info.soul}</td><td>${info.rate}</td><td>${info.cost.toLocaleString()}</td>`;
+        tbody.appendChild(row);
+      }
+
+      document.getElementById("totalCost").innerText =
+        `累计花费：${total.toLocaleString()} 元宝（${toChineseNumber(total)}）`;
+    }
+  </script>
+  <!-- footer -->
+<footer id="footer-container">加载中...</footer>
+
+  <script>
+    // 隐藏当前页面对应的链接整个元素（不留空白）
+    function hideCurrentPageLink() {
+      const currentPath = window.location.pathname.replace(/\/+$/, '');
+      const links = document.querySelectorAll('.footer-content a');
+
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+          link.style.display = 'none';
+        }
+      });
+    }
+
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        const container = document.getElementById('footer-container');
+        container.innerHTML = html;
+
+        hideCurrentPageLink();
+      })
+      .catch(() => {
+        document.getElementById('footer-container').textContent = '加载 footer 失败';
+      });
+  </script>
+<!-- footer -->
+</body>
+</html>
