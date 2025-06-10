@@ -1,181 +1,88 @@
 <!DOCTYPE html>
 <html lang="zh">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
 <!-- 载入 footer 样式 -->
-  <title>充值奖励查询</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>奖励查询</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    select { padding: 8px; font-size: 16px; }
+  </style>
 </head>
+<body>
 
-<body class="bg-gray-100 p-6">
-  <div id="app" class="max-w-5xl mx-auto">
-    <h1 class="text-3xl font-bold mb-6 text-center">充值奖励查询</h1>
+  <h2>请选择充值金额（单位：元）</h2>
+  <select id="amountSelect" onchange="updateRewards()">
+    <option value="">-- 请选择金额 --</option>
+    <option value="10">10</option>
+    <option value="20">20</option>
+    <option value="30">30</option>
+    <option value="50">50</option>
+    <option value="100">100</option>
+  </select>
 
-    <div class="mb-6 max-w-xs mx-auto">
-      <label for="amount" class="block mb-2 font-semibold text-gray-700">请选择充值金额</label>
-      <select id="amount" v-model="selectedAmount" class="w-full p-3 border rounded-xl shadow cursor-pointer">
-        <option value="">-- 请选择 --</option>
-        <option v-for="amt in uniqueAmounts" :key="amt" :value="amt">{{ amt }}</option>
-      </select>
-    </div>
-
-    <div v-if="selectedAmount" class="overflow-x-auto bg-white p-4 rounded-xl shadow">
-      <h2 class="text-xl font-semibold mb-4">充值金额达到 {{ selectedAmount }} 可获得以下奖励</h2>
-      <table class="min-w-full table-auto border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border border-gray-300 p-3 text-left">活动</th>
-            <th class="border border-gray-300 p-3 text-left">奖励内容</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in filteredAllRewards" :key="item.id" class="border-t hover:bg-gray-50">
-            <td class="border border-gray-300 p-3 align-top whitespace-nowrap">{{ item.source }}</td>
-            <td class="border border-gray-300 p-3">{{ item.reward }}</td>
-          </tr>
-          <tr v-if="filteredAllRewards.length === 0">
-            <td colspan="2" class="p-4 text-center text-gray-500">无对应奖励</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <table id="rewardTable">
+    <thead>
+      <tr>
+        <th>活动类型</th>
+        <th>活动目标</th>
+        <th>活动奖励1</th>
+        <th>活动奖励2</th>
+        <th>活动奖励3</th>
+        <th>活动奖励4</th>
+        <th>活动奖励5</th>
+        <th>金额（元）</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <script>
-    new Vue({
-      el: '#app',
-      data: {
-        selectedAmount: '',
-        rechargeData: [
-          { diamonds: '10W', treasure: '100', destiny: '90', refine: '10', amount: '￥10.00' },
-          { diamonds: '50W', treasure: '400', destiny: '360', refine: '40', amount: '￥10.00' },
-          { diamonds: '100W', treasure: '500', destiny: '450', refine: '50', amount: '￥10.00' },
-          { diamonds: '400W', treasure: '2000', destiny: '3600', refine: '400', amount: '￥20.00' },
-          { diamonds: '1000W', treasure: '2500', destiny: '4500', refine: '500', amount: '￥50.00' },
-          { diamonds: '2000W', treasure: '5000', destiny: '9000', refine: '1000', amount: '￥100.00' },
-        ],
-        dailyData: [
-          { type: '累计充值', diamonds: '累计充值1KW钻石', content: '星脉卷轴（大）80，天命宝钻90，1W钻石500', note: '', amount: '￥50.00' },
-          { type: '累计充值', diamonds: '累计充值3KW钻石', content: '鼎炉9阶，天命宝钻180，1W钻石1000', note: '', amount: '￥100.00' },
-          { type: '累计充值', diamonds: '累计充值5KW钻石', content: '法镜10阶，天命宝钻270，1W钻石3000', note: '', amount: '￥200.00' },
-          { type: '累计充值', diamonds: '累计充值7KW钻石', content: '1阶天命神甲，天命宝钻360，1W钻石4000', note: '', amount: '￥210.00' },
-          { type: '累计充值', diamonds: '累计充值1E钻石', content: '赤血战剑，天命宝钻455，1W钻石6000', note: '', amount: '￥320.00' },
-        ],
-        continuousData: [
-          { day: '连续充值第1天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-          { day: '连续充值第2天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-          { day: '连续充值第3天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-          { day: '连续充值第4天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-          { day: '连续充值第5天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-          { day: '连续充值第6天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-          { day: '连续充值第7天', reward500: '强化石300、熔晶石100、一万钻石100', amount500: '￥30', reward1000: '强化石500、熔晶石100、一万钻石900', amount1000: '￥50' },
-        ],
-        firstPackData: [
-          { amount: '10', content: '45阶剑、两仪升级丹100、五万元宝5个、30天宠物一张、帝国虎符1个' },
-          { amount: '50', content: '1阶天命神装甲、伏魔元石300、绝版称号、顶级爆率卡、魔法圣盾技能书' },
-          { amount: '100', content: '1阶天命神装兵、幻化丝绸99、幻化晶石99、天际星陨10、幻化精玉99' },
-        ]
-      },
-      computed: {
-        uniqueAmounts() {
-          const amountsSet = new Set();
+    const data = [
+      { type: "每日充值", target: "充值10万钻石", r1: "寻宝令100", r2: "天命宝钻90", r3: "熔炼石10", r4: "", r5: "", amount: 10 },
+      { type: "每日充值", target: "充值50万钻石", r1: "寻宝令400", r2: "天命宝钻360", r3: "熔炼石40", r4: "", r5: "", amount: 10 },
+      { type: "每日充值", target: "充值100万钻石", r1: "寻宝令500", r2: "天命宝钻450", r3: "熔炼石50", r4: "", r5: "", amount: 10 },
+      { type: "每日充值", target: "充值400万钻石", r1: "寻宝令2000", r2: "天命宝钻3600", r3: "熔炼石400", r4: "", r5: "", amount: 20 },
+      { type: "每日充值", target: "充值1000万钻石", r1: "寻宝令2500", r2: "天命宝钻4500", r3: "熔炼石500", r4: "", r5: "", amount: 50 },
+      { type: "每日充值", target: "充值2000万钻石", r1: "寻宝令5000", r2: "天命宝钻9000", r3: "熔炼石1000", r4: "", r5: "", amount: 100 },
+      { type: "连续充值", target: "连充500万钻石", r1: "强化石300", r2: "熔晶石100", r3: "一万钻石100", r4: "", r5: "", amount: 30 },
+      { type: "连续充值", target: "连充1000万钻石", r1: "强化石500", r2: "熔晶石100", r3: "一万钻石900", r4: "", r5: "", amount: 50 },
+      { type: "首充大礼包", target: "充值10元", r1: "45阶星王★秦俑龙蟠★剑1", r2: "两仪升级丹100", r3: "五万元宝5", r4: "宠物卡1", r5: "帝国虎符1", amount: 10 },
+      { type: "首充大礼包", target: "充值50元", r1: "1阶天命神装甲1", r2: "伏魔元石300", r3: "绝版称号1", r4: "顶级爆率卡1", r5: "魔法圣盾技能书1", amount: 50 },
+      { type: "首充大礼包", target: "充值100元", r1: "1阶天命神装兵1", r2: "幻化丝绸99", r3: "幻化晶石99", r4: "天际星陨10", r5: "幻化精玉99", amount: 100 }
+    ];
 
-          const parseNum = (str) => {
-            const match = str.match(/\d+/);
-            return match ? match[0] : '';
-          };
+    function updateRewards() {
+      const selected = parseInt(document.getElementById("amountSelect").value);
+      const tbody = document.getElementById("rewardTable").querySelector("tbody");
+      tbody.innerHTML = "";
 
-          [...this.rechargeData, ...this.dailyData].forEach(item => amountsSet.add(parseNum(item.amount)));
-          this.continuousData.forEach(item => {
-            amountsSet.add(parseNum(item.amount500));
-            amountsSet.add(parseNum(item.amount1000));
-          });
-          this.firstPackData.forEach(item => amountsSet.add(item.amount));
+      if (!selected) return;
 
-          return Array.from(amountsSet)
-            .filter(x => x)
-            .sort((a, b) => parseInt(a) - parseInt(b));
-        },
+      const filtered = data.filter(row => row.amount <= selected);
 
-        filteredAllRewards() {
-          if (!this.selectedAmount) return [];
-
-          const selNum = this.selectedAmount;
-
-          const results = [];
-
-          const parseNum = (str) => {
-            const match = str.match(/\d+/);
-            return match ? match[0] : '';
-          };
-
-          // 每日充值
-          this.rechargeData.forEach(item => {
-            if (parseNum(item.amount) === selNum) {
-              results.push({
-                id: `recharge-${item.diamonds}`,
-                source: '每日充值',
-                reward: `寻宝令${item.treasure}，天命宝钻${item.destiny}，熔炼石${item.refine}`,
-                amount: selNum,
-              });
-            }
-          });
-
-          // 累计充值
-          this.dailyData.forEach(item => {
-            if (parseNum(item.amount) === selNum) {
-              results.push({
-                id: `daily-${item.diamonds}`,
-                source: '累计充值',
-                reward: item.content,
-                amount: selNum,
-              });
-            }
-          });
-
-          // 连续充值
-          this.continuousData.forEach(item => {
-            if (parseNum(item.amount500) === selNum) {
-              results.push({
-                id: `cont500-${item.day}`,
-                source: '连续充值',
-                reward: `${item.day} 500W档奖励：${item.reward500}`,
-                amount: selNum,
-              });
-            }
-            if (parseNum(item.amount1000) === selNum) {
-              results.push({
-                id: `cont1000-${item.day}`,
-                source: '连续充值',
-                reward: `${item.day} 1000W档奖励：${item.reward1000}`,
-                amount: selNum,
-              });
-            }
-          });
-
-          // 首冲大礼包
-          this.firstPackData.forEach(item => {
-            if (item.amount === selNum) {
-              results.push({
-                id: `firstpack-${item.amount}`,
-                source: '首冲大礼包',
-                reward: item.content,
-                amount: selNum,
-              });
-            }
-          });
-
-          return results;
-        }
-      }
-    });
+      filtered.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.type}</td>
+          <td>${row.target}</td>
+          <td>${row.r1}</td>
+          <td>${row.r2}</td>
+          <td>${row.r3}</td>
+          <td>${row.r4}</td>
+          <td>${row.r5}</td>
+          <td>${row.amount}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
   </script>
-  <!-- footer -->
+<!-- footer -->
 <footer id="footer-container">加载中...</footer>
 
   <script>
@@ -209,5 +116,4 @@
   </script>
 <!-- footer -->
 </body>
-
 </html>
