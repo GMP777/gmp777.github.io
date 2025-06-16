@@ -1,87 +1,154 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
 <!-- 载入 footer 样式 -->
-  <title>奖励查询</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f4f4f4; }
-    select { padding: 8px; font-size: 16px; }
-  </style>
+<title>充值奖励 & 抽奖方案（支持天数限制）</title>
+<style>
+  body { font-family: "微软雅黑", sans-serif; padding: 20px; background: #fafafa; }
+  h2 { margin: 30px 0 10px; color: #333; }
+  label, select, input, button { margin: 5px 0; font-size: 14px; }
+  select, input { padding: 5px; }
+  button { padding: 6px 12px; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+  th, td { border:1px solid #ccc; padding: 8px; text-align: center; }
+  th { background:#eee; }
+  .footnote { font-size: 12px; color: #666; }
+  .section { background: #fff; padding: 15px; margin-bottom: 30px; border-radius: 6px; box-shadow: 0 0 5px rgba(0,0,0,0.05); }
+  @media (max-width:600px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    td { text-align: left; position: relative; padding-left: 50%; }
+    td:before { content: attr(data-label); position: absolute; left:8px; font-weight:bold; }
+  }
+</style>
 </head>
 <body>
 
-  <h2>请选择充值金额（单位：元）</h2>
-  <select id="amountSelect" onchange="updateRewards()">
-    <option value="">-- 请选择金额 --</option>
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="30">30</option>
-    <option value="50">50</option>
-    <option value="100">100</option>
+<div class="section">
+  <h2>🏷️ 查看充值奖励</h2>
+  <label for="amountSelect">请选择充值金额（元）：</label>
+  <select id="amountSelect">
+    <option value="">-- 请选择 --</option>
   </select>
+  <div id="rewardTable"></div>
+</div>
 
-  <table id="rewardTable">
-    <thead>
-      <tr>
-        <th>活动类型</th>
-        <th>活动目标</th>
-        <th>活动奖励1</th>
-        <th>活动奖励2</th>
-        <th>活动奖励3</th>
-        <th>活动奖励4</th>
-        <th>活动奖励5</th>
-        <th>金额（元）</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<div class="section">
+  <h2>🎯 抽奖最优充值方案（支持天数限制）</h2>
+  <label for="drawInput">请输入目标抽数：</label>
+  <input id="drawInput" type="number" value="20000" min="1">
+  <br>
+  <label for="dayLimit">请输入活动持续天数（例如4或7）：</label>
+  <input id="dayLimit" type="number" value="4" min="1">
+  <br>
+  <button onclick="calculateBestPlan()">计算最优方案</button>
+  <div id="drawResult"></div>
+</div>
 
-  <script>
-    const data = [
-      { type: "每日充值", target: "充值10万钻石", r1: "寻宝令100", r2: "天命宝钻90", r3: "熔炼石10", r4: "", r5: "", amount: 10 },
-      { type: "每日充值", target: "充值50万钻石", r1: "寻宝令400", r2: "天命宝钻360", r3: "熔炼石40", r4: "", r5: "", amount: 10 },
-      { type: "每日充值", target: "充值100万钻石", r1: "寻宝令500", r2: "天命宝钻450", r3: "熔炼石50", r4: "", r5: "", amount: 10 },
-      { type: "每日充值", target: "充值400万钻石", r1: "寻宝令2000", r2: "天命宝钻3600", r3: "熔炼石400", r4: "", r5: "", amount: 20 },
-      { type: "每日充值", target: "充值1000万钻石", r1: "寻宝令2500", r2: "天命宝钻4500", r3: "熔炼石500", r4: "", r5: "", amount: 50 },
-      { type: "每日充值", target: "充值2000万钻石", r1: "寻宝令5000", r2: "天命宝钻9000", r3: "熔炼石1000", r4: "", r5: "", amount: 100 },
-      { type: "连续充值", target: "连充500万钻石", r1: "强化石300", r2: "熔晶石100", r3: "一万钻石100", r4: "", r5: "", amount: 30 },
-      { type: "连续充值", target: "连充1000万钻石", r1: "强化石500", r2: "熔晶石100", r3: "一万钻石900", r4: "", r5: "", amount: 50 },
-      { type: "首充大礼包", target: "充值10元", r1: "45阶星王★秦俑龙蟠★剑1", r2: "两仪升级丹100", r3: "五万元宝5", r4: "宠物卡1", r5: "帝国虎符1", amount: 10 },
-      { type: "首充大礼包", target: "充值50元", r1: "1阶天命神装甲1", r2: "伏魔元石300", r3: "绝版称号1", r4: "顶级爆率卡1", r5: "魔法圣盾技能书1", amount: 50 },
-      { type: "首充大礼包", target: "充值100元", r1: "1阶天命神装兵1", r2: "幻化丝绸99", r3: "幻化晶石99", r4: "天际星陨10", r5: "幻化精玉99", amount: 100 }
-    ];
+<div class="section footnote">
+  <strong>道具价格说明：</strong><br>
+  寻宝令<sup>1</sup> ≈ 10,000钻石；强化石<sup>2</sup> ≈ 10,000元宝；宠物卡<sup>3</sup> ≈ 1,888,888钻石；<br>
+  魔法圣盾技能书<sup>4</sup> ≈ 900,000,000元宝；伏魔元石<sup>5</sup> ≈ 50,000钻石；<br>
+  5万元宝<sup>6</sup> = 50,000元宝；10000钻石<sup>7</sup> = 10,000钻石。
+</div>
 
-    function updateRewards() {
-      const selected = parseInt(document.getElementById("amountSelect").value);
-      const tbody = document.getElementById("rewardTable").querySelector("tbody");
-      tbody.innerHTML = "";
+<script>
+// 数据源
+const rewardData = [
+  { type:"每日充值", amt:10, rewards:["寻宝令100","天命宝钻90","熔炼石10"] },
+  { type:"每日充值", amt:10, rewards:["寻宝令400","天命宝钻360","熔炼石40"] },
+  { type:"每日充值", amt:10, rewards:["寻宝令500","天命宝钻450","熔炼石50"] },
+  { type:"每日充值", amt:20, rewards:["寻宝令2000","天命宝钻3600","熔炼石400"] },
+  { type:"每日充值", amt:50, rewards:["寻宝令2500","天命宝钻4500","熔炼石500"] },
+  { type:"每日充值", amt:100, rewards:["寻宝令5000","天命宝钻9000","熔炼石1000"] },
+  { type:"连续充值", amt:30, rewards:["强化石300","熔晶石100","10000钻石100"] },
+  { type:"连续充值", amt:50, rewards:["强化石500","熔晶石100","10000钻石900"] },
+  { type:"首充大礼包", amt:10, rewards:["45阶星王★秦俑龙蟠★剑1","两仪升级丹100","5万元宝5","宠物卡1","帝国虎符1"] },
+  { type:"首充大礼包", amt:50, rewards:["1阶天命★神の甲1","伏魔元石300","绝版称号1","顶级爆率卡1","魔法圣盾技能书1"] },
+  { type:"首充大礼包", amt:100, rewards:["1阶天命★神の兵1","幻化丝绸99","幻化晶石99","天际星陨10","幻化精玉99"] },
+  { type:"累计充值", amt:50, rewards:["星脉卷轴（大）80","天命宝钻90","10000钻石500"] },
+  { type:"累计充值", amt:100, rewards:["魂☆鼎炉☆9阶","天命宝钻180","10000钻石1000"] },
+  { type:"累计充值", amt:200, rewards:["魂☆法镜☆10阶","天命宝钻270","10000钻石3000"] },
+  { type:"累计充值", amt:250, rewards:["1阶天命★神の甲1","天命宝钻360","10000钻石4000"] },
+  { type:"累计充值", amt:350, rewards:["赤血★战剑","天命宝钻455","10000钻石6000"] }
+];
 
-      if (!selected) return;
+const diamondData = [
+  { amt:10, dia:2000000 }, { amt:20, dia:4000000 }, { amt:30, dia:6000000 },
+  { amt:50, dia:10000000 }, { amt:100, dia:30000000 }, { amt:200, dia:60000000 },
+  { amt:300, dia:90000000 }, { amt:500, dia:200000000 }, { amt:1000, dia:500000000 },
+  { amt:1500, dia:750000000 }, { amt:2000, dia:1200000000 }, { amt:3000, dia:2100000000 }
+];
 
-      const filtered = data.filter(row => row.amount <= selected);
+// 初始化金额选择
+(function(){
+  const sel = document.getElementById("amountSelect");
+  const amts = [...new Set(rewardData.map(r=>r.amt))].sort((a,b)=>a-b);
+  amts.forEach(a => sel.add(new Option(a, a)));
+  sel.addEventListener("change", showRewards);
+})();
 
-      filtered.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.type}</td>
-          <td>${row.target}</td>
-          <td>${row.r1}</td>
-          <td>${row.r2}</td>
-          <td>${row.r3}</td>
-          <td>${row.r4}</td>
-          <td>${row.r5}</td>
-          <td>${row.amount}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+// 展示奖励内容
+function showRewards() {
+  const v = +this.value;
+  if (!v) return document.getElementById("rewardTable").innerHTML = "<p>请选择金额</p>";
+  
+  const list = rewardData.filter(r => r.amt <= v).sort((a, b) => a.amt - b.amt);
+  
+  let html = `<table><tr><th>类型</th><th>金额</th><th>奖励内容</th></tr>`;
+  list.forEach(r => {
+    html += `<tr><td>${r.type}</td><td>${r.amt} 元</td><td>${r.rewards.join('，')}</td></tr>`;
+  });
+  html += "</table>";
+
+  document.getElementById("rewardTable").innerHTML = html;
+}
+
+// 计算抽奖最优方案，支持天数限制
+function calculateBestPlan() {
+  const target = +document.getElementById("drawInput").value;
+  const days = +document.getElementById("dayLimit").value;
+
+  if (!target || target < 1) return alert("请输入正确的目标抽数！");
+  if (!days || days < 1) return alert("请输入正确的活动天数！");
+
+  // 每档每日寻宝令奖励
+  const dailyOptions = [
+    { amt:10, draws:100+400+500 }, // 10元档
+    { amt:20, draws:100+400+500+2000 }, // 20元档
+    { amt:50, draws:100+400+500+2000+2500 }, // 50元档
+    { amt:100, draws:100+400+500+2000+2500+5000 } // 100元档
+  ];
+
+  let selected = null;
+
+  for (let option of dailyOptions) {
+    if (option.draws * days >= target) {
+      selected = option;
+      break;
     }
-  </script>
+  }
+
+  if (!selected) {
+    document.getElementById("drawResult").innerHTML = "<p>当前天数内无法达到目标抽数，请延长天数或调整目标。</p>";
+    return;
+  }
+
+  const totalDraws = selected.draws * days;
+  const totalCost = selected.amt * days;
+
+  document.getElementById("drawResult").innerHTML = `
+    <p>目标抽数：<strong>${target}</strong> 抽</p>
+    <p>活动天数：<strong>${days}</strong> 天</p>
+    <p>推荐每日充值：<strong>${selected.amt} 元</strong>（每日可得 ${selected.draws} 抽）</p>
+    <p>总充值：<strong>${totalCost} 元</strong></p>
+    <p>总可得抽数：<strong>${totalDraws} 抽</strong></p>
+  `;
+}
+</script>
 <!-- footer -->
 <footer id="footer-container">加载中...</footer>
 
