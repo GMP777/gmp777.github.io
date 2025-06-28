@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<title>🎮</title>
+<style>
+  body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
+  h2 { text-align: center; }
+  .tabs { text-align: center; margin-bottom: 20px; }
+  .tab-btn {
+    cursor: pointer;
+    border: 1px solid #007bff;
+    background: white;
+    color: #007bff;
+    padding: 6px 14px;
+    margin: 0 4px 10px 4px;
+    border-radius: 4px;
+    font-size: 1em;
+    transition: 0.3s;
+  }
+  .tab-btn.active, .tab-btn:hover {
+    background: #007bff;
+    color: white;
+  }
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+    justify-items: center;
+  }
+  .grid-item a {
+    display: inline-block;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #007bff;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .grid-item a:hover {
+    text-decoration: underline;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<h2>多游戏区服链接生成器</h2>
+
+<div class="tabs" id="tabs"></div>
+<div id="tables"></div>
+
+<script>
+  const games = [
+    { id: '111', name: '满V切割神域', servers: [235, 248, 249, 250, 251, 252, 253, 254] },
+    { id: '115', name: '满V悠久传奇', servers: [86,87,93,95,101,102,103, 104, 105, 107] },
+    { id: '137', name: 'GM赤焰无双', servers: [1, 2, 3, 4] },
+  ];
+
+  const tabsContainer = document.getElementById('tabs');
+  const tablesContainer = document.getElementById('tables');
+
+  function createGrid(game) {
+    const container = document.createElement('div');
+    container.id = 'table-' + game.id;
+    container.className = 'grid-container';
+    if (game !== games[0]) container.classList.add('hidden');
+
+    game.servers.forEach(server => {
+      const item = document.createElement('div');
+      item.className = 'grid-item';
+
+      const a = document.createElement('a');
+      a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+      a.target = '_blank';
+      a.textContent = `${server}区`;
+
+      item.appendChild(a);
+      container.appendChild(item);
+    });
+
+    return container;
+  }
+
+  games.forEach((game, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = game.name;
+    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      games.forEach(g => document.getElementById('table-' + g.id).classList.add('hidden'));
+      document.getElementById('table-' + game.id).classList.remove('hidden');
+    };
+    tabsContainer.appendChild(btn);
+
+    tablesContainer.appendChild(createGrid(game));
+  });
+</script>
+
+</body>
+</html>

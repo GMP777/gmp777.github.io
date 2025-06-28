@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta charset="UTF-8" />
+<title>🆕🎮</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f9f9f9;
+  }
+  .tabs {
+    max-width: 960px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .tab-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    border: 1px solid #007bff;
+    background: white;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  .tab-btn.active,
+  .tab-btn:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  .game-section {
+    max-width: 960px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 15px 20px 30px;
+    box-shadow: 0 0 12px #ccc;
+    border-radius: 6px;
+    display: none;
+  }
+  .game-section.active {
+    display: block;
+  }
+  .server-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px 15px;
+    margin-top: 15px;
+  }
+  .server-item {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 4px;
+    background-color: #fafafa;
+    transition: background-color 0.3s;
+  }
+  .server-item a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: normal;
+  }
+  .server-item a:hover {
+    text-decoration: underline;
+    background-color: #e6f0ff;
+  }
+  button.sort-btn {
+    display: block;
+    margin: 0 auto;
+    padding: 8px 16px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="tabs" id="tabsContainer">
+  <!-- 按钮动态生成 -->
+</div>
+
+<div class="game-section" id="game1">
+  <h2>满V切割神域</h2>
+  <button class="sort-btn">排序：从低到高 ↓</button>
+  <div class="server-grid"></div>
+</div>
+
+<div class="game-section" id="game2">
+  <h2>满V悠久传奇</h2>
+  <button class="sort-btn">排序：从低到高 ↓</button>
+  <div class="server-grid"></div>
+</div>
+
+<div class="game-section" id="game3">
+  <h2>GM赤焰无双</h2>
+  <button class="sort-btn">排序：从低到高 ↓</button>
+  <div class="server-grid"></div>
+</div>
+
+<script>
+  const games = [
+    { id: 'game1', name: '满V切割传奇', maxServer: 256, urlPrefix: 'http://gm.xayxms.cn/login/111/' },
+    { id: 'game2', name: '满V悠久传奇', maxServer: 107, urlPrefix: 'http://gm.xayxms.cn/login/105/' },
+    { id: 'game3', name: 'GM赤焰无双', maxServer: 4, urlPrefix: 'http://gm.xayxms.cn/login/137/' },
+  ];
+
+  const tabsContainer = document.getElementById('tabsContainer');
+
+  games.forEach((game, index) => {
+    // 动态生成顶部切换按钮
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.textContent = game.name;
+    if (index === 0) btn.classList.add('active');
+    btn.onclick = () => {
+      // 切换tab按钮高亮
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // 显示对应游戏区服列表，隐藏其他
+      games.forEach(g => {
+        const section = document.getElementById(g.id);
+        if (g.id === game.id) section.classList.add('active');
+        else section.classList.remove('active');
+      });
+    };
+    tabsContainer.appendChild(btn);
+
+    // 初始化游戏区服列表和排序逻辑
+    const section = document.getElementById(game.id);
+    const sortBtn = section.querySelector('button.sort-btn');
+    const grid = section.querySelector('.server-grid');
+
+    let servers = [];
+    for(let i = 1; i <= game.maxServer; i++) {
+      servers.push({ id: i, url: `${game.urlPrefix}${i}.html` });
+    }
+    let ascending = true;
+
+    function render() {
+      grid.innerHTML = '';
+      servers.forEach(server => {
+        const div = document.createElement('div');
+        div.className = 'server-item';
+        div.innerHTML = `<a href="${server.url}" target="_blank" title="多线${server.id}区">多线${server.id}区</a>`;
+        grid.appendChild(div);
+      });
+    }
+
+    sortBtn.onclick = () => {
+      ascending = !ascending;
+      sortBtn.textContent = ascending ? '排序：从低到高 ↓' : '排序：从高到低 ↑';
+      servers.sort((a,b) => ascending ? a.id - b.id : b.id - a.id);
+      render();
+    };
+
+    render();
+  });
+
+  // 页面加载后默认显示第一个游戏区服列表
+  document.getElementById(games[0].id).classList.add('active');
+</script>
+
+</body>
+</html>
