@@ -45,15 +45,16 @@
 </head>
 <body>
 <a href="https://gmp777.github.io/newgame.html">🎮</a>
-  
+
 <div class="tabs" id="tabs"></div>
 <div id="tables"></div>
 
 <script>
   const games = [
-    { id: '111', name: '满V切割神域', servers: [235, 248, 249, 250, 251, 252, 253, 254] },
-    { id: '115', name: '满V悠久传奇', servers: [86,87,93,95,101,102,103, 104, 105, 107] },
-    { id: '137', name: 'GM赤焰无双', servers: [1, 2, 3, 4] },
+    { id: '111', name: '满V切割神域', servers: [235, 248, 249, 250, 251, 252, 253, 254], type: 'xayxms' },
+    { id: '115', name: '满V悠久传奇', servers: [86,87,93,95,101,102,103, 104, 105, 107], type: 'xayxms' },
+    { id: '137', name: 'GM赤焰无双', servers: [1, 2, 3, 4], type: 'xayxms' },
+    { id: 'ydcs', name: '炎黃大陸', servers: [543,544,545,547,548,551], type: '1100yx' }
   ];
 
   const tabsContainer = document.getElementById('tabs');
@@ -70,7 +71,12 @@
       item.className = 'grid-item';
 
       const a = document.createElement('a');
-      a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+      if (game.type === '1100yx') {
+        a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
+      } else {
+        a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+      }
+
       a.target = '_blank';
       a.textContent = `${server}区`;
 
