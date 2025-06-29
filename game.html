@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>🎮 游戏跳转 + GM 页面</title>
+  <title>🎮</title>
   <style>
     body {
       font-family: Arial;
@@ -60,12 +60,19 @@
       text-align: center;
     }
 
+    /* 改为flex布局 支持换行 */
     .iframe-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
       margin-bottom: 10px;
     }
 
+    /* 按钮自适应宽度 */
     .iframe-buttons button {
-      margin: 0 5px;
+      flex: 1 1 120px; /* 最小120px，自动扩展 */
+      max-width: 160px;
       padding: 6px 14px;
       border: 1px solid #28a745;
       background: white;
@@ -73,6 +80,8 @@
       border-radius: 4px;
       cursor: pointer;
       transition: 0.3s;
+      white-space: nowrap;
+      box-sizing: border-box;
     }
 
     .iframe-buttons button.active,
@@ -89,6 +98,10 @@
       color: white;
       border-radius: 4px;
       cursor: pointer;
+      flex: 1 1 100px;
+      max-width: 120px;
+      white-space: nowrap;
+      box-sizing: border-box;
     }
 
     iframe {
@@ -97,30 +110,50 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       margin-top: 10px;
+      box-sizing: border-box;
     }
 
     .hidden {
       display: none;
     }
+
+    /* 响应式调整 */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .tab-btn {
+        font-size: 0.9em;
+        padding: 5px 10px;
+        margin: 0 3px 8px 3px;
+      }
+      .iframe-buttons button,
+      .close-btn {
+        flex: 1 1 100%;
+        max-width: 100%;
+        font-size: 0.9em;
+      }
+      iframe {
+        height: 400px;
+      }
+    }
   </style>
 </head>
 <body>
-
 <a href="https://gmp777.github.io/newgame.html">🎮</a>
-
 <div class="tabs" id="tabs"></div>
 <div id="tables"></div>
 
 <!-- 嵌套 iframe 区域 -->
 <div class="iframe-section">
-<div class="iframe-buttons">
-  <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/115.html')">满V悠久传奇</button>
-  <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/111.html')">满V切割神域</button>
-  <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/137.html')">GM赤焰无双</button>
-  <button id="closeBtn" class="close-btn hidden" onclick="closeIframe()">关闭页面</button>
+  <div class="iframe-buttons">
+    <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/115.html')">满V悠久传奇</button>
+    <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/111.html')">满V切割神域</button>
+    <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/137.html')">GM赤焰无双</button>
+    <button id="closeBtn" class="close-btn hidden" onclick="closeIframe()">关闭页面</button>
+  </div>
+  <iframe id="embeddedPage" class="hidden" loading="lazy"></iframe>
 </div>
-<iframe id="embeddedPage" class="hidden" loading="lazy"></iframe>
-
 
 <script>
   // 游戏数据表格部分
