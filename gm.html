@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>⚙️</title>
+<style>
+  html, body {
+    height: 100%;
+    margin: 0; padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+  #button-bar {
+    background: #007bff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  /* 左边 iframe 切换按钮 */
+  #iframe-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  /* 右边新窗口打开按钮 */
+  #newtab-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  button {
+    background: white;
+    border: 2px solid #007bff;
+    color: #007bff;
+    padding: 8px 16px;
+    font-size: 1em;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+  #iframe-buttons button.active,
+  #iframe-buttons button:hover {
+    background: #007bff;
+    color: white;
+  }
+  /* 新窗口打开按钮悬停也变色 */
+  #newtab-buttons button:hover {
+    background: #0056b3;
+    color: white;
+    border-color: #0056b3;
+  }
+  iframe {
+    flex-grow: 1;
+    width: 100%;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="button-bar">
+  <div id="iframe-buttons">
+    <button class="active" data-src="http://gm.xayxms.cn/games/115.html">满V悠久传奇</button>
+    <button data-src="http://gm.xayxms.cn/games/111.html">满V切割神域</button>
+    <button data-src="http://gm.xayxms.cn/games/137.html">GM赤焰无双</button>
+  </div>
+  <div id="newtab-buttons">
+    <button onclick="window.open('https://gmp777.github.io/newgame.html', '_blank')">🆕🎮</button>
+    <button onclick="window.open('https://gmp777.github.io/game.html', '_blank')">🎮</button>
+  </div>
+</div>
+
+<iframe id="gameFrame" src="http://gm.xayxms.cn/games/115.html" loading="lazy"></iframe>
+
+<script>
+  const iframeButtons = document.querySelectorAll('#iframe-buttons button');
+  const iframe = document.getElementById('gameFrame');
+
+  iframeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      iframeButtons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      iframe.src = button.getAttribute('data-src');
+    });
+  });
+</script>
+
+</body>
+</html>
