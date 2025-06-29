@@ -6,19 +6,25 @@
 <style>
   body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
   h2 { text-align: center; }
-  .tabs { text-align: center; margin-bottom: 20px; }
-  .tab-btn {
+  .tabs {
+    display: flex;              /* 横排 */
+    justify-content: center;    /* 居中 */
+    align-items: center;        /* 垂直居中 */
+    gap: 12px;                  /* 按钮间距 */
+    margin-bottom: 20px;
+  }
+  .tab-btn, .top-extra-btn {
     cursor: pointer;
     border: 1px solid #007bff;
     background: white;
     color: #007bff;
     padding: 6px 14px;
-    margin: 0 4px 10px 4px;
     border-radius: 4px;
     font-size: 1em;
     transition: 0.3s;
   }
-  .tab-btn.active, .tab-btn:hover {
+  .tab-btn.active, .tab-btn:hover,
+  .top-extra-btn:hover {
     background: #007bff;
     color: white;
   }
@@ -41,10 +47,10 @@
     text-decoration: underline;
   }
   .hidden { display: none; }
+  /* 取消之前底部按钮容器样式，按钮已移除底部 */
 </style>
 </head>
 <body>
-<a href="https://gmp777.github.io/newgame.html">🎮</a><a href="https://gmp777.github.io/gm.html">⚙️</a>
 <div class="tabs" id="tabs"></div>
 <div id="tables"></div>
 
@@ -59,6 +65,7 @@
   const tabsContainer = document.getElementById('tabs');
   const tablesContainer = document.getElementById('tables');
 
+  // 创建服务器列表表格
   function createGrid(game) {
     const container = document.createElement('div');
     container.id = 'table-' + game.id;
@@ -86,6 +93,7 @@
     return container;
   }
 
+  // 生成顶部游戏切换按钮
   games.forEach((game, idx) => {
     const btn = document.createElement('button');
     btn.textContent = game.name;
@@ -100,6 +108,23 @@
 
     tablesContainer.appendChild(createGrid(game));
   });
+
+  // 创建顶部额外按钮函数
+  function createTopButton(html, title, url) {
+    const btn = document.createElement('button');
+    btn.innerHTML = html;
+    btn.title = title;
+    btn.className = 'top-extra-btn';
+    btn.onclick = () => window.open(url, '_blank');
+    return btn;
+  }
+
+  const btnNewGame = createTopButton('🎮', '新游戏页面', 'https://gmp777.github.io/newgame.html');
+  const btnGM = createTopButton('⚙️', 'GM页面', 'https://gmp777.github.io/gm.html');
+
+  tabsContainer.appendChild(btnNewGame);
+  tabsContainer.appendChild(btnGM);
+
 </script>
 
 </body>
