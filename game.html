@@ -1,60 +1,134 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8" />
-<title>🎮</title>
-<style>
-  body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
-  h2 { text-align: center; }
-  .tabs { text-align: center; margin-bottom: 20px; }
-  .tab-btn {
-    cursor: pointer;
-    border: 1px solid #007bff;
-    background: white;
-    color: #007bff;
-    padding: 6px 14px;
-    margin: 0 4px 10px 4px;
-    border-radius: 4px;
-    font-size: 1em;
-    transition: 0.3s;
-  }
-  .tab-btn.active, .tab-btn:hover {
-    background: #007bff;
-    color: white;
-  }
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 10px;
-    justify-items: center;
-  }
-  .grid-item a {
-    display: inline-block;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    color: #007bff;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .grid-item a:hover {
-    text-decoration: underline;
-  }
-  .hidden { display: none; }
-</style>
+  <meta charset="UTF-8" />
+  <title>🎮 游戏跳转 + GM 页面</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+    }
+
+    .tabs {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      cursor: pointer;
+      border: 1px solid #007bff;
+      background: white;
+      color: #007bff;
+      padding: 6px 14px;
+      margin: 0 4px 10px 4px;
+      border-radius: 4px;
+      font-size: 1em;
+      transition: 0.3s;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: #007bff;
+      color: white;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .grid-item a {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #007bff;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .grid-item a:hover {
+      text-decoration: underline;
+    }
+
+    .iframe-section {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .iframe-buttons {
+      margin-bottom: 10px;
+    }
+
+    .iframe-buttons button {
+      margin: 0 5px;
+      padding: 6px 14px;
+      border: 1px solid #28a745;
+      background: white;
+      color: #28a745;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .iframe-buttons button.active,
+    .iframe-buttons button:hover {
+      background: #28a745;
+      color: white;
+    }
+
+    .close-btn {
+      margin-top: 10px;
+      padding: 6px 14px;
+      background: #dc3545;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
+
 <a href="https://gmp777.github.io/newgame.html">🎮</a>
 
 <div class="tabs" id="tabs"></div>
 <div id="tables"></div>
 
+<!-- 嵌套 iframe 区域 -->
+<div class="iframe-section">
+<div class="iframe-buttons">
+  <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/115.html')">满V悠久传奇</button>
+  <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/111.html')">满V切割神域</button>
+  <button onclick="loadIframe(this, 'http://gm.xayxms.cn/games/137.html')">GM赤焰无双</button>
+  <button id="closeBtn" class="close-btn hidden" onclick="closeIframe()">关闭页面</button>
+</div>
+<iframe id="embeddedPage" class="hidden" loading="lazy"></iframe>
+
+
 <script>
+  // 游戏数据表格部分
   const games = [
     { id: '111', name: '满V切割神域', servers: [235, 248, 249, 250, 251, 252, 253, 254], type: 'xayxms' },
-    { id: '115', name: '满V悠久传奇', servers: [86,87,93,95,101,102,103, 104, 105, 107], type: 'xayxms' },
+    { id: '115', name: '满V悠久传奇', servers: [86, 87, 93, 95, 101, 102, 103, 104, 105, 107], type: 'xayxms' },
     { id: '137', name: 'GM赤焰无双', servers: [1, 2, 3, 4], type: 'xayxms' },
-    { id: 'ydcs', name: '炎黃大陸', servers: [543,544,545,547,548,551], type: '1100yx' }
+    { id: 'ydcs', name: '炎黃大陸', servers: [543, 544, 545, 547, 548, 551], type: '1100yx' }
   ];
 
   const tabsContainer = document.getElementById('tabs');
@@ -98,9 +172,35 @@
       document.getElementById('table-' + game.id).classList.remove('hidden');
     };
     tabsContainer.appendChild(btn);
-
     tablesContainer.appendChild(createGrid(game));
   });
+
+  // iframe 逻辑部分
+  function loadIframe(button, url) {
+    const iframe = document.getElementById('embeddedPage');
+    const closeBtn = document.getElementById('closeBtn');
+
+    iframe.src = url;
+    iframe.classList.remove('hidden');
+    closeBtn.classList.remove('hidden');
+
+    // 移除所有按钮高亮
+    document.querySelectorAll('.iframe-buttons button').forEach(btn => btn.classList.remove('active'));
+    // 当前按钮高亮
+    button.classList.add('active');
+  }
+
+  function closeIframe() {
+    const iframe = document.getElementById('embeddedPage');
+    const closeBtn = document.getElementById('closeBtn');
+
+    iframe.src = '';
+    iframe.classList.add('hidden');
+    closeBtn.classList.add('hidden');
+
+    // 清除按钮高亮
+    document.querySelectorAll('.iframe-buttons button').forEach(btn => btn.classList.remove('active'));
+  }
 </script>
 
 </body>
