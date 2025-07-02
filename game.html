@@ -1,55 +1,55 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8" />
-<title>🎮</title>
-<style>
-  body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
-  h2 { text-align: center; }
-  .tabs {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .tab-btn, .top-extra-btn {
-    cursor: pointer;
-    border: 1px solid #007bff;
-    background: white;
-    color: #007bff;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 1em;
-    transition: 0.3s;
-  }
-  .tab-btn.active, .tab-btn:hover,
-  .top-extra-btn:hover {
-    background: #007bff;
-    color: white;
-  }
-  .grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-    gap: 10px;
-    justify-items: center;
-    margin-bottom: 30px;
-  }
-  .grid-item a {
-    display: inline-block;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    color: #007bff;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .grid-item a:hover {
-    text-decoration: underline;
-  }
-  .hidden { display: none; }
-</style>
+  <meta charset="UTF-8" />
+  <title>🎮</title>
+  <style>
+    body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
+    h2 { text-align: center; }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn, .top-extra-btn {
+      cursor: pointer;
+      border: 1px solid #007bff;
+      background: white;
+      color: #007bff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 1em;
+      transition: 0.3s;
+    }
+    .tab-btn.active, .tab-btn:hover,
+    .top-extra-btn:hover {
+      background: #007bff;
+      color: white;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 10px;
+      justify-items: center;
+      margin-bottom: 30px;
+    }
+    .grid-item a {
+      display: inline-block;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #007bff;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .grid-item a:hover {
+      text-decoration: underline;
+    }
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
 
@@ -58,10 +58,31 @@
 
 <script>
   const games = [
-    { id: '111', name: '满V切割神域', servers: [235,236,237, 248, 249, 250, 251, 252, 253, 254], type: 'xayxms' },
-    { id: '115', name: '满V悠久传奇', servers: [86, 87, 93, 95, 101, 102, 103, 104, 105, 107,108], type: 'xayxms' },
-    { id: '137', name: 'GM赤焰无双', servers: [1, 2, 3, 4], type: 'xayxms' },
-    { id: 'ydcs', name: '炎黃大陸', servers: [543, 544, 545, 547, 548, 551], type: '1100yx' }
+    {
+      id: '111',
+      name: '满V切割神域',
+      servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254],
+      type: 'xayxms'
+    },
+    {
+      id: '115',
+      name: '满V悠久传奇',
+      type: 'xayxms',
+      canHang: [86, 87, 93, 102, 103,104, 105, 107, 108],
+      cannotHang: [95,101]
+    },
+    {
+      id: '137',
+      name: 'GM赤焰无双',
+      servers: [1, 2, 3, 4],
+      type: 'xayxms'
+    },
+    {
+      id: 'ydcs',
+      name: '炎黃大陸',
+      servers: [543, 544, 545, 547, 548, 551],
+      type: '1100yx'
+    }
   ];
 
   const tabsContainer = document.getElementById('tabs');
@@ -83,23 +104,56 @@
     container.className = 'grid-container';
     if (game !== games[0]) container.classList.add('hidden');
 
-    game.servers.forEach(server => {
-      const item = document.createElement('div');
-      item.className = 'grid-item';
+    function renderSection(title, serverList) {
+      if (!serverList || serverList.length === 0) return;
 
-      const a = document.createElement('a');
-      if (game.type === '1100yx') {
-        a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
-      } else {
-        a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
-      }
+      const titleDiv = document.createElement('div');
+      titleDiv.textContent = title;
+      titleDiv.style.gridColumn = '1 / -1';
+      titleDiv.style.fontWeight = 'bold';
+      titleDiv.style.margin = '10px 0 5px';
+      container.appendChild(titleDiv);
 
-      a.target = '_blank';
-      a.textContent = `${server}区`;
+      serverList.forEach(server => {
+        const item = document.createElement('div');
+        item.className = 'grid-item';
 
-      item.appendChild(a);
-      container.appendChild(item);
-    });
+        const a = document.createElement('a');
+        if (game.type === '1100yx') {
+          a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
+        } else {
+          a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+        }
+
+        a.target = '_blank';
+        a.textContent = `${server}区`;
+
+        item.appendChild(a);
+        container.appendChild(item);
+      });
+    }
+
+    // 判断是否分组渲染
+    if (game.canHang || game.cannotHang) {
+      renderSection('✅ 可挂机区服', game.canHang);
+      renderSection('⛔ 不可挂机区服', game.cannotHang);
+    } else {
+      game.servers.forEach(server => {
+        const item = document.createElement('div');
+        item.className = 'grid-item';
+
+        const a = document.createElement('a');
+        a.href = game.type === '1100yx'
+          ? `http://www.1100yx.com/Game_Login_8_${server}.html`
+          : `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+
+        a.target = '_blank';
+        a.textContent = `${server}区`;
+
+        item.appendChild(a);
+        container.appendChild(item);
+      });
+    }
 
     // 添加游戏主页链接
     const homeItem = document.createElement('div');
@@ -117,7 +171,7 @@
     return container;
   }
 
-  // 生成顶部游戏切换按钮
+  // 创建游戏切换按钮和表格内容
   games.forEach((game, idx) => {
     const btn = document.createElement('button');
     btn.textContent = game.name;
@@ -144,7 +198,6 @@
   }
 
   const btnNewGame = createTopButton('🆕', '新游戏区服', 'https://gmp777.github.io/newgame.html');
-
   tabsContainer.appendChild(btnNewGame);
 </script>
 
