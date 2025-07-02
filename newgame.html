@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="footer.css" />
+<!-- 载入 footer 样式 -->
   <title>🆕</title>
   <style>
     body {
@@ -197,6 +200,38 @@
   // 默认显示第一个游戏
   document.getElementById(games[0].id).classList.add('active');
 </script>
+<!-- footer -->
+<footer id="footer-container">加载中...</footer>
 
+  <script>
+    // 隐藏当前页面对应的链接整个元素（不留空白）
+    function hideCurrentPageLink() {
+      const currentPath = window.location.pathname.replace(/\/+$/, '');
+      const links = document.querySelectorAll('.footer-content a');
+
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+        if (linkPath === currentPath) {
+          link.style.display = 'none';
+        }
+      });
+    }
+
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        const container = document.getElementById('footer-container');
+        container.innerHTML = html;
+
+        hideCurrentPageLink();
+      })
+      .catch(() => {
+        document.getElementById('footer-container').textContent = '加载 footer 失败';
+      });
+  </script>
+<!-- footer -->
 </body>
 </html>
