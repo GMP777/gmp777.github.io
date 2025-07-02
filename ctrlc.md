@@ -1,5 +1,7 @@
 # css
 
+在mate代码后
+
 ```html
 <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
@@ -7,6 +9,8 @@
 ```
 
 # v.5.0
+
+在JS代码后，body代码前
 
 ```html
 <!-- footer -->
