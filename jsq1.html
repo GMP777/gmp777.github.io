@@ -1,111 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="footer.css" />
-<title>钻石计算器v.1.5.5</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    margin: 20px;
-    gap: 20px;
-    background: #f9f9f9;
-    color: #333;
-  }
-  main {
-    flex: 1;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
-  }
-  #exchangeSummary {
-    width: 360px;
-    border: 1px solid #ccc;
-    padding: 20px;
-    border-radius: 8px;
-    background: #fff;
-    height: fit-content;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
-    overflow-y: auto;
-    font-size: 14px;
-  }
-  h1, h2 {
-    margin-top: 0;
-    color: #2c3e50;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 15px;
-  }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 10px 12px;
-    text-align: center;
-    font-size: 14px;
-  }
-  th {
-    background-color: #3498db;
-    color: white;
-  }
-  #total, #draw {
-    margin-top: 15px;
-    font-weight: 600;
-    font-size: 16px;
-    color: #34495e;
-  }
-  ul {
-    padding-left: 20px;
-    margin: 0;
-  }
-  li {
-    margin-bottom: 14px;
-    line-height: 1.4;
-  }
-  .success {
-    color: #27ae60;
-    font-weight: 600;
-  }
-  .fail {
-    color: #c0392b;
-    font-weight: 600;
-  }
-  input[type="text"] {
-    width: 90px;
-    padding: 6px 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: right;
-    outline-offset: 0;
-    transition: border-color 0.2s ease-in-out;
-  }
-  input[type="text"]:focus {
-    border-color: #2980b9;
-    box-shadow: 0 0 5px #2980b9;
-  }
-  button {
-    margin-top: 12px;
-    padding: 8px 15px;
-    font-size: 14px;
-    background-color: #2980b9;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #1c5980;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="footer.css" />
+  <title>钻石计算器v.2.0</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      margin: 20px;
+      gap: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    main {
+      flex: 1;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+    #exchangeSummary {
+      width: 360px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 8px;
+      background: #fff;
+      height: fit-content;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.05);
+      overflow-y: auto;
+      font-size: 14px;
+    }
+    h1, h2 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+    #total, #draw {
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #34495e;
+    }
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    li {
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    .success {
+      color: #27ae60;
+      font-weight: 600;
+    }
+    .fail {
+      color: #c0392b;
+      font-weight: 600;
+    }
+    input[type="text"] {
+      width: 90px;
+      padding: 6px 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      text-align: right;
+    }
+    input[type="text"]:focus {
+      border-color: #2980b9;
+      box-shadow: 0 0 5px #2980b9;
+    }
+    button {
+      margin-top: 12px;
+      padding: 8px 15px;
+      font-size: 14px;
+      background-color: #2980b9;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1c5980;
+    }
+    .copy-btn {
+      margin-top: 6px;
+      font-size: 12px;
+      background-color: #2ecc71;
+    }
+    .copy-btn:hover {
+      background-color: #239b56;
+    }
+  </style>
 </head>
 <body>
 <main>
   <h1>钻石计算器v.1.5.5</h1>
+
+  <div style="margin-bottom: 10px;">
+    <button id="clearBtn">清空数量</button>
+  </div>
 
   <table>
     <thead>
@@ -116,39 +125,8 @@
 
   <div id="total">总钻石：0（零）</div>
   <div id="draw">可抽奖次数：0 次（50 次抽奖需 500000 钻石）</div>
-    <!-- footer -->
-<footer id="footer-container">加载中...</footer>
 
-  <script>
-    // 隐藏当前页面对应的链接整个元素（不留空白）
-    function hideCurrentPageLink() {
-      const currentPath = window.location.pathname.replace(/\/+$/, '');
-      const links = document.querySelectorAll('.footer-content a');
-
-      links.forEach(link => {
-        const href = link.getAttribute('href');
-        if (!href) return;
-
-        const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
-        if (linkPath === currentPath) {
-          link.style.display = 'none';
-        }
-      });
-    }
-
-    fetch('footer.html')
-      .then(res => res.text())
-      .then(html => {
-        const container = document.getElementById('footer-container');
-        container.innerHTML = html;
-
-        hideCurrentPageLink();
-      })
-      .catch(() => {
-        document.getElementById('footer-container').textContent = '加载 footer 失败';
-      });
-  </script>
-<!-- footer -->
+  <footer id="footer-container">加载中...</footer>
 </main>
 
 <aside id="exchangeSummary">
@@ -173,10 +151,8 @@ const items = [
   { name: "法拉利", price: 10000 }
 ];
 
-// 兑换钻石目标（只显示这几个）
 const exchangeTargets = [100000, 500000, 1000000, 4000000, 10000000, 20000000];
 
-// 数字转中文（简化版）
 function numberToChinese(num) {
   if(num === 0) return "零";
   const digitToCN = ["零","一","二","三","四","五","六","七","八","九"];
@@ -197,7 +173,6 @@ function numberToChinese(num) {
   return res.replace(/零+$/,"");
 }
 
-// 创建表格和监听输入
 function createTable(){
   const tbody = document.getElementById("itemTable");
   items.forEach((item, idx) => {
@@ -223,7 +198,6 @@ function createTable(){
   });
 }
 
-// 计算总钻石和抽奖次数（实时）
 function calculateTotal(){
   let total = 0;
   items.forEach((item, idx) => {
@@ -237,9 +211,7 @@ function calculateTotal(){
   document.getElementById("draw").textContent = `可抽奖次数：${draws} 次（50 次抽奖需 500000 钻石）`;
 }
 
-// 兑换计算（贪心+验证多重限制，按价值倒序用道具满足目标）
 function calcBestExchange(target, itemsAvailable) {
-  // 按单价倒序排序
   const sorted = itemsAvailable.slice().sort((a,b)=>b.price - a.price);
   let remain = target;
   const countMap = {};
@@ -250,32 +222,23 @@ function calcBestExchange(target, itemsAvailable) {
       remain -= maxUse * sorted[i].price;
     }
   }
-  // 如果还没达到target，考虑用最小的道具“补足”，只要最后能超过目标即可
   if(remain > 0){
-    // 找最小价格道具（升序）
     let minItem = itemsAvailable.reduce((min, cur) => cur.price < min.price ? cur : min, itemsAvailable[0]);
-    // 如果剩余钻石不为0，尝试用1个最小道具补足
     if(minItem.qty > (countMap[minItem.name]||0)){
       countMap[minItem.name] = (countMap[minItem.name]||0) + 1;
       remain -= minItem.price;
     }
   }
-  // 计算总价
   let sum = 0;
   for(let name in countMap){
     const item = items.find(i => i.name === name);
     sum += item.price * countMap[name];
   }
-  if(sum < target){
-    // 说明不足以兑换
-    return null;
-  }
+  if(sum < target) return null;
   return { sum, countMap, exceed: sum - target };
 }
 
-// 点击按钮计算兑换方案
 function calculateAllExchanges(){
-  // 读取当前所有道具的数量
   const available = [];
   items.forEach((item, idx) => {
     let qtyInput = document.getElementById(`qty-${idx}`);
@@ -305,14 +268,26 @@ function calculateAllExchanges(){
       li.innerHTML = `💎 <strong>${target.toLocaleString()}</strong> 钻石兑换：<span class="fail">无法兑换，现有道具钻石总额不足。</span>`;
     } else {
       const useStrArr = [];
-      // 保证显示顺序跟items一致
       items.forEach(i => {
         if(res.countMap[i.name]){
           useStrArr.push(`${i.name} × ${res.countMap[i.name]}`);
         }
       });
       const itemsStr = useStrArr.join("，");
+      const resultText = `💎 ${target.toLocaleString()} 钻石兑换：可兑换（总计 ${res.sum.toLocaleString()} 钻石，超出 ${res.exceed.toLocaleString()}）\n使用：${itemsStr}`;
       li.innerHTML = `💎 <strong>${target.toLocaleString()}</strong> 钻石兑换：<span class="success">可兑换（总计 ${res.sum.toLocaleString()} 钻石，超出 ${res.exceed.toLocaleString()}）</span><br>使用：${itemsStr}`;
+      if(target === 1000000){
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = "复制";
+        copyBtn.className = "copy-btn";
+        copyBtn.addEventListener("click", () => {
+          navigator.clipboard.writeText(resultText).then(() => {
+            copyBtn.textContent = "已复制!";
+            setTimeout(() => copyBtn.textContent = "复制", 1500);
+          });
+        });
+        li.appendChild(copyBtn);
+      }
     }
     ul.appendChild(li);
   });
@@ -320,8 +295,37 @@ function calculateAllExchanges(){
 
 document.getElementById("calcExchangeBtn").addEventListener("click", calculateAllExchanges);
 
+document.getElementById("clearBtn").addEventListener("click", () => {
+  const inputs = document.querySelectorAll("input[type='text']");
+  inputs.forEach(input => input.value = "0");
+  calculateTotal();
+});
+
 createTable();
 calculateTotal();
+
+// Footer 加载
+function hideCurrentPageLink() {
+  const currentPath = window.location.pathname.replace(/\/+$/, '');
+  const links = document.querySelectorAll('.footer-content a');
+  links.forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href) return;
+    const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+    if (linkPath === currentPath) {
+      link.style.display = 'none';
+    }
+  });
+}
+fetch('footer.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('footer-container').innerHTML = html;
+    hideCurrentPageLink();
+  })
+  .catch(() => {
+    document.getElementById('footer-container').textContent = '加载 footer 失败';
+  });
 </script>
 </body>
 </html>
