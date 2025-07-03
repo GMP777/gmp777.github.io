@@ -107,15 +107,6 @@
       tableBody.appendChild(row);
     });
 
-    // ✅ 复制并弹出提示
-    function copyText(text) {
-      navigator.clipboard.writeText(text.toString()).then(() => {
-        alert(`已复制内容：${text}`);
-      }).catch(err => {
-        alert("复制失败：" + err);
-      });
-    }
-
     // ✅ 异步加载 footer
     function hideCurrentPageLink() {
       const currentPath = window.location.pathname.replace(/\/+$/, '');
