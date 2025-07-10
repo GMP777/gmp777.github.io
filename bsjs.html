@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<title>宝石升级计算器</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  h1, h2 {
+    color: #333;
+  }
+  label, input {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: white;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+  th {
+    background-color: #e0e0e0;
+  }
+  .input-table td {
+    text-align: left;
+  }
+</style>
+</head>
+<body>
+<h1>宝石升级计算器</h1>
+
+<h2>输入已有宝石数量和目标15级宝石数量</h2>
+<table class="input-table">
+  <tbody>
+    <tr><td>想要合成15级宝石数量:</td><td><input type="number" id="want15" value="1" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有8级宝石数量:</td><td><input type="number" id="has8" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有9级宝石数量:</td><td><input type="number" id="has9" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有10级宝石数量:</td><td><input type="number" id="has10" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有11级宝石数量:</td><td><input type="number" id="has11" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有12级宝石数量:</td><td><input type="number" id="has12" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有13级宝石数量:</td><td><input type="number" id="has13" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有14级宝石数量:</td><td><input type="number" id="has14" value="0" min="0" onchange="calculate()" /></td></tr>
+    <tr><td>已有15级宝石数量:</td><td><input type="number" id="has15" value="0" min="0" onchange="calculate()" /></td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>还需合成15级宝石</th>
+      <th>所需7级宝石</th>
+      <th>所需宝石精髓</th>
+    </tr>
+  </thead>
+  <tbody id="combinedResult"></tbody>
+</table>
+
+<script>
+  const perSet = {
+    gem7: 256,
+    essence: 1144
+  };
+
+  const breakdown = {
+    8: { gem7: 2, essence: 2 },
+    9: { gem7: 4, essence: 6 },
+    10: { gem7: 8, essence: 16 },
+    11: { gem7: 16, essence: 54 },
+    12: { gem7: 32, essence: 123 },
+    13: { gem7: 64, essence: 266 },
+    14: { gem7: 128, essence: 557 }
+  };
+
+  function calculate() {
+    const want15 = parseInt(document.getElementById("want15").value) || 0;
+    const has15 = parseInt(document.getElementById("has15").value) || 0;
+    const need = Math.max(want15 - has15, 0);
+
+    let totalGem7 = need * perSet.gem7;
+    let totalEssence = need * perSet.essence;
+
+    for (let level = 8; level <= 14; level++) {
+      const count = parseInt(document.getElementById("has" + level).value) || 0;
+      totalGem7 -= count * breakdown[level].gem7;
+      totalEssence -= count * breakdown[level].essence;
+    }
+
+    const result = `<tr>
+      <td>${need}</td>
+      <td>${Math.max(totalGem7, 0)}</td>
+      <td>${Math.max(totalEssence, 0)}</td>
+    </tr>`;
+
+    document.getElementById("combinedResult").innerHTML = result;
+  }
+
+  window.onload = calculate;
+</script>
+</body>
+</html>
