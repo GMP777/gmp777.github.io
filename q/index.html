@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>切割神域 新服信息</title>
+<style>
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex; 
+    justify-content: center;
+  }
+  .container {
+    background: white;
+    max-width: 480px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    padding: 30px 40px;
+  }
+  h1 {
+    font-weight: 700;
+    color: #0057e7;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .info {
+    font-size: 17px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .info strong {
+    color: #0a74da;
+  }
+  a.button {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.4);
+    transition: background-color 0.3s ease;
+  }
+  a.button:hover {
+    background: #0056b3;
+    box-shadow: 0 6px 14px rgba(0,86,179,0.6);
+  }
+  .footer {
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    margin-top: 30px;
+  }
+  @media (max-width: 520px) {
+    .container {
+      padding: 20px;
+      margin: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>切割神域 - 新服信息</h1>
+  <div id="content" class="info">加载中...</div>
+</div>
+
+<script>
+  const baseUrl = "http://gm.xayxms.cn/login/111/";
+  const knownDate = new Date(2025, 6, 9);  // 2025-07-09 是第259服
+  const knownServerId = 259;
+
+  const today = new Date();
+  const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const dow = todayDate.getDay();
+
+  function countOpenings(start, end) {
+    let count = 0;
+    const d = new Date(start);
+    while (d <= end) {
+      const day = d.getDay();
+      if (day === 3 || day === 6) count++;
+      d.setDate(d.getDate() + 1);
+    }
+    return count;
+  }
+
+  let html = "";
+  const isOpenDay = dow === 3 || dow === 6;
+
+  if (isOpenDay) {
+    const openCount = countOpenings(knownDate, todayDate);
+    const serverId = knownServerId + (openCount - 1);
+    const y = todayDate.getFullYear();
+    const m = String(todayDate.getMonth() + 1).padStart(2, '0');
+    const d = String(todayDate.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
+    html += `<p>✅ <strong>开服时间：</strong>${dateStr}</p>`;
+    html += `<p>🎮 <a class="button" href="${baseUrl}${serverId}.html" target="_blank">进入第 ${serverId} 服</a></p>`;
+  } else {
+    html += `<p>今天没有新服，<strong>请在周三或周六</strong>再来查看最新服！</p>`;
+  }
+
+  const nextOpenDate = new Date(todayDate);
+  if (dow < 3) {
+    nextOpenDate.setDate(todayDate.getDate() + (3 - dow));
+  } else if (dow < 6) {
+    nextOpenDate.setDate(todayDate.getDate() + (6 - dow));
+  } else {
+    nextOpenDate.setDate(todayDate.getDate() + (7 - dow + 3));
+  }
+
+  const openCountToNext = countOpenings(knownDate, nextOpenDate);
+  const nextServerId = knownServerId + (openCountToNext - 1);
+
+  const ny = nextOpenDate.getFullYear();
+  const nm = String(nextOpenDate.getMonth() + 1).padStart(2, '0');
+  const nd = String(nextOpenDate.getDate()).padStart(2, '0');
+  const nextDateStr = `${ny}-${nm}-${nd}`;
+
+  html += `<p>🕒 <strong>下次开服时间：</strong>${nextDateStr}</p>`;
+  html += `<p>🎮 <a class="button" href="${baseUrl}${nextServerId}.html" target="_blank">进入第 ${nextServerId} 服</a></p>`;
+
+  const totalBefore = knownServerId - 1;
+  const weeks = Math.floor(totalBefore / 2);
+  const daysOffset = weeks * 7;
+  const firstServerDate = new Date(knownDate);
+  firstServerDate.setDate(knownDate.getDate() - daysOffset);
+
+  const fy = firstServerDate.getFullYear();
+  const fm = String(firstServerDate.getMonth() + 1).padStart(2, '0');
+  const fd = String(firstServerDate.getDate()).padStart(2, '0');
+  html += `<p>📅 <strong>第 1 服开服时间：</strong>${fy}-${fm}-${fd}</p>`;
+
+  document.getElementById("content").innerHTML = html;
+</script>
+
+</body>
+</html>
