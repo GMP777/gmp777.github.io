@@ -21,6 +21,21 @@
 <!-- footer -->
 ```
 
+# html
+
+```html
+<div class="footer-wrapper">
+  <footer id="footer-container">
+    <div class="footer-content">
+      <a href="#">关于我们</a>
+      <a href="#">服务条款</a>
+      <a href="#">隐私政策</a>
+      <a href="#">联系我们</a>
+    </div>
+  </footer>
+</div>
+```
+
 # footer.html
 
 ## v.6.0
