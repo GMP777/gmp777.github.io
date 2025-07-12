@@ -21,7 +21,7 @@
 <!-- footer -->
 ```
 
-# html
+# footer.html
 
 ```html
 <div class="footer-wrapper">
@@ -36,7 +36,7 @@
 </div>
 ```
 
-# footer.html
+# x.html
 
 ## v.6.0
 
