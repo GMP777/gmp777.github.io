@@ -47,7 +47,6 @@
       background-color: #eaf6ff;
     }
 
-    /* ✅ Toast 样式 */
     .toast {
       position: fixed;
       bottom: 30px;
@@ -68,6 +67,20 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    .footer-wrapper {
+      width: 100%;
+      background-color: #f8f8f8;
+      padding: 20px 0;
+      margin-top: 40px;
+    }
+
+    #footer-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: center;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -85,8 +98,10 @@
     </tbody>
   </table>
 
-  <!-- footer -->
-  <footer id="footer-container">加载中...</footer>
+  <!-- ✅ footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
 
   <script>
     // ✅ 数据列表
@@ -109,27 +124,20 @@
       { name: "39阶自选首饰箱", amount: 8 }
     ];
 
-    // ✅ 渲染表格
     const tableBody = document.getElementById("tableBody");
-
     data.forEach(item => {
       const row = document.createElement("tr");
-
       const nameCell = document.createElement("td");
       nameCell.textContent = item.name;
       nameCell.addEventListener("click", () => copyText(item.name));
-
       const amountCell = document.createElement("td");
       amountCell.textContent = item.amount;
       amountCell.addEventListener("click", () => copyText(item.amount));
-
       row.appendChild(nameCell);
       row.appendChild(amountCell);
-
       tableBody.appendChild(row);
     });
 
-    // ✅ 复制函数 + Toast 弹出
     function copyText(text) {
       navigator.clipboard.writeText(text.toString()).then(() => {
         showToast(`✅ 已复制：${text}`);
@@ -138,19 +146,14 @@
       });
     }
 
-    // ✅ Toast 显示函数
     function showToast(message) {
       const toast = document.createElement("div");
       toast.className = "toast";
       toast.textContent = message;
       document.body.appendChild(toast);
-
-      // 开始动画
       setTimeout(() => {
         toast.classList.add("show");
       }, 10);
-
-      // 3秒后移除
       setTimeout(() => {
         toast.classList.remove("show");
         setTimeout(() => {
@@ -159,7 +162,18 @@
       }, 3000);
     }
 
-    // ✅ footer 处理
+    // ✅ Footer 根据路径判断加载哪个文件
+    function getFooterFile() {
+      const path = window.location.pathname;
+      if (path.includes('/y/')) {
+        return '/y/footer.html';
+      } else if (path.includes('/x/')) {
+        return '/x/footer.html';
+      } else {
+        return '/footer.html';
+      }
+    }
+
     function hideCurrentPageLink() {
       const currentPath = window.location.pathname.replace(/\/+$/, '');
       const links = document.querySelectorAll('.footer-content a');
@@ -173,7 +187,7 @@
       });
     }
 
-    fetch('footer.html')
+    fetch(getFooterFile())
       .then(res => res.text())
       .then(html => {
         const container = document.getElementById('footer-container');
