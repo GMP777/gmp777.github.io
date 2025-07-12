@@ -1,17 +1,16 @@
-在mate代码后
-
 # css
+
+在title代码后
 
 ```html
 <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
 <!-- 载入 footer 样式 -->
 ```
------
-
-在 </body> 前加入这两行
 
 # JS
+
+在 </body> 前加入这两行
 
 ```html
   <!-- Footer -->
