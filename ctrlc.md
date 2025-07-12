@@ -1,16 +1,69 @@
-# css
-
 在mate代码后
+
+# css
 
 ```html
 <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="footer.css" />
 <!-- 载入 footer 样式 -->
 ```
-
-# v.5.0
+-----
 
 在JS代码后，body代码前
+
+# v.6.0
+
+```html
+<!-- footer -->
+<footer id="footer-container">加载中...</footer>
+
+<script>
+  // 根据路径选择 footer 文件
+  function getFooterFile() {
+    const path = window.location.pathname;
+
+    if (path.includes('/y/')) {
+      return '/y/footer.html';
+    } else if (path.includes('/x/')) {
+      return '/x/footer.html';
+    } else {
+      return '/footer.html'; // 根目录下的默认 footer
+    }
+  }
+
+  // 隐藏当前页面对应的链接
+  function hideCurrentPageLink() {
+    const currentPath = window.location.pathname.replace(/\/+$/, '');
+    const links = document.querySelectorAll('.footer-content a');
+
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (!href) return;
+
+      const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
+      if (linkPath === currentPath) {
+        link.style.display = 'none';
+      }
+    });
+  }
+
+  const footerFile = getFooterFile();
+
+  fetch(footerFile)
+    .then(res => res.text())
+    .then(html => {
+      const container = document.getElementById('footer-container');
+      container.innerHTML = html;
+      hideCurrentPageLink();
+    })
+    .catch(() => {
+      document.getElementById('footer-container').textContent = '加载 footer 失败';
+    });
+</script>
+<!-- footer -->
+```
+
+# v.5.0
 
 ```html
 <!-- footer -->
