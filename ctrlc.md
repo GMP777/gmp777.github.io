@@ -14,8 +14,10 @@
 # JS
 
 ```html
+<!-- footer -->
 <footer id="footer-container">加载中...</footer>
 <script src="/load-footer.js"></script>
+<!-- footer -->
 ```
 
 # footer.html
