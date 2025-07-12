@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
@@ -59,10 +58,12 @@
     });
   </script>
 
-  <!-- footer -->
-  <footer id="footer-container">加载中...</footer>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
   <script src="/load-footer.js"></script>
-  <!-- footer -->
+<!-- footer -->
 
 </body>
 </html>
