@@ -5,6 +5,12 @@
 
 简化一下……因为要加别的东西进来！`2025-07-12 16:20:05`
 
+|🎮|🔗|
+|:---:|:---:|
+|悠久传奇|/y/index.html|
+|切割传奇|/q/index.html|
+|赤焰无双|/c/index.html|
+
 <!-- footer -->
 <footer id="footer-container">加载中...</footer>
 <script src="/load-footer.js"></script>
