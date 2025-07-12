@@ -7,9 +7,9 @@
 
 |🎮|🔗|
 |:---:|:---:|
-|悠久传奇|https://gmp777.github.io/y/index.html|
-|切割传奇|https://gmp777.github.io/q/index.html|
-|赤焰无双|https://gmp777.github.io/c/index.html|
+|悠久传奇|<https://gmp777.github.io/y/index.html>|
+|切割传奇|<https://gmp777.github.io/q/index.html>|
+|赤焰无双|<https://gmp777.github.io/c/index.html>|
 
 <!-- footer -->
 <footer id="footer-container">加载中...</footer>
