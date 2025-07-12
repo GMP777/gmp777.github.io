@@ -1,26 +1,68 @@
-<!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="footer.css" />
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>悠久传奇工具合集</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="footer.css">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    a { text-decoration: none; color: #007BFF; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
 
-自己常用到的功能让Ai帮忙整了个网页工具，如果出现问题请怀疑是代码的问题。时不时让Ai维修两下……
+  <h2>🎯 我的常用网页工具</h2>
+  <table id="tools-table">
+    <thead>
+      <tr>
+        <th>功能</th>
+        <th>版本</th>
+        <th>最新更新日期</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-|悠久传奇| 版本 | 最新更新日期 |
-| --- | --- | --- |
-|📖简阅攻略|<a href="https://gmp777.github.io/go.html" target="_blank">v.0.0</a>|2025-06-05|
-| 💎钻石计算器 | <a href="https://gmp777.github.io/jsq1.html" target="_blank">v.3.0</a>|2025-07-03 03:22:28|
-|💎钻石计算器|<a href="https://gmp777.github.io/jsq2.html" target="_blank">v.2.0</a> |2025-06-04|
-| 🥤888钻石消耗多少道具 | <a href="https://gmp777.github.io/888.html" target="_blank">v.0.0</a> | 2025-06-04 |
-| 🏆抽奖所需钻石计算 | <a href="https://gmp777.github.io/roll.html" target="_blank">v.0.0</a> | 2025-06-04 |
-| 🪶翅膀进阶器 | <a href="https://gmp777.github.io/cb.html" target="_blank">v.2.0</a> |2025-06-06 15:28:21|
-| ☯️道装合成器 | <a href="https://gmp777.github.io/jsq4.html" target="_blank">v.2.0</a> | 2025-06-05 23:32:07 |
-| 🪙元宝商城计算器 | <a href="https://gmp777.github.io/shop.html" target="_blank">v.0.0</a> |2025-06-05 15:28:15 |
-| 💎宝石合成器 | <a href="https://gmp777.github.io/jsq5.html" target="_blank">v.1.0</a> |2025-06-05 23:31:46 |
-| 🔥天命神装合成器 | <a href="https://gmp777.github.io/tm.html" target="_blank">v.2.0</a> |2025-06-06 21:14:49|
-|🐉十二生肖装备合成器| <a href="https://gmp777.github.io/12.html" target="_blank">v.1.0</a> |2025-06-06 01:07:12 |
-|🔧footer自动载入链接|v.5.0|2025-06-07 03:06:34|
-|🔨强化元宝计算器|<a href="https://gmp777.github.io/qh.html" target="_blank">v.0.0</a>|2025-06-10 01:10:46|
-|💰充值相关|<a href="https://gmp777.github.io/pay.html" target="_blank">v.1.0</a>|2025-06-16 23:31:54|
+  <!-- 嵌入 JSON 数据 -->
+  <script>
+    const toolsData = [
+      { name: "📖简阅攻略", url: "go.html", version: "v.0.0", date: "2025-06-05" },
+      { name: "💎钻石计算器", url: "jsq1.html", version: "v.3.0", date: "2025-07-03 03:22:28" },
+      { name: "💎钻石计算器", url: "jsq2.html", version: "v.2.0", date: "2025-06-04" },
+      { name: "🥤888钻石消耗多少道具", url: "888.html", version: "v.0.0", date: "2025-06-04" },
+      { name: "🏆抽奖所需钻石计算", url: "roll.html", version: "v.0.0", date: "2025-06-04" },
+      { name: "🪶翅膀进阶器", url: "cb.html", version: "v.2.0", date: "2025-06-06 15:28:21" },
+      { name: "☯️道装合成器", url: "jsq4.html", version: "v.2.0", date: "2025-06-05 23:32:07" },
+      { name: "🪙元宝商城计算器", url: "shop.html", version: "v.0.0", date: "2025-06-05 15:28:15" },
+      { name: "💎宝石合成器", url: "jsq5.html", version: "v.1.0", date: "2025-06-05 23:31:46" },
+      { name: "🔥天命神装合成器", url: "tm.html", version: "v.2.0", date: "2025-06-06 21:14:49" },
+      { name: "🐉十二生肖装备合成器", url: "12.html", version: "v.1.0", date: "2025-06-06 01:07:12" },
+      { name: "🔧footer自动载入链接", url: "#", version: "v.5.0", date: "2025-06-07 03:06:34" },
+      { name: "🔨强化元宝计算器", url: "qh.html", version: "v.0.0", date: "2025-06-10 01:10:46" },
+      { name: "💰充值相关", url: "pay.html", version: "v.1.0", date: "2025-06-16 23:31:54" }
+    ];
 
-<!-- footer -->
-<footer id="footer-container">加载中...</footer>
-<script src="/load-footer.js"></script>
-<!-- footer -->
+    const tbody = document.querySelector("#tools-table tbody");
+    toolsData.forEach(tool => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${tool.name}</td>
+        <td>${tool.url !== "#" ? `<a href="https://gmp777.github.io/y/${tool.url}" target="_blank">${tool.version}</a>` : tool.version}</td>
+        <td>${tool.date}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  </script>
+
+  <!-- footer -->
+  <footer id="footer-container">加载中...</footer>
+  <script src="/load-footer.js"></script>
+  <!-- footer -->
+
+</body>
+</html>
