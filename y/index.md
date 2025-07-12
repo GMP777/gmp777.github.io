@@ -1,7 +1,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>悠久传奇工具合集</title>
+  <title>悠久传奇工具🔧</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="footer.css">
   <style>
@@ -14,8 +14,6 @@
   </style>
 </head>
 <body>
-
-  <h2>🎯 我的常用网页工具</h2>
   <table id="tools-table">
     <thead>
       <tr>
