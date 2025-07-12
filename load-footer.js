@@ -2,9 +2,11 @@
 function getFooterFile() {
   const path = window.location.pathname;
   if (path.includes('/y/')) {
-    return '/y/footer.html';
+    return '/footer.html';
   } else if (path.includes('/q/')) {
-    return '/q/footer.html';
+    return '/footer.html';
+  } else if (path.includes('/c/')) {
+    return '/footer.html';
   } else {
     return '/footer.html'; // 根目录默认 footer
   }
