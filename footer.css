@@ -1,22 +1,25 @@
+/* 外层容器，占满宽度，背景色 + 上边距 */
 .footer-wrapper {
   width: 100%;
   background-color: #f8f8f8;
   padding: 20px 0;
   margin-top: 40px;
+  box-sizing: border-box; /* 确保 padding 不撑破容器 */
 }
 
-/* 这个 ID 用于限制最大宽度和居中对齐 */
+/* 内层容器，限制最大宽度并水平居中 */
 #footer-container {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 1em 1em; /* 左右加一些 padding 以防屏幕太窄时贴边 */
   text-align: center;
   color: #333;
   font-size: 0.95em;
   line-height: 1.6;
-  padding: 1em;
+  box-sizing: border-box;
 }
 
-/* Flex 布局居中，响应式换行 */
+/* 内容区：Flex 布局，居中对齐并支持换行 */
 .footer-content {
   display: flex;
   justify-content: center;
@@ -26,6 +29,7 @@
   margin: 0 auto;
   padding: 0 1em;
   align-items: center;
+  box-sizing: border-box;
 }
 
 /* 链接样式 */
@@ -34,10 +38,12 @@
   text-decoration: none;
   margin: 0 0.3em;
   white-space: nowrap;
+  transition: color 0.2s ease;
 }
 
 .footer-content a:hover {
   text-decoration: underline;
+  color: #005f99;
 }
 
 /* 小屏幕优化 */
