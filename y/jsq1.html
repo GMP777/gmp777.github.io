@@ -126,7 +126,13 @@
   <div id="total">总钻石：0（零）</div>
   <div id="draw">可抽奖次数：0 次（50 次抽奖需 500000 钻石）</div>
 
+  <!-- Footer -->
+<div class="footer-wrapper">
   <footer id="footer-container">加载中...</footer>
+</div>
+<script src="/load-footer.js"></script>
+<!-- footer -->
+
 </main>
 
 <aside id="exchangeSummary">
@@ -304,28 +310,6 @@ document.getElementById("clearBtn").addEventListener("click", () => {
 createTable();
 calculateTotal();
 
-// Footer 加载
-function hideCurrentPageLink() {
-  const currentPath = window.location.pathname.replace(/\/+$/, '');
-  const links = document.querySelectorAll('.footer-content a');
-  links.forEach(link => {
-    const href = link.getAttribute('href');
-    if (!href) return;
-    const linkPath = new URL(href, window.location.origin).pathname.replace(/\/+$/, '');
-    if (linkPath === currentPath) {
-      link.style.display = 'none';
-    }
-  });
-}
-fetch('footer.html')
-  .then(res => res.text())
-  .then(html => {
-    document.getElementById('footer-container').innerHTML = html;
-    hideCurrentPageLink();
-  })
-  .catch(() => {
-    document.getElementById('footer-container').textContent = '加载 footer 失败';
-  });
 </script>
 </body>
 </html>
