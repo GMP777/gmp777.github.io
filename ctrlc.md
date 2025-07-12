@@ -9,9 +9,18 @@
 ```
 -----
 
-在JS代码后，body代码前
+在 </body> 前加入这两行
 
-# v.6.0
+# JS
+
+```html
+<footer id="footer-container">加载中...</footer>
+<script src="/load-footer.js"></script>
+```
+
+# footer.html
+
+## v.6.0
 
 ```html
 <!-- footer -->
