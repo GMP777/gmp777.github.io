@@ -24,8 +24,8 @@
 
     if (path.includes('/y/')) {
       return '/y/footer.html';
-    } else if (path.includes('/x/')) {
-      return '/x/footer.html';
+    } else if (path.includes('/q/')) {
+      return '/q/footer.html';
     } else {
       return '/footer.html'; // 根目录下的默认 footer
     }
