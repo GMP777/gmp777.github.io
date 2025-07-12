@@ -1,13 +1,22 @@
-footer {
+.footer-wrapper {
+  width: 100%;
+  background-color: #f8f8f8;
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+/* 这个 ID 用于限制最大宽度和居中对齐 */
+#footer-container {
+  max-width: 1000px;
+  margin: 0 auto;
   text-align: center;
-  padding: 1em;
   color: #333;
   font-size: 0.95em;
   line-height: 1.6;
-  /* 无背景色 */
+  padding: 1em;
 }
 
-/* flex 布局，居中，允许换行 */
+/* Flex 布局居中，响应式换行 */
 .footer-content {
   display: flex;
   justify-content: center;
@@ -16,24 +25,24 @@ footer {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 1em;
-  align-items: center; /* 保持行高一致，避免参差不齐 */
+  align-items: center;
 }
 
 /* 链接样式 */
-footer a {
+.footer-content a {
   color: #007acc;
   text-decoration: none;
   margin: 0 0.3em;
-  white-space: nowrap; /* 防止链接内换行 */
+  white-space: nowrap;
 }
 
-footer a:hover {
+.footer-content a:hover {
   text-decoration: underline;
 }
 
-/* 小屏幕响应式 */
+/* 小屏幕优化 */
 @media (max-width: 600px) {
-  footer {
+  #footer-container {
     font-size: 0.85em;
     padding: 1.2em 0.5em;
   }
@@ -43,7 +52,7 @@ footer a:hover {
     gap: 0.3em;
   }
 
-  footer a {
+  .footer-content a {
     margin: 0.3em 0;
   }
 }
