@@ -4,7 +4,7 @@
 
 ```html
 <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="footer.css" />
+<link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
 ```
 
