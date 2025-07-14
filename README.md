@@ -1,5 +1,5 @@
 <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="footer.css" />
+<link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
 
 自己常用到的功能让Ai帮忙整了个网页工具，如果出现问题请怀疑是代码的问题。时不时让Ai维修两下……
