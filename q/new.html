@@ -3,32 +3,29 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>切割神域 新服信息</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
-<title>切割神域 新服信息</title>
 <style>
   body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background: #f0f4f8;
-  color: #333;
-  margin: 0;
-  padding: 20px;
-  display: flex; 
-  flex-direction: column; /* 垂直方向排列 */
-  align-items: center;     /* 居中内容 */
-  min-height: 100vh;       /* 填满整个页面高度 */
-}
-
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f0f4f8;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex; 
+    justify-content: center;
+  }
   .container {
     background: white;
-    max-width: 480px;
+    max-width: 520px;
     width: 100%;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.1);
     padding: 30px 40px;
   }
-  h1 {
+  h1, h2 {
     font-weight: 700;
     color: #0057e7;
     margin-bottom: 20px;
@@ -57,6 +54,14 @@
     background: #0056b3;
     box-shadow: 0 6px 14px rgba(0,86,179,0.6);
   }
+  ul.history {
+    padding-left: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  ul.history li {
+    margin-bottom: 6px;
+  }
   .footer {
     text-align: center;
     color: #777;
@@ -76,11 +81,19 @@
 <div class="container">
   <h1>切割神域 - 新服信息</h1>
   <div id="content" class="info">加载中...</div>
+
+  <h2>📜 最近开服记录</h2>
+  <ul id="history" class="history">加载中...</ul>
+
+  <div class="footer">© 2025 切割神域 | 非官方信息展示</div>
 </div>
+<p style="text-align:center; margin-top: 30px;">
+  🔗 <a class="button" href="http://gm.xayxms.cn/games/111.html" target="_blank">查看游戏主页</a>
+</p>
 
 <script>
   const baseUrl = "http://gm.xayxms.cn/login/111/";
-  const knownDate = new Date(2025, 6, 9);  // 2025-07-09 是第259服
+  const knownDate = new Date(2025, 6, 9); // 2025-07-09 是259服
   const knownServerId = 259;
 
   const today = new Date();
@@ -98,22 +111,43 @@
     return count;
   }
 
+  function formatDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  }
+
+  function getLastOpenDates(count) {
+    const list = [];
+    let date = new Date(knownDate);
+    let server = knownServerId;
+
+    // 向前找指定数量的开服日
+    while (list.length < count) {
+      date.setDate(date.getDate() - 1);
+      const d = date.getDay();
+      if (d === 3 || d === 6) {
+        list.unshift({ id: --server, date: formatDate(date) });
+      }
+    }
+
+    return list;
+  }
+
   let html = "";
   const isOpenDay = dow === 3 || dow === 6;
 
   if (isOpenDay) {
     const openCount = countOpenings(knownDate, todayDate);
     const serverId = knownServerId + (openCount - 1);
-    const y = todayDate.getFullYear();
-    const m = String(todayDate.getMonth() + 1).padStart(2, '0');
-    const d = String(todayDate.getDate()).padStart(2, '0');
-    const dateStr = `${y}-${m}-${d}`;
-    html += `<p>✅ <strong>开服时间：</strong>${dateStr}</p>`;
+    html += `<p>✅ <strong>开服时间：</strong>${formatDate(todayDate)}</p>`;
     html += `<p>🎮 <a class="button" href="${baseUrl}${serverId}.html" target="_blank">进入第 ${serverId} 服</a></p>`;
   } else {
     html += `<p>今天没有新服，<strong>请在周三或周六</strong>再来查看最新服！</p>`;
   }
 
+  // 下次开服
   const nextOpenDate = new Date(todayDate);
   if (dow < 3) {
     nextOpenDate.setDate(todayDate.getDate() + (3 - dow));
@@ -125,27 +159,28 @@
 
   const openCountToNext = countOpenings(knownDate, nextOpenDate);
   const nextServerId = knownServerId + (openCountToNext - 1);
-
-  const ny = nextOpenDate.getFullYear();
-  const nm = String(nextOpenDate.getMonth() + 1).padStart(2, '0');
-  const nd = String(nextOpenDate.getDate()).padStart(2, '0');
-  const nextDateStr = `${ny}-${nm}-${nd}`;
-
-  html += `<p>🕒 <strong>下次开服时间：</strong>${nextDateStr}</p>`;
+  html += `<p>🕒 <strong>下次开服时间：</strong>${formatDate(nextOpenDate)}</p>`;
   html += `<p>🎮 <a class="button" href="${baseUrl}${nextServerId}.html" target="_blank">进入第 ${nextServerId} 服</a></p>`;
 
+  // 推算第一服日期
   const totalBefore = knownServerId - 1;
   const weeks = Math.floor(totalBefore / 2);
   const daysOffset = weeks * 7;
   const firstServerDate = new Date(knownDate);
   firstServerDate.setDate(knownDate.getDate() - daysOffset);
-
-  const fy = firstServerDate.getFullYear();
-  const fm = String(firstServerDate.getMonth() + 1).padStart(2, '0');
-  const fd = String(firstServerDate.getDate()).padStart(2, '0');
-  html += `<p>📅 <strong>第 1 服开服时间：</strong>${fy}-${fm}-${fd}</p>`;
+  html += `<p>📅 <strong>第 1 服开服时间：</strong>${formatDate(firstServerDate)}</p>`;
 
   document.getElementById("content").innerHTML = html;
+
+  // 最近10个服
+  const history = getLastOpenDates(10);
+  const ul = document.getElementById("history");
+  ul.innerHTML = "";
+  history.reverse().forEach(item => {
+    const li = document.createElement("li");
+    li.innerHTML = `🗓️ 第 <strong>${item.id}</strong> 服 - ${item.date} - <a href="${baseUrl}${item.id}.html" target="_blank">进入</a>`;
+    ul.appendChild(li);
+  });
 </script>
   <!-- Footer -->
   <div class="footer-wrapper">
