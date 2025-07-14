@@ -12,6 +12,18 @@
 
 在 </body> 前加入这两行
 
+## v.2.0
+
+```html
+<!-- Footer -->
+<div class="footer-wrapper">
+  <footer id="footer-container">加载中...</footer>
+</div>
+<script src="/load-footer.js"></script>
+```
+
+## v.1.0
+
 ```html
   <!-- Footer -->
   <div class="footer-wrapper">
