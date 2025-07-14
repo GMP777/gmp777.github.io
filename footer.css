@@ -1,64 +1,57 @@
-/* 外层容器，占满宽度，背景色 + 上边距 */
+/* 去掉背景和边距 */
 .footer-wrapper {
   width: 100%;
-  background-color: #f8f8f8;
-  padding: 20px 0;
-  margin-top: 40px;
-  box-sizing: border-box; /* 确保 padding 不撑破容器 */
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background: none;
 }
 
-/* 内层容器，限制最大宽度并水平居中 */
+/* 容器排版 */
 #footer-container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 1em 1em; /* 左右加一些 padding 以防屏幕太窄时贴边 */
+  padding: 1em;
   text-align: center;
-  color: #333;
   font-size: 0.95em;
   line-height: 1.6;
   box-sizing: border-box;
 }
 
-/* 内容区：Flex 布局，居中对齐并支持换行 */
+/* 内容区域 */
 .footer-content {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5em;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 0 1em;
   align-items: center;
-  box-sizing: border-box;
 }
 
-/* 链接样式 */
+/* 每个链接按钮样式 */
 .footer-content a {
-  color: #007acc;
+  display: inline-block;
+  background-color: #007acc;
+  color: #fff;
+  padding: 0.5em 0.8em;
+  border-radius: 6px;
   text-decoration: none;
-  margin: 0 0.3em;
-  white-space: nowrap;
-  transition: color 0.2s ease;
+  transition: background-color 0.2s ease;
+  font-size: 0.9em;
 }
 
 .footer-content a:hover {
-  text-decoration: underline;
-  color: #005f99;
+  background-color: #005f99;
 }
 
-/* 小屏幕优化 */
+/* 移动端优化 */
 @media (max-width: 600px) {
-  #footer-container {
-    font-size: 0.85em;
-    padding: 1.2em 0.5em;
-  }
-
   .footer-content {
     flex-direction: column;
-    gap: 0.3em;
+    gap: 0.4em;
   }
 
   .footer-content a {
-    margin: 0.3em 0;
+    width: 100%;
+    text-align: center;
   }
 }
