@@ -3,7 +3,9 @@
   <meta charset="UTF-8">
   <title>悠久传奇工具🔧</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="footer.css">
+<!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
   <style>
     body { font-family: sans-serif; padding: 20px; }
     table { border-collapse: collapse; width: 100%; margin-top: 20px; }
