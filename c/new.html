@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>新服信息</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+<style>
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f2f6fc;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    background: white;
+    max-width: 520px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    padding: 30px 40px;
+  }
+  h1, h2 {
+    font-weight: 700;
+    color: #0c6cf2;
+    text-align: center;
+  }
+  .info, .history {
+    font-size: 17px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .info strong {
+    color: #0a74da;
+  }
+  a.button {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+    transition: background-color 0.3s ease;
+  }
+  a.button:hover {
+    background: #0056b3;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  ul li {
+    margin-bottom: 8px;
+  }
+  .footer {
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🎮 新游戏 - 最新区服</h1>
+  <div class="info" id="latest">加载中...</div>
+
+  <h2>📜 最近开服记录</h2>
+  <ul id="history" class="history">加载中...</ul>
+
+  <p style="text-align:center; margin-top: 30px;">
+    🔗 <a class="button" href="http://gm.xayxms.cn/games/137.html" target="_blank">查看游戏主页</a>
+  </p>
+
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</div>
+
+<script>
+  const baseUrl = "http://gm.xayxms.cn/login/137/";
+
+  // 👉 修改这行，手动设置当前最新区服号（整数）
+  const latestServerId = 8;
+
+  // 显示最新服信息
+  const latestDiv = document.getElementById("latest");
+  latestDiv.innerHTML = `
+    🆕 <strong>当前最新区服：</strong>第 <strong>${latestServerId}</strong> 服<br/>
+    <a class="button" href="${baseUrl}${latestServerId}.html" target="_blank">进入游戏</a>
+  `;
+
+  // 显示前10个历史服
+  const historyList = document.getElementById("history");
+  historyList.innerHTML = "";
+  for (let i = 9; i >= 0; i--) {
+    const id = latestServerId - i;
+    if (id > 0) {
+      const li = document.createElement("li");
+      li.innerHTML = `第 <strong>${id}</strong> 服 - <a href="${baseUrl}${id}.html" target="_blank">进入</a>`;
+      historyList.appendChild(li);
+    }
+  }
+</script>
+
+</body>
+</html>
