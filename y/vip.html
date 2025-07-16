@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP经验表</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f9f9f9;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f3f3f3;
+    }
+    input, select, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 14px;
+    }
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <table>
+    <thead>
+      <tr>
+        <th>👑 VIP等级</th>
+        <th>💎 所需钻石</th>
+        <th>💴 金额换算（1元=20万钻）</th>
+      </tr>
+    </thead>
+    <tbody id="vipTableBody">
+      <!-- 动态生成 -->
+    </tbody>
+  </table>
+
+  <h3>升级计算器</h3>
+
+  <label>当前已充值钻石数 💎：
+    <input type="number" id="currentDiamonds" value="0" min="0">
+  </label><br>
+
+  <label>每日充值钻石 💎：
+    <select id="dailyRecharge">
+      <option value="100000">10万钻石</option>
+      <option value="500000">50万钻石</option>
+      <option value="1000000">100万钻石</option>
+      <option value="10000000">1000万钻石</option>
+      <option value="20000000">2000万钻石</option>
+    </select>
+  </label><br>
+
+  <button onclick="calculateUpgrade()">计算升级信息</button>
+
+  <div class="result" id="calcResult"></div>
+
+  <script>
+    // 假设每级所需钻石
+    const vipLevels = [
+      { level: 1, diamonds: 300000 },
+      { level: 2, diamonds: 0 },
+      { level: 3, diamonds: 0 },
+      { level: 4, diamonds: 3800000 },
+      { level: 5, diamonds: 7800000 },
+      { level: 6, diamonds: 15800000 },
+      { level: 7, diamonds: 0 },
+      { level: 8, diamonds: 63800000 },
+      { level: 9, diamonds: 127800000 },
+      { level: 10, diamonds: 0 },
+      { level: 11, diamonds: 0 },
+      { level: 12, diamonds: 0 },
+      { level: 13, diamonds: 0 },
+      { level: 14, diamonds: 0 }
+    ];
+
+    const vipTable = document.getElementById("vipTableBody");
+
+    // 填充表格
+    vipLevels.forEach(vip => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>👑 VIP${vip.level}</td>
+    <td>💎 ${vip.diamonds.toLocaleString()}</td>
+    <td>💴 ${(vip.diamonds / 200000).toFixed(2)}</td>
+    `;
+    vipTable.appendChild(tr);
+  });
+
+
+    // 计算升级信息
+    function calculateUpgrade() {
+      const current = parseInt(document.getElementById("currentDiamonds").value, 10);
+      const daily = parseInt(document.getElementById("dailyRecharge").value, 10);
+      let nextVIP = null;
+
+      for (let i = 0; i < vipLevels.length; i++) {
+        if (current < vipLevels[i].diamonds) {
+          nextVIP = vipLevels[i];
+          break;
+        }
+      }
+
+      const resultDiv = document.getElementById("calcResult");
+      if (!nextVIP) {
+        resultDiv.innerHTML = "🎉 你已经是最高等级 VIP10 啦！";
+      } else {
+        const needed = nextVIP.diamonds - current;
+        const days = Math.ceil(needed / daily);
+        resultDiv.innerHTML = `
+          距离 👑 VIP${nextVIP.level} 还需要 💎 ${needed.toLocaleString()} 钻石。<br>
+          如果你每天充值 💎 ${daily.toLocaleString()}，预计还需要 ${days} 天。
+        `;
+      }
+    }
+  </script>
+
+</body>
+</html>
