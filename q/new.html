@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>切割神域 新服信息</title>
+<title>🆕新服消息</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
@@ -145,7 +145,7 @@
     const openCount = countOpenings(knownDate, todayDate);
     const serverId = knownServerId + (openCount - 1);
     html += `<p>✅ <strong>开服时间：</strong>${formatDate(todayDate)}</p>`;
-    html += `<p>🎮 <a class="button" href="${baseUrl}${serverId}.html" target="_blank">进入第 ${serverId} 服</a></p>`;
+    html += `<p><a class="button" href="${baseUrl}${serverId}.html" target="_blank">进入第 ${serverId} 服</a></p>`;
   } else {
     html += `<p>今天没有新服，<strong>请在周三或周六</strong>再来查看最新服！</p>`;
   }
