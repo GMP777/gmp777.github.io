@@ -6,6 +6,7 @@
 |:---:|:---:|
 |🔧GM工具|[v.1.0](https://gmp777.github.io/c/gm.html)|
 |⏰Boss表|[v.1.0](https://gmp777.github.io/c/boss.html)|
+|🆕新服消息|[v.1.0](https://gmp777.github.io/c/new.html)|
 
   <!-- Footer -->
   <div class="footer-wrapper">
