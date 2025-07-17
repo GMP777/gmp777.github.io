@@ -7,147 +7,153 @@
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: #f0f4f8;
-      padding: 1rem;
-      max-width: 1000px;
-      margin: auto;
-    }
+<style>
+  /* 基础排版和字体 */
+  body {
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+    margin: 10px;
+    background: #f9f9f9;
+  }
 
-    h1 {
-      text-align: center;
-      font-size: 1.6rem;
-      margin-bottom: 1rem;
-    }
+  /* 容器宽度限制和居中 */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+  /* 表格自适应 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+  }
 
+  th, td {
+    padding: 10px 6px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    word-break: break-word;
+  }
+
+  /* 按钮和输入框适配 */
+  button, input, select {
+    font-size: 1rem;
+    padding: 6px 10px;
+    margin: 2px 0;
+  }
+
+  /* 按钮色彩和交互 */
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+  }
+  .btn-kill { background-color: #4CAF50; color: white; }
+  .btn-set { background-color: #2196F3; color: white; }
+  .btn-copy { background-color: #FF9800; color: white; }
+  .btn-clear { background-color: #f44336; color: white; }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  /* 控制输入宽度 */
+  input[type="number"], select, #serverNumber {
+    min-width: 60px;
+    max-width: 100px;
+  }
+
+  /* toast 样式 */
+  #toast-container {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+  }
+  .toast {
+    background: rgba(60, 60, 60, 0.9);
+    color: white;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-size: 0.9rem;
+  }
+
+  /* 日志区 */
+  #log-box {
+    margin-top: 16px;
+    max-height: 150px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  #log-box .log-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  #log-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  #log-list li {
+    padding: 2px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 768px) {
     th, td {
-      padding: 10px;
-      text-align: center;
-      border-bottom: 1px solid #ddd;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
+      padding: 8px 4px;
     }
 
-    th {
-      background-color: #f2f2f2;
+    button, input, select {
+      font-size: 0.85rem;
+      padding: 5px 8px;
     }
 
-    button {
-      padding: 6px 10px;
-      margin: 3px 2px;
-      font-size: 0.8rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    .btn-kill { background-color: #4caf50; color: white; }
-    .btn-set { background-color: #2196f3; color: white; }
-    .btn-copy { background-color: #9c27b0; color: white; }
-    .btn-clear { background-color: #f44336; color: white; }
-
-    input[type="number"] {
-      width: 60px;
-      padding: 5px;
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 768px) {
-      th, td {
-        font-size: 0.85rem;
-        padding: 6px;
-      }
-      button {
-        font-size: 0.75rem;
-      }
-      input[type="number"] {
-        width: 50px;
-      }
-    }
-
-    #toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-    }
-
-    .toast {
-      background-color: #333;
-      color: white;
-      padding: 10px 16px;
-      margin-top: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      font-size: 0.9rem;
-      width: 260px;
-      max-width: 90vw;
-      opacity: 0;
-      transform: translateY(-10px);
-      animation: toastInOut 3s ease forwards;
-    }
-
-    @keyframes toastInOut {
-      0% {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      10% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      85% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
+    #serverNumber, select {
+      max-width: 80px;
     }
 
     #log-box {
-      margin-top: 30px;
-      background: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-      padding: 10px;
+      font-size: 0.8rem;
+      max-height: 120px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      margin: 6px;
     }
 
-    #log-box .log-title {
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #333;
+    /* 表格横向滚动 */
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
     }
 
-    #log-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
+    /* 控制按钮和输入框换行 */
+    #gameSelect, #serverNumber, button {
+      display: block;
+      width: 100%;
+      margin: 4px 0;
     }
 
-    #log-list li {
-      margin-bottom: 4px;
-      color: #333;
-      font-size: 0.88rem;
-      word-break: break-word;
+    /* 顶部选择区居左 */
+    div[style*="text-align: right"] {
+      text-align: left !important;
     }
-  </style>
+  }
+</style>
+
 </head>
 <body>
   <div style="text-align: right; margin: 10px 0;">
