@@ -263,7 +263,7 @@
         <td>${reviveStr}</td>
         <td>${remaining}</td>
         <td>
-          <button class="btn-kill" onclick="recordKill('${boss.key}', ${boss.minutes}, '${boss.name}')">记录击败</button>
+          <button class="btn-kill" onclick="recordKill('${boss.key}', ${boss.minutes}, '${boss.name}')">击败</button>
           <input type="number" id="set_${boss.key}" min="1" placeholder="分钟">
           <button class="btn-set" onclick="setManual('${boss.key}', '${boss.name}')">设置</button>
           <button class="btn-copy" onclick="copyRevive('${boss.key}', '${boss.name}')">复制</button>
@@ -280,8 +280,8 @@
     saveTime(key, 'killTime', now);
     saveTime(key, 'reviveTime', revive);
     updateTable();
-    showToast(`✔️ ${name}复活时间已更新`);
-    addLog(`${name}复活时间已更新`);
+    showToast(`✔️ ${name}击败时间已更新`);
+    addLog(`${name}击败时间已更新`);
   }
 
   function setManual(key, name) {
@@ -296,14 +296,14 @@
     localStorage.removeItem(getStorageKey(key, 'killTime'));
     saveTime(key, 'reviveTime', revive);
     updateTable();
-    showToast(`✔️ ${name}复活时间已手动设置`);
-    addLog(`${name}复活时间手动设置为 ${minutes} 分钟`);
+    showToast(`✔️ ${name}击败时间已记录`);
+    addLog(`${name}击败时间记录为 ${minutes} 分钟`);
   }
 
   function copyRevive(key, name) {
     const revive = loadTime(key, 'reviveTime');
     if (!revive) {
-      showToast("⚠️ 尚未记录复活时间");
+      showToast("⚠️ 尚未记录击败时间");
       return;
     }
     const text = `${name}将于 ${formatDate(revive)} 复活`;
@@ -316,7 +316,7 @@
     localStorage.removeItem(getStorageKey(key, 'killTime'));
     localStorage.removeItem(getStorageKey(key, 'reviveTime'));
     updateTable();
-    showToast(`✔️ 已清除${name}的复活记录`);
+    showToast(`✔️ 已清除${name}的记录`);
   }
 
   setInterval(updateTable, 60000);
