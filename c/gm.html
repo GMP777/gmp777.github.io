@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GM道具清单</title>
-<!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
 
   <style>
     body {
@@ -20,33 +18,46 @@
       color: #333;
     }
 
-    table {
-      width: 60%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      background-color: #fff;
+    /* 排序选择框容器 */
+    #sortContainer {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    th, td {
+    select {
+      padding: 6px 12px;
+      font-size: 14px;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      padding: 12px 16px;
-      text-align: center;
       cursor: pointer;
     }
 
-    th {
-      background-color: #f0f0f0;
-      font-weight: bold;
-      cursor: default;
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    tr:hover {
-      background-color: #f5faff;
+    .card {
+      display: inline-block;
+      padding: 10px 16px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.2s;
+      white-space: nowrap;
+      font-size: 14px;
+      user-select: none;
     }
 
-    td:hover {
-      background-color: #eaf6ff;
+    .card:hover {
+      background-color: #f0f8ff;
     }
 
     .toast {
@@ -63,6 +74,7 @@
       transition: all 0.4s ease;
       z-index: 9999;
       font-size: 14px;
+      pointer-events: none;
     }
 
     .toast.show {
@@ -70,16 +82,9 @@
       transform: translateY(0);
     }
 
-    .footer-wrapper {
-      width: 100%;
-      background-color: #f8f8f8;
-      padding: 20px 0;
-      margin-top: 40px;
-    }
-
     #footer-container {
       max-width: 1000px;
-      margin: 0 auto;
+      margin: 40px auto 0;
       text-align: center;
       color: #666;
     }
@@ -88,61 +93,79 @@
 <body>
   <h2>道具清单</h2>
 
-  <table id="itemTable">
-    <thead>
-      <tr>
-        <th>道具</th>
-        <th>数量</th>
-      </tr>
-    </thead>
-    <tbody id="tableBody">
-      <!-- 表格内容由 JS 插入 -->
-    </tbody>
-  </table>
+  <div id="sortContainer">
+    <label for="sortMode">排序方式：</label>
+    <select id="sortMode" aria-label="选择排序方式">
+      <option value="original">原始顺序</option>
+      <option value="lengthAsc">按长度（短 → 长）</option>
+      <option value="lengthDesc">按长度（长 → 短）</option>
+      <option value="alpha">按字母（A → Z）</option>
+    </select>
+  </div>
 
-  <!-- ✅ footer -->
-<!-- footer -->
-<footer id="footer-container">加载中...</footer>
-<script src="/load-footer.js"></script>
-<!-- footer -->
+  <div class="card-container" id="cardContainer"></div>
+
+  <footer id="footer-container">加载中...</footer>
+  <script src="/load-footer.js"></script>
 
   <script>
-    // ✅ 数据列表
     const data = [
-      { name: "轮回★血染九天甲[盘古](40阶)", amount: 2 },
-      { name: "轮回★血染九天剑[盘古](40阶)", amount: 2 },
-      { name: "等级丹(圣级)", amount: 666 },
-      { name: "等级丹(初级)", amount: 99 },
-      { name: "佛·战神★大王巡山甲[无敌](45阶)", amount: 1 },
-      { name: "佛·战神★大王巡山剑[无敌](45阶)", amount: 1 },
-      { name: "佛·大道不灭浮屠·", amount: 1 },
-      { name: "极品兽魂自选箱", amount: 999 },
-      { name: "兽魂大礼包", amount: 999 },
-      { name: "战神★大王巡山剑[无敌](42阶)", amount: 1 },
-      { name: "战神★大王巡山甲[无敌](42阶)", amount: 1 },
-      { name: "大道不灭浮屠·", amount: 1 },
-      { name: "融合晶石★16级", amount: 10 },
-      { name: "10000充值钻石", amount: 999 },
-      { name: "40阶自选首饰箱", amount: 16 },
-      { name: "/屠魔首饰箱", amount: 999 },
-      { name: "圣妖首饰箱", amount: 999 },
-      { name: "灵羽·至尊宝图", amount: 999 },
-      { name: "39阶自选首饰箱", amount: 8 }
+      "999",
+      "(大)",
+      "(超)",
+      "【灭世】",
+      "【神】",
+      "【圣】",
+      "[完美]",
+      "·十",
+      "龙晶",
+      "万剑归一",
+      "轮回★血染九天甲[盘古](40阶)",
+      "轮回★血染九天剑[盘古](40阶)",
+      "等级丹(圣级)",
+      "等级丹(初级)",
+      "佛·战神★大王巡山甲[无敌](45阶)",
+      "佛·战神★大王巡山剑[无敌](45阶)",
+      "佛·大道不灭浮屠·",
+      "极品兽魂自选箱",
+      "兽魂大礼包",
+      "战神★大王巡山剑[无敌](42阶)",
+      "战神★大王巡山甲[无敌](42阶)",
+      "大道不灭浮屠·",
+      "融合晶石★16级",
+      "10000充值钻石",
+      "40阶自选首饰箱",
+      "/屠魔首饰箱",
+      "圣妖首饰箱",
+      "灵羽·至尊宝图",
+      "自选首饰箱"
     ];
 
-    const tableBody = document.getElementById("tableBody");
-    data.forEach(item => {
-      const row = document.createElement("tr");
-      const nameCell = document.createElement("td");
-      nameCell.textContent = item.name;
-      nameCell.addEventListener("click", () => copyText(item.name));
-      const amountCell = document.createElement("td");
-      amountCell.textContent = item.amount;
-      amountCell.addEventListener("click", () => copyText(item.amount));
-      row.appendChild(nameCell);
-      row.appendChild(amountCell);
-      tableBody.appendChild(row);
-    });
+    const container = document.getElementById("cardContainer");
+    const sortSelect = document.getElementById("sortMode");
+    const originalData = [...data]; // 保留原始顺序副本
+
+    function renderCards(itemList) {
+      container.innerHTML = "";
+      itemList.forEach(name => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = name;
+        card.title = "点击复制道具名称";
+        card.setAttribute("role", "button");
+        card.setAttribute("tabindex", "0");
+
+        card.addEventListener("click", () => copyText(name));
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            copyText(name);
+          }
+        });
+
+        container.appendChild(card);
+      });
+    }
 
     function copyText(text) {
       navigator.clipboard.writeText(text.toString()).then(() => {
@@ -152,32 +175,54 @@
       });
     }
 
+    let toastEl;
     function showToast(message) {
-      const toast = document.createElement("div");
-      toast.className = "toast";
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add("show");
-      }, 10);
-      setTimeout(() => {
-        toast.classList.remove("show");
-        setTimeout(() => {
-          document.body.removeChild(toast);
-        }, 400);
+      if (!toastEl) {
+        toastEl = document.createElement("div");
+        toastEl.className = "toast";
+        document.body.appendChild(toastEl);
+      }
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+
+      clearTimeout(toastEl._timeout);
+      toastEl._timeout = setTimeout(() => {
+        toastEl.classList.remove("show");
       }, 3000);
     }
 
-    // ✅ Footer 根据路径判断加载哪个文件
+    // 监听排序方式变更
+    sortSelect.addEventListener("change", (e) => {
+      const mode = e.target.value;
+      let sorted = [...originalData];
+
+      switch (mode) {
+        case "lengthAsc":
+          sorted.sort((a, b) => a.length - b.length);
+          break;
+        case "lengthDesc":
+          sorted.sort((a, b) => b.length - a.length);
+          break;
+        case "alpha":
+          // 使用 localeCompare 支持中文拼音排序
+          sorted.sort((a, b) => a.localeCompare(b, 'zh-Hans-CN'));
+          break;
+        default:
+          sorted = [...originalData];
+      }
+
+      renderCards(sorted);
+    });
+
+    // 初始化渲染
+    renderCards(originalData);
+
+    // footer 加载相关
     function getFooterFile() {
       const path = window.location.pathname;
-      if (path.includes('/y/')) {
-        return '/y/footer.html';
-      } else if (path.includes('/x/')) {
-        return '/x/footer.html';
-      } else {
-        return '/footer.html';
-      }
+      if (path.includes('/y/')) return '/y/footer.html';
+      else if (path.includes('/x/')) return '/x/footer.html';
+      else return '/footer.html';
     }
 
     function hideCurrentPageLink() {
@@ -196,12 +241,13 @@
     fetch(getFooterFile())
       .then(res => res.text())
       .then(html => {
-        const container = document.getElementById('footer-container');
-        container.innerHTML = html;
+        document.getElementById('footer-container').innerHTML = html;
         hideCurrentPageLink();
       })
       .catch(() => {
-        document.getElementById('footer-container').textContent = '加载 footer 失败';
+        const footer = document.getElementById('footer-container');
+        footer.textContent = '加载 footer 失败';
+        footer.style.color = 'red';
       });
   </script>
 </body>
