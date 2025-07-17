@@ -44,7 +44,9 @@
       { name: "🔧footer自动载入链接", url: "#", version: "v.5.0", date: "2025-06-07 03:06:34" },
       { name: "🔨强化元宝计算器", url: "qh.html", version: "v.0.0", date: "2025-06-10 01:10:46" },
       { name: "💰充值相关", url: "pay.html", version: "v.1.0", date: "2025-06-16 23:31:54" },
-      { name: "👑VIP等级", url: "vip.html", version: "v.1.0", date: "2025-07-17 04:34:02" }
+      { name: "👑VIP等级", url: "vip.html", version: "v.1.0", date: "2025-07-17 04:34:02" },
+      { name: "👿Boss击杀", url: "boss.html", version: "v.1.0", date: "2025-07-17" },
+      { name: "🆕新服消息", url: "new.html", version: "v.1.0", date: "2025-07-18 02:26:34" }
     ];
 
     const tbody = document.querySelector("#tools-table tbody");
