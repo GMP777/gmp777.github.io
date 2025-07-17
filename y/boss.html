@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boss💿表</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f0f4f8;
+      padding: 1rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      font-size: 0.95rem;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      padding: 6px 10px;
+      margin: 3px 2px;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .btn-kill { background-color: #4caf50; color: white; }
+    .btn-set { background-color: #2196f3; color: white; }
+    .btn-copy { background-color: #9c27b0; color: white; }
+    .btn-clear { background-color: #f44336; color: white; }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      th, td {
+        font-size: 0.85rem;
+        padding: 6px;
+      }
+      button {
+        font-size: 0.75rem;
+      }
+      input[type="number"] {
+        width: 50px;
+      }
+    }
+
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+
+    .toast {
+      background-color: #333;
+      color: white;
+      padding: 10px 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+      width: 260px;
+      max-width: 90vw;
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: toastInOut 3s ease forwards;
+    }
+
+    @keyframes toastInOut {
+      0% {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      10% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      85% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+    }
+
+    #log-box {
+      margin-top: 30px;
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+      padding: 10px;
+    }
+
+    #log-box .log-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    #log-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #log-list li {
+      margin-bottom: 4px;
+      color: #333;
+      font-size: 0.88rem;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+<table>
+  <thead>
+    <tr>
+      <th>Boss名称</th>
+      <th>击败时间</th>
+      <th>预计复活时间</th>
+      <th>剩余时间</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody id="bossTableBody"></tbody>
+</table>
+
+<div id="toast-container"></div>
+
+<div id="log-box">
+  <div class="log-title">📝 操作记录（最近5条）</div>
+  <ul id="log-list"></ul>
+</div>
+
+<script>
+  const bosses = [
+  { key: 'warden', name: '沙海魔楼·典狱长', minutes: 300 },
+  { key: 'elder5', name: '魔界妖王', minutes: 480 },
+  { key: 'elder4', name: '魔界统领', minutes: 360 },
+  { key: 'elder3', name: '魔界巨蝎', minutes: 210 },
+  { key: 'elder2', name: '魔界长老', minutes: 120 },
+  { key: 'hell5', name: '沙海魔楼·五层守护者', minutes: 300 },
+  { key: 'hell4', name: '沙海魔楼·四层守护者', minutes: 240 },
+  { key: 'hell3', name: '沙海魔楼·三层守护者', minutes: 180 },
+  { key: 'hell2', name: '沙海魔楼·二层守护者', minutes: 150 },
+  { key: 'hell1', name: '沙海魔楼·一层守护者', minutes: 120 },
+];
+
+  function formatDate(date) {
+    return date.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  function formatTimeOnly(date) {
+    return date.toTimeString().split(' ')[0];
+  }
+
+  function showToast(message) {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => container.removeChild(toast), 3000);
+  }
+
+  function addLog(message) {
+    const list = document.getElementById("log-list");
+    const now = new Date();
+    const time = formatTimeOnly(now);
+    const item = document.createElement("li");
+    item.textContent = `✔️ [${time}] ${message}`;
+    list.insertBefore(item, list.firstChild);
+    while (list.children.length > 5) {
+      list.removeChild(list.lastChild);
+    }
+  }
+
+  function getStorageKey(key, field) {
+    return `${key}_${field}`;
+  }
+
+  function saveTime(key, type, value) {
+    localStorage.setItem(getStorageKey(key, type), value.toISOString());
+  }
+
+  function loadTime(key, type) {
+    const val = localStorage.getItem(getStorageKey(key, type));
+    return val ? new Date(val) : null;
+  }
+
+  function updateTable() {
+    const tbody = document.getElementById('bossTableBody');
+    tbody.innerHTML = '';
+    const now = new Date();
+
+    bosses.forEach(boss => {
+      const kill = loadTime(boss.key, 'killTime');
+      const revive = loadTime(boss.key, 'reviveTime');
+
+      const killStr = kill ? formatDate(kill) : '-';
+      const reviveStr = revive ? formatDate(revive) : '-';
+      let remaining = '-';
+
+      if (revive) {
+        const diffMs = revive - now;
+        remaining = diffMs > 0
+          ? Math.floor(diffMs / 60000) + ' 分钟'
+          : '已复活';
+      }
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${boss.name}</td>
+        <td>${killStr}</td>
+        <td>${reviveStr}</td>
+        <td>${remaining}</td>
+        <td>
+          <button class="btn-kill" onclick="recordKill('${boss.key}', ${boss.minutes}, '${boss.name}')">记录击败</button>
+          <input type="number" id="set_${boss.key}" min="1" placeholder="分钟">
+          <button class="btn-set" onclick="setManual('${boss.key}', '${boss.name}')">设置</button>
+          <button class="btn-copy" onclick="copyRevive('${boss.key}', '${boss.name}')">复制</button>
+          <button class="btn-clear" onclick="clearTimes('${boss.key}', '${boss.name}')">清除</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function recordKill(key, minutes, name) {
+    const now = new Date();
+    const revive = new Date(now.getTime() + minutes * 60000);
+    saveTime(key, 'killTime', now);
+    saveTime(key, 'reviveTime', revive);
+    updateTable();
+    showToast(`✔️ ${name}击败时间已记录`);
+    addLog(`${name}击败时间已记录`);
+  }
+
+  function setManual(key, name) {
+    const input = document.getElementById(`set_${key}`);
+    const minutes = parseInt(input.value);
+    if (isNaN(minutes) || minutes <= 0) {
+      showToast("⚠️ 请输入有效的分钟数");
+      return;
+    }
+    const now = new Date();
+    const revive = new Date(now.getTime() + minutes * 60000);
+    localStorage.removeItem(getStorageKey(key, 'killTime'));
+    saveTime(key, 'reviveTime', revive);
+    updateTable();
+    showToast(`✔️ ${name}击败时间已记录`);
+    addLog(`${name}击败时间记录为 ${minutes} 分钟`);
+  }
+
+  function copyRevive(key, name) {
+    const revive = loadTime(key, 'reviveTime');
+    if (!revive) {
+      showToast("⚠️ 尚未记录击败时间");
+      return;
+    }
+    const text = `${name}将于 ${formatDate(revive)} 复活`;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(`✔️ 已复制：${text}`);
+    });
+  }
+
+  function clearTimes(key, name) {
+    localStorage.removeItem(getStorageKey(key, 'killTime'));
+    localStorage.removeItem(getStorageKey(key, 'reviveTime'));
+    updateTable();
+    showToast(`✔️ 已清除${name}的复活记录`);
+  }
+
+  setInterval(updateTable, 60000);
+  window.onload = updateTable;
+</script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
