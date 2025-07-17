@@ -151,229 +151,252 @@
 </head>
 <body>
   <div style="text-align: right; margin: 10px 0;">
-  <button id="btn-export" style="background-color:#ff9800; color:#fff; padding:6px 12px; border:none; border-radius:4px; cursor:pointer;">
-    导出击败Boss复活时间（Markdown）
-  </button>
-</div>
+    <label for="gameSelect">游戏名：</label>
+    <select id="gameSelect" style="padding:4px 6px; font-size:0.9rem;">
+      <option value="切割神域">切割神域</option>
+      <option value="悠久传奇">悠久传奇</option>
+      <option value="赤焰无双">赤焰无双</option>
+    </select>
+    <label for="serverNumber" style="margin-left:8px;">区服号：</label>
+    <input type="text" id="serverNumber" placeholder="输入区服号" style="width:60px; padding:4px 6px; font-size:0.9rem;" />
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Boss名称</th>
-      <th>击败时间</th>
-      <th>预计复活时间</th>
-      <th>剩余时间</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody id="bossTableBody"></tbody>
-</table>
+  <div style="text-align: right; margin: 10px 0;">
+    <button id="btn-export" style="background-color:#ff9800; color:#fff; padding:6px 12px; border:none; border-radius:4px; cursor:pointer;">
+      导出击败Boss复活时间（Markdown）
+    </button>
+  </div>
 
-<div id="toast-container"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Boss名称</th>
+        <th>击败时间</th>
+        <th>预计复活时间</th>
+        <th>剩余时间</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody id="bossTableBody"></tbody>
+  </table>
 
-<div id="log-box">
-  <div class="log-title">📝 操作记录（最近5条）</div>
-  <ul id="log-list"></ul>
-</div>
+  <div id="toast-container"></div>
 
-<script>
- const bosses = [
-  { key: 'warden', name: '魔灵幻狱·典狱长', minutes: 300 },
-  { key: 'elder5', name: '议会长老·五', minutes: 480 },
-  { key: 'elder4', name: '议会长老·四', minutes: 360 },
-  { key: 'elder3', name: '议会长老·三', minutes: 210 },
-  { key: 'elder2', name: '议会长老·二', minutes: 120 },
-  { key: 'hell5', name: '魔灵幻狱·五层守护者', minutes: 300 },
-  { key: 'hell4', name: '魔灵幻狱·四层守护者', minutes: 240 },
-  { key: 'hell3', name: '魔灵幻狱·三层守护者', minutes: 180 },
-  { key: 'hell2', name: '魔灵幻狱·二层守护者', minutes: 150 },
-  { key: 'hell1', name: '魔灵幻狱·一层守护者', minutes: 120 },
-];
+  <div id="log-box">
+    <div class="log-title">📝 操作记录（最近5条）</div>
+    <ul id="log-list"></ul>
+  </div>
 
-function formatDate(date) {
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-}
+  <script>
+    const bosses = [
+      { key: 'warden', name: '魔灵幻狱·典狱长', minutes: 300 },
+      { key: 'elder5', name: '议会长老·五', minutes: 480 },
+      { key: 'elder4', name: '议会长老·四', minutes: 360 },
+      { key: 'elder3', name: '议会长老·三', minutes: 210 },
+      { key: 'elder2', name: '议会长老·二', minutes: 120 },
+      { key: 'hell5', name: '魔灵幻狱·五层守护者', minutes: 300 },
+      { key: 'hell4', name: '魔灵幻狱·四层守护者', minutes: 240 },
+      { key: 'hell3', name: '魔灵幻狱·三层守护者', minutes: 180 },
+      { key: 'hell2', name: '魔灵幻狱·二层守护者', minutes: 150 },
+      { key: 'hell1', name: '魔灵幻狱·一层守护者', minutes: 120 },
+    ];
 
-function formatTimeOnly(date) {
-  return date.toTimeString().split(' ')[0];
-}
-
-function showToast(message) {
-  const container = document.getElementById("toast-container");
-  const toast = document.createElement("div");
-  toast.className = "toast";
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => container.removeChild(toast), 3000);
-}
-
-function addLog(message) {
-  const list = document.getElementById("log-list");
-  const now = new Date();
-  const time = formatTimeOnly(now);
-  const item = document.createElement("li");
-  item.textContent = `✔️ [${time}] ${message}`;
-  list.insertBefore(item, list.firstChild);
-  while (list.children.length > 5) {
-    list.removeChild(list.lastChild);
-  }
-}
-
-function getStorageKey(key, field) {
-  return `${key}_${field}`;
-}
-
-function saveTime(key, type, value) {
-  localStorage.setItem(getStorageKey(key, type), value.toISOString());
-}
-
-function loadTime(key, type) {
-  const val = localStorage.getItem(getStorageKey(key, type));
-  return val ? new Date(val) : null;
-}
-
-function updateTable() {
-  const tbody = document.getElementById('bossTableBody');
-  tbody.innerHTML = '';
-  const now = new Date();
-
-  // 先获取带复活时间的Boss，没复活时间的排后面
-  const sortedBosses = [...bosses].sort((a, b) => {
-    const aRevive = loadTime(a.key, 'reviveTime');
-    const bRevive = loadTime(b.key, 'reviveTime');
-    if (aRevive && bRevive) return aRevive - bRevive;
-    if (aRevive && !bRevive) return -1;
-    if (!aRevive && bRevive) return 1;
-    return 0;
-  });
-
-  sortedBosses.forEach(boss => {
-    const kill = loadTime(boss.key, 'killTime');
-    const revive = loadTime(boss.key, 'reviveTime');
-
-    const killStr = kill ? formatDate(kill) : '-';
-    const reviveStr = revive ? formatDate(revive) : '-';
-    let remaining = '-';
-
-    if (revive) {
-      const diffMs = revive - now;
-      remaining = diffMs > 0
-        ? Math.floor(diffMs / 60000) + ' 分钟'
-        : '已复活';
+    function formatDate(date) {
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
 
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${boss.name}</td>
-      <td>${killStr}</td>
-      <td>${reviveStr}</td>
-      <td>${remaining}</td>
-      <td>
-        <button class="btn-kill" onclick="recordKill('${boss.key}', ${boss.minutes}, '${boss.name}')">击败</button>
-        <input type="number" id="set_${boss.key}" min="1" placeholder="分钟">
-        <button class="btn-set" onclick="setManual('${boss.key}', '${boss.name}')">设置</button>
-        <button class="btn-copy" onclick="copyRevive('${boss.key}', '${boss.name}')">复制</button>
-        <button class="btn-clear" onclick="clearTimes('${boss.key}', '${boss.name}')">清除</button>
-      </td>
-    `;
-    tbody.appendChild(row);
-  });
-}
+    function formatTimeOnly(date) {
+      return date.toTimeString().split(' ')[0];
+    }
 
-function recordKill(key, minutes, name) {
-  const now = new Date();
-  const revive = new Date(now.getTime() + minutes * 60000);
-  saveTime(key, 'killTime', now);
-  saveTime(key, 'reviveTime', revive);
-  updateTable();
-  showToast(`✔️ ${name}击败时间已更新`);
-  addLog(`${name}击败时间已更新`);
-}
+    function showToast(message) {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => container.removeChild(toast), 3000);
+    }
 
-function setManual(key, name) {
-  const input = document.getElementById(`set_${key}`);
-  const minutes = parseInt(input.value);
-  if (isNaN(minutes) || minutes <= 0) {
-    showToast("⚠️ 请输入有效的分钟数");
-    return;
-  }
-  const now = new Date();
-  const revive = new Date(now.getTime() + minutes * 60000);
-  localStorage.removeItem(getStorageKey(key, 'killTime'));
-  saveTime(key, 'reviveTime', revive);
-  updateTable();
-  showToast(`✔️ ${name}击败时间已记录`);
-  addLog(`${name}击败时间记录为 ${minutes} 分钟`);
-}
+    function addLog(message) {
+      const list = document.getElementById("log-list");
+      const now = new Date();
+      const time = formatTimeOnly(now);
+      const item = document.createElement("li");
+      item.textContent = `✔️ [${time}] ${message}`;
+      list.insertBefore(item, list.firstChild);
+      while (list.children.length > 5) {
+        list.removeChild(list.lastChild);
+      }
+    }
 
-function copyRevive(key, name) {
-  const revive = loadTime(key, 'reviveTime');
-  if (!revive) {
-    showToast("⚠️ 尚未记录击败时间");
-    return;
-  }
-  const text = `${name}将于 ${formatDate(revive)} 复活`;
-  navigator.clipboard.writeText(text).then(() => {
-    showToast(`✔️ 已复制：${text}`);
-  });
-}
+    function getCurrentServer() {
+      const game = document.getElementById('gameSelect').value;
+      const number = document.getElementById('serverNumber').value.trim();
+      return number ? `${game}${number}` : game;
+    }
 
-function clearTimes(key, name) {
-  localStorage.removeItem(getStorageKey(key, 'killTime'));
-  localStorage.removeItem(getStorageKey(key, 'reviveTime'));
-  updateTable();
-  showToast(`✔️ 已清除${name}的记录`);
-}
+    function getStorageKey(key, field) {
+      return `${getCurrentServer()}_${key}_${field}`;
+    }
 
-// 新增：导出Markdown格式击败Boss复活时间并复制到剪贴板
-function exportMarkdown() {
-  const now = new Date();
-  // 过滤有复活时间的Boss，并排序
-  const defeatedBosses = bosses
-    .map(boss => {
-      const revive = loadTime(boss.key, 'reviveTime');
-      return { boss, revive };
-    })
-    .filter(item => item.revive)
-    .sort((a, b) => a.revive - b.revive);
+    function saveTime(key, type, value) {
+      localStorage.setItem(getStorageKey(key, type), value.toISOString());
+    }
 
-  if (defeatedBosses.length === 0) {
-    showToast("⚠️ 当前无击败Boss记录");
-    return;
-  }
+    function loadTime(key, type) {
+      const val = localStorage.getItem(getStorageKey(key, type));
+      return val ? new Date(val) : null;
+    }
 
-  // 生成Markdown表格
-  let md = `| Boss名称 | 预计复活时间 |\n| --- | --- |\n`;
-  defeatedBosses.forEach(({ boss, revive }) => {
-    md += `| ${boss.name} | ${formatDate(revive)} |\n`;
-  });
+    function updateTable() {
+      const tbody = document.getElementById('bossTableBody');
+      tbody.innerHTML = '';
+      const now = new Date();
 
-  // 复制到剪贴板
-  navigator.clipboard.writeText(md).then(() => {
-    showToast("✔️ 已复制击败Boss复活时间（Markdown格式）");
-    addLog("导出并复制了击败Boss复活时间（Markdown格式）");
-  });
-}
+      const sortedBosses = [...bosses].sort((a, b) => {
+        const aRevive = loadTime(a.key, 'reviveTime');
+        const bRevive = loadTime(b.key, 'reviveTime');
+        if (aRevive && bRevive) return aRevive - bRevive;
+        if (aRevive && !bRevive) return -1;
+        if (!aRevive && bRevive) return 1;
+        return 0;
+      });
 
-document.getElementById('btn-export').addEventListener('click', exportMarkdown);
+      sortedBosses.forEach(boss => {
+        const kill = loadTime(boss.key, 'killTime');
+        const revive = loadTime(boss.key, 'reviveTime');
 
-setInterval(updateTable, 60000);
-window.onload = () => {
-  updateTable();
-};
-</script>
+        const killStr = kill ? formatDate(kill) : '-';
+        const reviveStr = revive ? formatDate(revive) : '-';
+        let remaining = '-';
+
+        if (revive) {
+          const diffMs = revive - now;
+          remaining = diffMs > 0
+            ? Math.floor(diffMs / 60000) + ' 分钟'
+            : '已复活';
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${boss.name}</td>
+          <td>${killStr}</td>
+          <td>${reviveStr}</td>
+          <td>${remaining}</td>
+          <td>
+            <button class="btn-kill" onclick="recordKill('${boss.key}', ${boss.minutes}, '${boss.name}')">击败</button>
+            <input type="number" id="set_${boss.key}" min="1" placeholder="分钟">
+            <button class="btn-set" onclick="setManual('${boss.key}', '${boss.name}')">设置</button>
+            <button class="btn-copy" onclick="copyRevive('${boss.key}', '${boss.name}')">复制</button>
+            <button class="btn-clear" onclick="clearTimes('${boss.key}', '${boss.name}')">清除</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function recordKill(key, minutes, name) {
+      const now = new Date();
+      const revive = new Date(now.getTime() + minutes * 60000);
+      saveTime(key, 'killTime', now);
+      saveTime(key, 'reviveTime', revive);
+      updateTable();
+      showToast(`✔️ ${name}击败时间已更新`);
+      addLog(`${name}击败时间已更新（${getCurrentServer()}）`);
+    }
+
+    function setManual(key, name) {
+      const input = document.getElementById(`set_${key}`);
+      const minutes = parseInt(input.value);
+      if (isNaN(minutes) || minutes <= 0) {
+        showToast("⚠️ 请输入有效的分钟数");
+        return;
+      }
+      const now = new Date();
+      const revive = new Date(now.getTime() + minutes * 60000);
+      localStorage.removeItem(getStorageKey(key, 'killTime'));
+      saveTime(key, 'reviveTime', revive);
+      updateTable();
+      showToast(`✔️ ${name}击败时间已记录`);
+      addLog(`${name}击败时间记录为 ${minutes} 分钟（${getCurrentServer()}）`);
+    }
+
+    function copyRevive(key, name) {
+      const revive = loadTime(key, 'reviveTime');
+      if (!revive) {
+        showToast("⚠️ 尚未记录击败时间");
+        return;
+      }
+      const text = `${name}将于 ${formatDate(revive)} 复活（${getCurrentServer()}）`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`✔️ 已复制：${text}`);
+      });
+    }
+
+    function clearTimes(key, name) {
+      localStorage.removeItem(getStorageKey(key, 'killTime'));
+      localStorage.removeItem(getStorageKey(key, 'reviveTime'));
+      updateTable();
+      showToast(`✔️ 已清除${name}的记录（${getCurrentServer()}）`);
+    }
+
+    function exportMarkdown() {
+      const now = new Date();
+      const server = getCurrentServer();
+
+      const defeatedBosses = bosses
+        .map(boss => {
+          const revive = loadTime(boss.key, 'reviveTime');
+          return { boss, revive };
+        })
+        .filter(item => item.revive)
+        .sort((a, b) => a.revive - b.revive);
+
+      if (defeatedBosses.length === 0) {
+        showToast("⚠️ 当前无击败Boss记录");
+        return;
+      }
+
+      let md = `## Boss复活记录 - ${server}\n\n`;
+      md += `| Boss名称 | 预计复活时间 |\n| --- | --- |\n`;
+      defeatedBosses.forEach(({ boss, revive }) => {
+        md += `| ${boss.name} | ${formatDate(revive)} |\n`;
+      });
+
+      navigator.clipboard.writeText(md).then(() => {
+        showToast(`✔️ 已复制${server}的Boss复活时间`);
+        addLog(`导出并复制了 ${server} 的Boss复活时间（Markdown格式）`);
+      });
+    }
+
+    document.getElementById('btn-export').addEventListener('click', exportMarkdown);
+    document.getElementById('gameSelect').addEventListener('change', () => {
+      updateTable();
+      addLog(`切换游戏为：${getCurrentServer()}`);
+    });
+    document.getElementById('serverNumber').addEventListener('input', () => {
+      updateTable();
+      addLog(`切换区服为：${getCurrentServer()}`);
+    });
+
+    setInterval(updateTable, 60000);
+    window.onload = () => {
+      updateTable();
+    };
+  </script>
+
   <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
