@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎮 游戏登录链接（带备注 & 自适应）</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      cursor: pointer;
+      border: 1px solid #007bff;
+      background: white;
+      color: #007bff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 1em;
+      transition: 0.3s;
+      flex-shrink: 0;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: #007bff;
+      color: white;
+    }
+    .grid-container {
+      margin-bottom: 30px;
+    }
+    .server-title {
+      font-weight: bold;
+      margin: 20px 0 6px;
+    }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px 15px;
+      margin-bottom: 15px;
+      justify-content: flex-start;
+    }
+    .button-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+    .button-wrapper a {
+      display: inline-block;
+      padding: 8px 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #007bff;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background-color 0.3s;
+      min-width: 80px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .button-wrapper a:hover {
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+    }
+    .remark {
+      font-size: 0.85em;
+      color: #555;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hidden { display: none; }
+
+    /* 响应式 */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .tab-btn {
+        font-size: 0.9em;
+        padding: 5px 10px;
+      }
+      .button-wrapper a {
+        padding: 6px 10px;
+        font-size: 0.9em;
+        min-width: 70px;
+      }
+      .remark {
+        font-size: 0.75em;
+        max-width: 100px;
+      }
+      .button-row {
+        gap: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h2>游戏登录区服选择（带备注）</h2>
+<div class="tabs" id="tabs"></div>
+<div id="tables"></div>
+
+<script>
+  const games = [
+    { id: '111', name: '满V切割神域' },
+    { id: '115', name: '满V悠久传奇' }
+  ];
+
+  const tabsContainer = document.getElementById('tabs');
+  const tablesContainer = document.getElementById('tables');
+
+  const serverListMap = {
+    '111': [263],
+    '115': [108, 110]
+  };
+
+  // 备注信息可自由调整
+  const mirrorSiteMap = {
+    '111': [
+      { title: 'xayxms', base: 'http://gm.xayxms.cn', remark: 'xxxx' },
+      { title: '395wan', base: 'http://game.395wan.com/', remark: 'qqq,aaa' },
+      { title: '99yn', base: 'http://gm.99yn.cn', remark: '无' },
+      { title: '8kyou', base: 'http://www.8kyou.com:81', remark: '无' },
+      { title: '336buy', base: 'http://gm.336buy.com', remark: '无' },
+      { title: 'lovedfm', base: 'http://mv.lovedfm.com', remark: '无' },
+      { title: '42uc', base: 'http://gm.42uc.com', remark: '无' },
+      { title: '32sf', base: 'http://mv.32sf.cn', remark: '无' }
+    ],
+    '115': [
+      { title: 'xayxms', base: 'http://gm.xayxms.cn', remark: 'xxxx' },
+      { title: '395wan', base: 'http://game.395wan.com/', remark: 'qqq,aaa' },
+      { title: '99yn', base: 'http://gm.99yn.cn', remark: '无' },
+      { title: '8kyou', base: 'http://www.8kyou.com:81', remark: '无' },
+      { title: '336buy', base: 'http://gm.336buy.com', remark: '无' },
+      { title: 'lovedfm', base: 'http://mv.lovedfm.com', remark: '无' },
+      { title: '42uc', base: 'http://gm.42uc.com', remark: '无' },
+      { title: '32sf', base: 'http://mv.32sf.cn', remark: '无' }
+    ]
+  };
+
+  function createGrid(game) {
+    const container = document.createElement('div');
+    container.id = 'table-' + game.id;
+    container.className = 'grid-container';
+    if (game !== games[0]) container.classList.add('hidden');
+
+    const serverList = serverListMap[game.id] || [];
+
+    serverList.forEach(serverId => {
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'server-title';
+      titleDiv.textContent = `【${serverId}区】`;
+      container.appendChild(titleDiv);
+
+      // 登录按钮行
+      const loginRow = document.createElement('div');
+      loginRow.className = 'button-row';
+      mirrorSiteMap[game.id].forEach(site => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'button-wrapper';
+
+        const a = document.createElement('a');
+        a.href = `${site.base}/login/${game.id}/${serverId}.html`;
+        a.target = '_blank';
+        a.textContent = `${site.title}登录`;
+        wrapper.appendChild(a);
+
+        const remarkSpan = document.createElement('span');
+        remarkSpan.className = 'remark';
+        remarkSpan.textContent = site.remark || '';
+        wrapper.appendChild(remarkSpan);
+
+        loginRow.appendChild(wrapper);
+      });
+      container.appendChild(loginRow);
+
+      // 主页按钮行
+      const homeRow = document.createElement('div');
+      homeRow.className = 'button-row';
+      mirrorSiteMap[game.id].forEach(site => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'button-wrapper';
+
+        const a = document.createElement('a');
+        a.href = `${site.base}/games/${game.id}.html`;
+        a.target = '_blank';
+        a.textContent = `${site.title}主页`;
+        wrapper.appendChild(a);
+
+        const remarkSpan = document.createElement('span');
+        remarkSpan.className = 'remark';
+        remarkSpan.textContent = site.remark || '';
+        wrapper.appendChild(remarkSpan);
+
+        homeRow.appendChild(wrapper);
+      });
+      container.appendChild(homeRow);
+    });
+
+    return container;
+  }
+
+  // 创建tab按钮和对应内容区
+  games.forEach((game, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = game.name;
+    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      games.forEach(g => document.getElementById('table-' + g.id).classList.add('hidden'));
+      document.getElementById('table-' + game.id).classList.remove('hidden');
+    };
+    tabsContainer.appendChild(btn);
+
+    tablesContainer.appendChild(createGrid(game));
+  });
+</script>
+
+</body>
+</html>
