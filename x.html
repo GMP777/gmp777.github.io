@@ -2,7 +2,10 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <title>🎮 游戏登录链接（带备注 & 自适应）</title>
+  <title>🎮</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -115,7 +118,6 @@
 </head>
 <body>
 
-<h2>游戏登录区服选择（带备注）</h2>
 <div class="tabs" id="tabs"></div>
 <div id="tables"></div>
 
@@ -235,6 +237,11 @@
     tablesContainer.appendChild(createGrid(game));
   });
 </script>
-
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
 </body>
 </html>
