@@ -46,6 +46,7 @@
       { name: "💰充值相关", url: "pay.html", version: "v.1.0", date: "2025-06-16 23:31:54" },
       { name: "👑VIP等级", url: "vip.html", version: "v.1.0", date: "2025-07-17 04:34:02" },
       { name: "👿Boss击杀", url: "boss.html", version: "v.1.0", date: "2025-07-17" },
+      { name: "💴充值", url: "cz.html", version: "v.1.0", date: "2025-07-22" },
       { name: "🆕新服消息", url: "new.html", version: "v.1.0", date: "2025-07-18 02:26:34" }
     ];
 
