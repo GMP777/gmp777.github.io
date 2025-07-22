@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>游戏充值计算器</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .best {
+      background-color: #ffeeba;
+      font-weight: bold;
+    }
+
+    .calculator {
+      width: 90%;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    .calculator input {
+      padding: 10px;
+      width: 60%;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .calculator label {
+      font-weight: bold;
+    }
+
+    .calculator button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .calculator button:hover {
+      background-color: #45a049;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>游戏充值价格表</h1>
+
+  <div class="calculator">
+    <label>你需要充值的总钻石（单位：万）</label><br>
+    <input type="number" id="diamondInput" placeholder="例如：10000 = 1亿钻石" /><br>
+
+    <label>你要在多少天内完成</label><br>
+    <input type="number" id="daysInput" placeholder="例如：3" /><br><br>
+
+    <button onclick="calculateRecharge()">计算最划算组合</button>
+
+    <div class="result" id="resultArea"></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>充值金额（元）</th>
+        <th>获得钻石</th>
+        <th>单价（元/万钻）</th>
+        <th>性价比评级</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>10</td><td>200万</td><td>0.05</td><td>低</td></tr>
+      <tr><td>20</td><td>400万</td><td>0.05</td><td>低</td></tr>
+      <tr><td>30</td><td>600万</td><td>0.05</td><td>低</td></tr>
+      <tr><td>50</td><td>1000万</td><td>0.05</td><td>低</td></tr>
+      <tr><td>100</td><td>3000万</td><td>0.033</td><td>中</td></tr>
+      <tr><td>200</td><td>6000万</td><td>0.033</td><td>中</td></tr>
+      <tr><td>300</td><td>9000万</td><td>0.033</td><td>中</td></tr>
+      <tr><td>500</td><td>2亿</td><td>0.0025</td><td>高</td></tr>
+      <tr><td>1000</td><td>5亿</td><td>0.002</td><td>高</td></tr>
+      <tr><td>1500</td><td>7.5亿</td><td>0.002</td><td>高</td></tr>
+      <tr><td>2000</td><td>12亿</td><td>0.00167</td><td class="best">超高</td></tr>
+      <tr><td>3000</td><td>21亿</td><td>0.00143</td><td class="best">最优</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    const rechargeOptions = [
+      { cost: 3000, diamonds: 210000000 },
+      { cost: 2000, diamonds: 120000000 },
+      { cost: 1500, diamonds: 75000000 },
+      { cost: 1000, diamonds: 50000000 },
+      { cost: 500, diamonds: 20000000 },
+      { cost: 300, diamonds: 9000000 },
+      { cost: 200, diamonds: 6000000 },
+      { cost: 100, diamonds: 3000000 },
+      { cost: 50, diamonds: 1000000 },
+      { cost: 30, diamonds: 600000 },
+      { cost: 20, diamonds: 400000 },
+      { cost: 10, diamonds: 200000 },
+    ];
+
+    function calculateBestCombo(target) {
+      let remaining = target;
+      const result = [];
+
+      for (const option of rechargeOptions) {
+        const count = Math.floor(remaining / option.diamonds);
+        if (count > 0) {
+          result.push({ ...option, count });
+          remaining -= count * option.diamonds;
+        }
+      }
+
+      if (remaining > 0) {
+        for (const option of rechargeOptions.reverse()) {
+          if (option.diamonds >= remaining) {
+            result.push({ ...option, count: 1 });
+            break;
+          }
+        }
+      }
+
+      const totalCost = result.reduce((sum, item) => sum + item.cost * item.count, 0);
+      const totalDiamonds = result.reduce((sum, item) => sum + item.diamonds * item.count, 0);
+
+      return { result, totalCost, totalDiamonds };
+    }
+
+    function calculateRecharge() {
+      const input = parseInt(document.getElementById('diamondInput').value);
+      const days = parseInt(document.getElementById('daysInput').value);
+      const totalDiamonds = input * 10000;
+
+      if (!input || input <= 0 || !days || days <= 0) {
+        document.getElementById('resultArea').innerHTML = "请输入有效的钻石数量和天数。";
+        return;
+      }
+
+      const perDayDiamonds = Math.ceil(totalDiamonds / days);
+
+      let html = `<strong>总需求：</strong> ${input.toLocaleString()} 万钻石（${(totalDiamonds).toLocaleString()}）<br>`;
+      html += `<strong>平均每天：</strong> ${Math.ceil(perDayDiamonds / 10000)} 万钻石<br><br>`;
+
+      let grandTotal = 0;
+      let grandDiamonds = 0;
+
+      for (let i = 1; i <= days; i++) {
+        const combo = calculateBestCombo(perDayDiamonds);
+        grandTotal += combo.totalCost;
+        grandDiamonds += combo.totalDiamonds;
+
+        html += `<u>第 ${i} 天：</u><br><ul>`;
+        combo.result.forEach(item => {
+          html += `<li>${item.cost}元 × ${item.count} 次 = ${item.cost * item.count} 元，获得 ${(item.diamonds * item.count / 100000000).toFixed(2)} 亿钻石</li>`;
+        });
+        html += `</ul>`;
+      }
+
+      html += `<strong>总花费：</strong> ${grandTotal} 元<br>`;
+      html += `<strong>总获得：</strong> ${(grandDiamonds / 100000000).toFixed(2)} 亿钻石`;
+
+      document.getElementById('resultArea').innerHTML = html;
+    }
+  </script>
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
