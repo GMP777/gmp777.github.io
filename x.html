@@ -1,23 +1,48 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>🎮</title>
   <link rel="stylesheet" href="/footer.css" />
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1200px; margin: 30px auto; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-bottom: 40px; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 40px;
+      table-layout: fixed;
+      word-wrap: break-word;
+    }
     th, td {
       border: 1px solid #ccc;
-      padding: 10px;
+      padding: 10px 8px;
       text-align: center;
-      white-space: nowrap;
+      white-space: normal;
+      vertical-align: middle;
     }
-    th { background-color: #f2f2f2; }
-    a { color: #007bff; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .remark { font-size: 0.85em; color: #666; }
-
+    th {
+      background-color: #f2f2f2;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+      display: inline-block;
+      margin: 2px 0;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .remark {
+      font-size: 0.85em;
+      color: #666;
+      display: block;
+      margin-top: 4px;
+    }
     .tabs {
       display: flex;
       justify-content: center;
@@ -34,15 +59,21 @@
       border-radius: 4px;
       font-size: 1em;
       transition: 0.3s;
+      user-select: none;
     }
-    .tab-btn.active, .tab-btn:hover {
+    .tab-btn.active,
+    .tab-btn:hover {
       background: #007bff;
       color: white;
     }
-    .hidden { display: none; }
-
+    .hidden {
+      display: none;
+    }
     @media (max-width: 600px) {
-      table, th, td { font-size: 0.85em; }
+      th, td {
+        font-size: 0.85em;
+        padding: 8px 4px;
+      }
     }
   </style>
 </head>
@@ -55,7 +86,7 @@
   const gameData = {
     "111": {
       name: "满V切割神域",
-      servers: [262,263, 264],
+      servers: [263, 264],
       remark: "新服"
     },
     "115": {
@@ -95,35 +126,41 @@
     tableWrapper.id = `game-${gameId}`;
     tableWrapper.className = 'game-table hidden';
 
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    const headRow = document.createElement('tr');
+    // 按照最多5列来切分 mirrorSites
+    const chunkSize = 5;
+    for(let i = 0; i < mirrorSites.length; i += chunkSize) {
+      const sitesChunk = mirrorSites.slice(i, i + chunkSize);
+      const table = document.createElement('table');
 
-    headRow.innerHTML = `<th>游戏主页</th><th>区服</th>`;
-    mirrorSites.forEach(site => {
-      headRow.innerHTML += `<th>${site.name}<br><span class="remark">${site.remark}</span></th>`;
-    });
-    thead.appendChild(headRow);
-    table.appendChild(thead);
+      // 表头
+      const thead = document.createElement('thead');
+      const headRow = document.createElement('tr');
+      sitesChunk.forEach(site => {
+        headRow.innerHTML += `<th>${site.name}<br><span class="remark">${site.remark}</span></th>`;
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
 
-    const tbody = document.createElement('tbody');
-    game.servers.forEach(server => {
-      const row = document.createElement('tr');
+      // 表体
+      const tbody = document.createElement('tbody');
+      game.servers.forEach(server => {
+        const row = document.createElement('tr');
+        sitesChunk.forEach(site => {
+          const loginURL = `${site.base}/login/${gameId}/${server}.html`;
+          const homeURL = `${site.base}/games/${gameId}.html`;
 
-      const homeURL = `${mirrorSites[0].base}/games/${gameId}.html`;
-      row.innerHTML += `<td><a href="${homeURL}" target="_blank">主页</a></td>`;
-      row.innerHTML += `<td>${server} 区</td>`;
-
-      mirrorSites.forEach(site => {
-        const loginURL = `${site.base}/login/${gameId}/${server}.html`;
-        row.innerHTML += `<td><a href="${loginURL}" target="_blank">进入</a></td>`;
+          row.innerHTML += `<td>
+            <a href="${loginURL}" target="_blank">进入${server}区</a><br>
+            <a href="${homeURL}" target="_blank">游戏主页</a>
+          </td>`;
+        });
+        tbody.appendChild(row);
       });
 
-      tbody.appendChild(row);
-    });
+      table.appendChild(tbody);
+      tableWrapper.appendChild(table);
+    }
 
-    table.appendChild(tbody);
-    tableWrapper.appendChild(table);
     tablesContainer.appendChild(tableWrapper);
   }
 
