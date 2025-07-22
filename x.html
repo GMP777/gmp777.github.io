@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>🎮</title>
-  <!-- 载入 footer 样式 -->
   <link rel="stylesheet" href="/footer.css" />
-  <!-- 载入 footer 样式 -->
   <style>
     body { font-family: Arial, sans-serif; max-width: 1200px; margin: 30px auto; padding: 20px; }
     table { border-collapse: collapse; width: 100%; margin-bottom: 40px; }
@@ -82,7 +80,6 @@
   const tablesContainer = document.getElementById('game-tables');
 
   for (const [gameId, game] of Object.entries(gameData)) {
-    // 创建 tab 按钮
     const tabBtn = document.createElement('button');
     tabBtn.textContent = game.name;
     tabBtn.className = 'tab-btn';
@@ -94,7 +91,6 @@
     };
     tabsContainer.appendChild(tabBtn);
 
-    // 创建表格
     const tableWrapper = document.createElement('div');
     tableWrapper.id = `game-${gameId}`;
     tableWrapper.className = 'game-table hidden';
@@ -103,27 +99,26 @@
     const thead = document.createElement('thead');
     const headRow = document.createElement('tr');
 
-    headRow.innerHTML = `<th>区服</th>`;
+    headRow.innerHTML = `<th>游戏主页</th><th>区服</th>`;
     mirrorSites.forEach(site => {
       headRow.innerHTML += `<th>${site.name}<br><span class="remark">${site.remark}</span></th>`;
     });
-    headRow.innerHTML += `<th>游戏主页</th>`;
     thead.appendChild(headRow);
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
     game.servers.forEach(server => {
       const row = document.createElement('tr');
-      row.innerHTML = `<td>${server} 区</td>`;
+
+      const homeURL = `${mirrorSites[0].base}/games/${gameId}.html`;
+      row.innerHTML += `<td><a href="${homeURL}" target="_blank">主页</a></td>`;
+      row.innerHTML += `<td>${server} 区</td>`;
 
       mirrorSites.forEach(site => {
         const loginURL = `${site.base}/login/${gameId}/${server}.html`;
         row.innerHTML += `<td><a href="${loginURL}" target="_blank">进入</a></td>`;
       });
 
-      // 游戏主页取第一个站点地址
-      const homeURL = `${mirrorSites[0].base}/games/${gameId}.html`;
-      row.innerHTML += `<td><a href="${homeURL}" target="_blank">主页</a></td>`;
       tbody.appendChild(row);
     });
 
@@ -132,7 +127,7 @@
     tablesContainer.appendChild(tableWrapper);
   }
 
-  // 默认选中第一个游戏
+  // 默认激活第一个游戏
   document.querySelectorAll('.tab-btn')[0].click();
 </script>
 
@@ -141,6 +136,5 @@
   <footer id="footer-container">加载中...</footer>
 </div>
 <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
