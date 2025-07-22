@@ -71,8 +71,8 @@
       id: '115',
       name: '满V悠久传奇',
       type: 'xayxms',
-      canHang: [86,  93, 102, 103,104, 105, 107, 108,110,111],
-      cannotHang: [87,95,101,109,111]
+      canHang: [86,93,102,103,104,105,107,108,110,111],
+      cannotHang: [87,91,95,101,106,109,111]
     },
     {
       id: '137',
@@ -138,8 +138,8 @@
 
     // 判断是否分组渲染
     if (game.canHang || game.cannotHang) {
-      renderSection('✅ 可挂机区服', game.canHang);
-      renderSection('⛔ 不可挂机区服', game.cannotHang);
+      renderSection('✅ 刷', game.canHang);
+      renderSection('⛔ 签到', game.cannotHang);
     } else {
       game.servers.forEach(server => {
         const item = document.createElement('div');
