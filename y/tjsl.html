@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>天界神炉开放日预测</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #4A90E2;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    input[type="date"] {
+      padding: 8px;
+      font-size: 16px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4A90E2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #357ABD;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>天界神炉开放日预测</h2>
+  <label for="startDate">请输入开服日期：</label>
+  <input type="date" id="startDate">
+
+  <button onclick="predictDates()">预测开放日期</button>
+
+  <div id="result"></div>
+
+  <script>
+    function predictDates() {
+      const startDateInput = document.getElementById('startDate').value;
+      const resultDiv = document.getElementById('result');
+
+      if (!startDateInput) {
+        resultDiv.innerHTML = "⚠️ 请先输入开服日期。";
+        return;
+      }
+
+      const startDate = new Date(startDateInput);
+      const day42 = new Date(startDate);
+      const day43 = new Date(startDate);
+
+      day42.setDate(startDate.getDate() + 41); // 第42天（含开服日）
+      day43.setDate(startDate.getDate() + 42); // 第43天
+
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+
+      resultDiv.innerHTML = `
+        <p>📅 第42天：<strong>${day42.toLocaleDateString('zh-CN', options)}</strong></p>
+        <p>📅 第43天：<strong>${day43.toLocaleDateString('zh-CN', options)}</strong></p>
+        <p>🌟 天界神炉预计在以上日期开放。</p>
+      `;
+    }
+  </script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
