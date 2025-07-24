@@ -31,6 +31,7 @@
   <script>
     const toolsData = [
       { name: "📖简阅攻略", url: "go.html", version: "v.0.0", date: "2025-06-05" },
+      { name: "💪战力提升", url: "up.html", version: "v.1.0", date: "2025-07-25 01:50:46" },
       { name: "💎钻石计算器", url: "jsq1.html", version: "v.3.0", date: "2025-07-03 03:22:28" },
       { name: "💎钻石计算器", url: "jsq2.html", version: "v.2.0", date: "2025-06-04" },
       { name: "🥤888钻石消耗多少道具", url: "888.html", version: "v.0.0", date: "2025-06-04" },
