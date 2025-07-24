@@ -47,6 +47,7 @@
       { name: "👑VIP等级", url: "vip.html", version: "v.1.0", date: "2025-07-17 04:34:02" },
       { name: "👿Boss击杀", url: "boss.html", version: "v.1.0", date: "2025-07-17" },
       { name: "💴充值", url: "cz.html", version: "v.1.0", date: "2025-07-22" },
+      { name: "⏰天界神炉", url: "tjsl.html", version: "v.1.0", date: "2025-07-25 01:26:29" },
       { name: "🆕新服消息", url: "new.html", version: "v.1.0", date: "2025-07-18 02:26:34" }
     ];
 
