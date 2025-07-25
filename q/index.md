@@ -4,8 +4,8 @@
 
 |🎮|🔗|
 |:---:|:---:|
-|💎宝石计算器|<https://gmp777.github.io/q/bsjs.html>|
-|🆕新区服|<https://gmp777.github.io/q/new.html>|
+|💎宝石计算器|[v.1.0](https://gmp777.github.io/q/bsjs.html)|
+|🆕新区服|[v.1.0](https://gmp777.github.io/q/new.html)|
 
   <!-- Footer -->
   <div class="footer-wrapper">
