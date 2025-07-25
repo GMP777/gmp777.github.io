@@ -4,7 +4,7 @@
 
 |🎮|🔗|
 |:---:|:---:|
-|💎宝石计算器|<https://gmp777.github.io/q/bjsj.html>|
+|💎宝石计算器|<https://gmp777.github.io/q/bsjs.html>|
 |🆕新区服|<https://gmp777.github.io/q/new.html>|
 
   <!-- Footer -->
