@@ -403,26 +403,37 @@
     }
 
     function exportToText(type) {
-      const date = document.getElementById("date-select").value;
-      if (!date) return showMessage("请选择日期！", "error");
-      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
-      const byZone = {};
-      records.filter(r => r.date === date).forEach(r => {
-        if (!byZone[r.server]) byZone[r.server] = new Set();
-        r.tasks.forEach(task => byZone[r.server].add(task));
-      });
-      let content = type === 'md' ? `# ${date} 未完成任务统计\n\n` : `${date} 未完成任务统计\n\n`;
-      for (const zone in byZone) {
-        const done = Array.from(byZone[zone]);
-        const undone = ALL_TASKS.filter(t => !done.includes(t));
-        content += `- ${zone}区：${undone.length ? `❌ 未完成：${undone.join("，")}` : '✅ 所有任务完成'}\n`;
-      }
-      const blob = new Blob([content], { type: "text/plain" });
-      const link = document.createElement("a");
-      link.download = `未完成统计_${date}.${type}`;
-      link.href = URL.createObjectURL(blob);
-      link.click();
-    }
+  const date = document.getElementById("date-select").value;
+  if (!date) return showMessage("请选择日期！", "error");
+  const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+  const byZone = {};
+  records.filter(r => r.date === date).forEach(r => {
+    if (!byZone[r.server]) byZone[r.server] = new Set();
+    r.tasks.forEach(task => byZone[r.server].add(task));
+  });
+
+  let content = type === 'md' ? `# ${date} 未完成任务统计\n\n` : `${date} 未完成任务统计\n\n`;
+  for (const zone in byZone) {
+    const done = Array.from(byZone[zone]);
+    const undone = ALL_TASKS.filter(t => !done.includes(t));
+    content += `- ${zone}区：${undone.length ? `❌ 未完成：${undone.join("，")}` : '✅ 所有任务完成'}\n`;
+  }
+
+  if (type === 'md') {
+    // ✅ 复制到剪贴板
+    navigator.clipboard.writeText(content).then(() => {
+      showMessage("Markdown内容已复制到剪贴板！");
+    }).catch(() => {
+      showMessage("复制失败，请手动复制", "error");
+    });
+  } else {
+    const blob = new Blob([content], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.download = `未完成统计_${date}.${type}`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  }
+}
 
     function exportJSON() {
       const records = localStorage.getItem("taskRecords") || "[]";
