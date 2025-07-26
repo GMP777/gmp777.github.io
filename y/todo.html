@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>📢每日任务</title>
+  <meta charset="UTF-8" />
+  <title>✅</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
@@ -13,20 +13,16 @@
       background-color: #f1f1f1;
     }
     .container {
-      max-width: 450px;
+      max-width: 520px;
       margin: auto;
       background: white;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     h2 {
       text-align: center;
       margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin: 10px 0 5px;
     }
     input[type="number"] {
       width: 100%;
@@ -34,10 +30,10 @@
       margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-size: 16px;
     }
     .task {
       display: flex;
-      align-items: center;
       justify-content: space-between;
       background: #f9f9f9;
       padding: 10px;
@@ -49,12 +45,10 @@
       text-decoration: line-through;
       color: #555;
     }
-    .task input[type="checkbox"] {
-      margin-right: 10px;
-    }
     .buttons {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
       margin-top: 15px;
     }
     .buttons button {
@@ -66,16 +60,54 @@
       cursor: pointer;
       color: white;
     }
-    .submit-btn { background-color: #0078D7; }
-    .submit-btn:hover { background-color: #005fa3; }
-    .screenshot-btn { background-color: #28a745; }
-    .screenshot-btn:hover { background-color: #1e7e34; }
+    .submit-btn {
+      background-color: #0078d7;
+    }
+    .screenshot-btn {
+      background-color: #28a745;
+    }
+    .export-btn {
+      background-color: #6c757d;
+    }
+    .import-btn {
+      background-color: #17a2b8;
+    }
+    .clear-btn {
+      background-color: #dc3545;
+    }
+
+    .history, .daily-summary {
+      margin-top: 30px;
+    }
+    .history-item {
+      background: #f8f8f8;
+      padding: 8px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        width: 95%;
+        padding: 15px;
+      }
+      .buttons {
+        flex-direction: column;
+      }
+      .buttons button {
+        width: 100%;
+      }
+      .task {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container" id="task-container">
-    <h2>每日任务</h2>
-    
+
     <label for="server">区服数字：</label>
     <input type="number" id="server" placeholder="例如：123" />
 
@@ -101,13 +133,46 @@
     <div class="buttons">
       <button class="submit-btn" onclick="submitTasks()">提交</button>
       <button class="screenshot-btn" onclick="saveAsImage()">保存图片</button>
+      <button class="export-btn" onclick="exportToText('txt')">导出TXT</button>
+      <button class="export-btn" onclick="exportToText('md')">导出MD</button>
+      <button class="export-btn" onclick="exportJSON()">导出JSON</button>
+      <button class="import-btn" onclick="document.getElementById('fileInput').click()">导入JSON</button>
+      <button class="clear-btn" onclick="clearAll()">清除所有记录</button>
+    </div>
+
+    <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)" accept=".json" />
+
+    <div class="history" id="history">
+      <h3>提交记录</h3>
+      <div id="history-list"></div>
+    </div>
+
+    <div class="daily-summary">
+      <h3>每日未完成任务统计</h3>
+      <label for="date-select">选择日期：</label>
+      <select id="date-select" onchange="renderDailyUnfinished()"></select>
+      <div id="daily-result" style="margin-top: 15px;"></div>
     </div>
   </div>
 
-  <!-- html2canvas library -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
   <script>
+    const ALL_TASKS = ['赏金猎人', '降魔道人', '试炼道人', '回收金不换'];
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function formatTime(date) {
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
     function toggleTask(taskId) {
       const task = document.getElementById(taskId);
       const checkbox = task.querySelector("input[type='checkbox']");
@@ -122,31 +187,156 @@
     }
 
     function submitTasks() {
-      const server = document.getElementById("server").value;
-      const selectedTasks = [];
-
-      document.querySelectorAll(".task input[type='checkbox']").forEach((cb) => {
-        if (cb.checked) {
-          selectedTasks.push(cb.parentElement.textContent.trim());
-        }
+      const server = document.getElementById("server").value.trim();
+      if (!server) return alert("请填写区服数字！");
+      const completed = [];
+      document.querySelectorAll(".task input[type='checkbox']").forEach(cb => {
+        if (cb.checked) completed.push(cb.parentElement.textContent.trim());
       });
+      if (!completed.length) return alert("请至少选择一个任务！");
+      const now = new Date();
+      const record = {
+        server,
+        tasks: completed,
+        time: formatTime(now),
+        date: formatDate(now)
+      };
+      const all = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      all.unshift(record);
+      localStorage.setItem("taskRecords", JSON.stringify(all));
+      renderHistory();
+      renderDailyUnfinished();
+      alert("记录已提交！");
+    }
 
-      if (!server) {
-        alert("请填写区服数字！");
-        return;
+    function renderHistory() {
+      const list = document.getElementById("history-list");
+      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      list.innerHTML = "";
+      const zones = new Set();
+      const dates = new Set();
+      records.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.textContent = `${r.server}区 于 ${r.time} 完成：${r.tasks.join("，")}`;
+        list.appendChild(div);
+        zones.add(r.server);
+        dates.add(r.date);
+      });
+      const dateSelect = document.getElementById("date-select");
+      if (dateSelect) {
+        dateSelect.innerHTML = `<option value="">-- 请选择日期 --</option>`;
+        [...dates].sort((a, b) => b.localeCompare(a)).forEach(d => {
+          const opt = document.createElement("option");
+          opt.value = d;
+          opt.textContent = d;
+          dateSelect.appendChild(opt);
+        });
       }
+    }
 
-      alert(`区服：${server}\n完成任务：\n${selectedTasks.join("\n") || "无"}`);
+    function renderDailyUnfinished() {
+      const selectedDate = document.getElementById("date-select").value;
+      const resultDiv = document.getElementById("daily-result");
+      if (!selectedDate) return resultDiv.innerHTML = '';
+      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      const byZone = {};
+      records.filter(r => r.date === selectedDate).forEach(r => {
+        if (!byZone[r.server]) byZone[r.server] = new Set();
+        r.tasks.forEach(task => byZone[r.server].add(task));
+      });
+      let output = '';
+      for (const zone in byZone) {
+        const done = Array.from(byZone[zone]);
+        const undone = ALL_TASKS.filter(t => !done.includes(t));
+        output += `<p><strong>${zone}区</strong>：${undone.length ? `❌ 未完成：${undone.join("，")}` : '✅ 所有任务完成'}</p>`;
+      }
+      resultDiv.innerHTML = output || '<p>该日期无记录</p>';
     }
 
     function saveAsImage() {
-      html2canvas(document.getElementById("task-container")).then((canvas) => {
+      html2canvas(document.getElementById("daily-result")).then(canvas => {
         const link = document.createElement("a");
-        link.download = `任务记录_${Date.now()}.png`;
+        link.download = `未完成统计_${Date.now()}.png`;
         link.href = canvas.toDataURL();
         link.click();
       });
     }
+
+    function exportToText(type) {
+      const date = document.getElementById("date-select").value;
+      if (!date) return alert("请选择日期！");
+      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      const byZone = {};
+      records.filter(r => r.date === date).forEach(r => {
+        if (!byZone[r.server]) byZone[r.server] = new Set();
+        r.tasks.forEach(task => byZone[r.server].add(task));
+      });
+      let content = type === 'md' ? `# ${date} 未完成任务统计\n\n` : `${date} 未完成任务统计\n\n`;
+      for (const zone in byZone) {
+        const done = Array.from(byZone[zone]);
+        const undone = ALL_TASKS.filter(t => !done.includes(t));
+        content += `- ${zone}区：${undone.length ? `❌ 未完成：${undone.join("，")}` : '✅ 所有任务完成'}\n`;
+      }
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.download = `未完成统计_${date}.${type}`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
+
+    function exportJSON() {
+      const records = localStorage.getItem("taskRecords") || "[]";
+      const blob = new Blob([records], { type: "application/json" });
+      const link = document.createElement("a");
+      link.download = `任务备份_${Date.now()}.json`;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data)) {
+            localStorage.setItem("taskRecords", JSON.stringify(data));
+            renderHistory();
+            renderDailyUnfinished();
+            alert("导入成功！");
+          } else {
+            alert("格式错误！");
+          }
+        } catch (err) {
+          alert("文件读取失败！");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearAll() {
+      if (confirm("确定要清除所有任务记录吗？")) {
+        localStorage.removeItem("taskRecords");
+        renderHistory();
+        renderDailyUnfinished();
+        alert("已清除！");
+      }
+    }
+
+    function clearOldRecords() {
+      const today = formatDate(new Date());
+      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      const todayRecords = records.filter(r => r.date === today);
+      localStorage.setItem("taskRecords", JSON.stringify(todayRecords));
+    }
+
+    window.onload = () => {
+      clearOldRecords();
+      renderHistory();
+      renderDailyUnfinished();
+    };
   </script>
     <!-- Footer -->
   <div class="footer-wrapper">
