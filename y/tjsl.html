@@ -1,89 +1,107 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>天界神炉开放日预测</title>
+  <meta charset="UTF-8" />
+  <title>⏰天界神炉</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 500px;
-      margin: 50px auto;
+      max-width: 800px;
+      margin: 40px auto;
       padding: 20px;
       border: 1px solid #ccc;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h2 {
+      text-align: center;
       color: #4A90E2;
     }
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    input[type="date"] {
-      padding: 8px;
-      font-size: 16px;
+    table {
       width: 100%;
-      margin-bottom: 20px;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
       background-color: #4A90E2;
       color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #357ABD;
-    }
-    #result {
-      margin-top: 20px;
-      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
-  <h2>天界神炉开放日预测</h2>
-  <label for="startDate">请输入开服日期：</label>
-  <input type="date" id="startDate">
+  <table>
+    <thead>
+      <tr>
+        <th>区服</th>
+        <th>开服时间</th>
+        <th>第42天 (天界神炉开启)</th>
+        <th>第43天 (天界神炉开启)</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <!-- JS填充 -->
+    </tbody>
+  </table>
 
-  <button onclick="predictDates()">预测开放日期</button>
+<script>
+  // 这里写你的JSON数据，格式是区服名和开服时间（YYYY-MM-DD）
+  const serverData = [
+    { 区服: "103", 开服时间: "2025-05-30" },
+    { 区服: "104", 开服时间: "2025-06-06" },
+    { 区服: "105", 开服时间: "2025-06-12" },
+    { 区服: "106", 开服时间: "2025-06-16" },
+    { 区服: "107", 开服时间: "2025-06-20" },
+    { 区服: "108", 开服时间: "2025-06-30" },
+    { 区服: "109", 开服时间: "2025-07-13" },
+    { 区服: "110", 开服时间: "2025-07-18" },
+    { 区服: "111", 开服时间: "2025-07-22" }
+  ];
 
-  <div id="result"></div>
+  function formatDate(date) {
+    const y = date.getFullYear();
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const d = date.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
 
-  <script>
-    function predictDates() {
-      const startDateInput = document.getElementById('startDate').value;
-      const resultDiv = document.getElementById('result');
+  function calcDayAfter(startDateStr, daysAfter) {
+    const date = new Date(startDateStr);
+    if (isNaN(date)) return "日期无效";
+    date.setDate(date.getDate() + daysAfter);
+    return formatDate(date);
+  }
 
-      if (!startDateInput) {
-        resultDiv.innerHTML = "⚠️ 请先输入开服日期。";
-        return;
-      }
+  function renderTable() {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
 
-      const startDate = new Date(startDateInput);
-      const day42 = new Date(startDate);
-      const day43 = new Date(startDate);
+    serverData.forEach(item => {
+      const day42 = calcDayAfter(item.开服时间, 41);
+      const day43 = calcDayAfter(item.开服时间, 42);
 
-      day42.setDate(startDate.getDate() + 41); // 第42天（含开服日）
-      day43.setDate(startDate.getDate() + 42); // 第43天
-
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-
-      resultDiv.innerHTML = `
-        <p>📅 第42天：<strong>${day42.toLocaleDateString('zh-CN', options)}</strong></p>
-        <p>📅 第43天：<strong>${day43.toLocaleDateString('zh-CN', options)}</strong></p>
-        <p>🌟 天界神炉预计在以上日期开放。</p>
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item.区服}</td>
+        <td>${item.开服时间}</td>
+        <td>${day42}</td>
+        <td>${day43}</td>
       `;
-    }
-  </script>
+      tbody.appendChild(tr);
+    });
+  }
+
+  // 页面加载时渲染
+  window.onload = renderTable;
+</script>
   <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
