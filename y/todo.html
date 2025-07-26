@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>✅</title>
+  <title>✓</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
@@ -63,9 +63,6 @@
     .submit-btn {
       background-color: #0078d7;
     }
-    .screenshot-btn {
-      background-color: #28a745;
-    }
     .export-btn {
       background-color: #6c757d;
     }
@@ -107,7 +104,6 @@
 </head>
 <body>
   <div class="container" id="task-container">
-
     <label for="server">区服数字：</label>
     <input type="number" id="server" placeholder="例如：123" />
 
@@ -128,11 +124,34 @@
         <label><input type="checkbox" onchange="toggleTask('task-recycle')">回收金不换</label>
         <span class="status"></span>
       </div>
+      <div class="task" id="task-fs1">
+        <label><input type="checkbox" onchange="toggleTask('task-fs1')">封神法器1/4</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-fs2">
+        <label><input type="checkbox" onchange="toggleTask('task-fs2')">封神法器2/4</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-fs3">
+        <label><input type="checkbox" onchange="toggleTask('task-fs3')">封神法器3/4</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-fs4">
+        <label><input type="checkbox" onchange="toggleTask('task-fs4')">封神法器4/4</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-charge50">
+        <label><input type="checkbox" onchange="toggleTask('task-charge50')">每日充值50万钻石</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-charge100">
+        <label><input type="checkbox" onchange="toggleTask('task-charge100')">每日充值100万钻石</label>
+        <span class="status"></span>
+      </div>
     </div>
 
     <div class="buttons">
       <button class="submit-btn" onclick="submitTasks()">提交</button>
-      <button class="screenshot-btn" onclick="saveAsImage()">保存图片</button>
       <button class="export-btn" onclick="exportToText('txt')">导出TXT</button>
       <button class="export-btn" onclick="exportToText('md')">导出MD</button>
       <button class="export-btn" onclick="exportJSON()">导出JSON</button>
@@ -155,9 +174,19 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    const ALL_TASKS = ['赏金猎人', '降魔道人', '试炼道人', '回收金不换'];
+    const ALL_TASKS = [
+      '赏金猎人',
+      '降魔道人',
+      '试炼道人',
+      '回收金不换',
+      '封神法器1/4',
+      '封神法器2/4',
+      '封神法器3/4',
+      '封神法器4/4',
+      '每日充值50万钻石',
+      '每日充值100万钻石'
+    ];
 
     function formatDate(date) {
       return date.toISOString().split('T')[0];
@@ -213,14 +242,12 @@
       const list = document.getElementById("history-list");
       const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
       list.innerHTML = "";
-      const zones = new Set();
       const dates = new Set();
       records.forEach(r => {
         const div = document.createElement("div");
         div.className = "history-item";
         div.textContent = `${r.server}区 于 ${r.time} 完成：${r.tasks.join("，")}`;
         list.appendChild(div);
-        zones.add(r.server);
         dates.add(r.date);
       });
       const dateSelect = document.getElementById("date-select");
@@ -252,15 +279,6 @@
         output += `<p><strong>${zone}区</strong>：${undone.length ? `❌ 未完成：${undone.join("，")}` : '✅ 所有任务完成'}</p>`;
       }
       resultDiv.innerHTML = output || '<p>该日期无记录</p>';
-    }
-
-    function saveAsImage() {
-      html2canvas(document.getElementById("daily-result")).then(canvas => {
-        const link = document.createElement("a");
-        link.download = `未完成统计_${Date.now()}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      });
     }
 
     function exportToText(type) {
