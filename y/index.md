@@ -30,6 +30,7 @@
   <!-- 嵌入 JSON 数据 -->
   <script>
     const toolsData = [
+      { name: "✅每日任务", url: "todo.html", version: "v.1.0", date: "2025-07-27 00:15:25" },
       { name: "📖简阅攻略", url: "go.html", version: "v.0.0", date: "2025-06-05" },
       { name: "💪战力提升", url: "up.html", version: "v.1.0", date: "2025-07-25 01:50:46" },
       { name: "💎钻石计算器", url: "jsq1.html", version: "v.3.0", date: "2025-07-03 03:22:28" },
