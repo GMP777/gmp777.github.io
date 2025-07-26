@@ -19,6 +19,8 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1;
     }
     h2 {
       text-align: center;
@@ -84,6 +86,71 @@
       font-size: 14px;
     }
 
+    /* toast提示样式 */
+    #toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 200px;
+      max-width: 80%;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
+    }
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 自定义确认框背景 */
+    #confirmOverlay {
+      position: fixed;
+      top: 0; left: 0; right:0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    #confirmBox {
+      background: white;
+      padding: 20px 25px;
+      border-radius: 10px;
+      max-width: 320px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+    #confirmBox p {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    #confirmButtons {
+      display: flex;
+      justify-content: space-around;
+    }
+    #confirmButtons button {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      color: white;
+    }
+    #confirmYes {
+      background-color: #dc3545;
+    }
+    #confirmNo {
+      background-color: #6c757d;
+    }
+
     @media (max-width: 600px) {
       .container {
         width: 95%;
@@ -103,6 +170,18 @@
   </style>
 </head>
 <body>
+  <div id="toast"></div>
+
+  <div id="confirmOverlay">
+    <div id="confirmBox">
+      <p id="confirmMessage"></p>
+      <div id="confirmButtons">
+        <button id="confirmYes">确定</button>
+        <button id="confirmNo">取消</button>
+      </div>
+    </div>
+  </div>
+
   <div class="container" id="task-container">
     <label for="server">区服数字：</label>
     <input type="number" id="server" placeholder="例如：123" />
@@ -156,7 +235,7 @@
       <button class="export-btn" onclick="exportToText('md')">导出MD</button>
       <button class="export-btn" onclick="exportJSON()">导出JSON</button>
       <button class="import-btn" onclick="document.getElementById('fileInput').click()">导入JSON</button>
-      <button class="clear-btn" onclick="clearAll()">清除所有记录</button>
+      <button class="clear-btn" onclick="confirmClear()">清除所有记录</button>
     </div>
 
     <input type="file" id="fileInput" style="display:none" onchange="importJSON(event)" accept=".json" />
@@ -215,14 +294,56 @@
       }
     }
 
-    function submitTasks() {
+    function showMessage(msg, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.backgroundColor = type === 'error' ? 'rgba(220,53,69,0.9)' : 'rgba(0,0,0,0.8)';
+      toast.classList.add('show');
+      clearTimeout(toast.timeout);
+      toast.timeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // 自定义确认框返回Promise
+    function showConfirm(message) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('confirmOverlay');
+        const msgElem = document.getElementById('confirmMessage');
+        const yesBtn = document.getElementById('confirmYes');
+        const noBtn = document.getElementById('confirmNo');
+
+        msgElem.textContent = message;
+        overlay.style.display = 'flex';
+
+        function cleanup() {
+          overlay.style.display = 'none';
+          yesBtn.removeEventListener('click', onYes);
+          noBtn.removeEventListener('click', onNo);
+        }
+
+        function onYes() {
+          cleanup();
+          resolve(true);
+        }
+        function onNo() {
+          cleanup();
+          resolve(false);
+        }
+
+        yesBtn.addEventListener('click', onYes);
+        noBtn.addEventListener('click', onNo);
+      });
+    }
+
+    async function submitTasks() {
       const server = document.getElementById("server").value.trim();
-      if (!server) return alert("请填写区服数字！");
+      if (!server) return showMessage("请填写区服数字！", "error");
       const completed = [];
       document.querySelectorAll(".task input[type='checkbox']").forEach(cb => {
         if (cb.checked) completed.push(cb.parentElement.textContent.trim());
       });
-      if (!completed.length) return alert("请至少选择一个任务！");
+      if (!completed.length) return showMessage("请至少选择一个任务！", "error");
       const now = new Date();
       const record = {
         server,
@@ -235,7 +356,7 @@
       localStorage.setItem("taskRecords", JSON.stringify(all));
       renderHistory();
       renderDailyUnfinished();
-      alert("记录已提交！");
+      showMessage("记录已提交！");
     }
 
     function renderHistory() {
@@ -283,7 +404,7 @@
 
     function exportToText(type) {
       const date = document.getElementById("date-select").value;
-      if (!date) return alert("请选择日期！");
+      if (!date) return showMessage("请选择日期！", "error");
       const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
       const byZone = {};
       records.filter(r => r.date === date).forEach(r => {
@@ -307,7 +428,7 @@
       const records = localStorage.getItem("taskRecords") || "[]";
       const blob = new Blob([records], { type: "application/json" });
       const link = document.createElement("a");
-      link.download = `任务备份_${Date.now()}.json`;
+      link.download = "taskRecords.json";
       link.href = URL.createObjectURL(blob);
       link.click();
     }
@@ -316,42 +437,36 @@
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = e => {
         try {
           const data = JSON.parse(e.target.result);
-          if (Array.isArray(data)) {
-            localStorage.setItem("taskRecords", JSON.stringify(data));
-            renderHistory();
-            renderDailyUnfinished();
-            alert("导入成功！");
-          } else {
-            alert("格式错误！");
-          }
+          if (!Array.isArray(data)) throw new Error("JSON格式不正确");
+          localStorage.setItem("taskRecords", JSON.stringify(data));
+          renderHistory();
+          renderDailyUnfinished();
+          showMessage("导入成功！");
         } catch (err) {
-          alert("文件读取失败！");
+          showMessage("导入失败：文件格式错误", "error");
         }
       };
       reader.readAsText(file);
+      event.target.value = "";
     }
 
-    function clearAll() {
-      if (confirm("确定要清除所有任务记录吗？")) {
+    async function confirmClear() {
+      const ok = await showConfirm("确定清除所有记录吗？此操作不可恢复！");
+      if (ok) {
         localStorage.removeItem("taskRecords");
         renderHistory();
         renderDailyUnfinished();
-        alert("已清除！");
+        showMessage("所有记录已清除");
+      } else {
+        showMessage("已取消清除");
       }
     }
 
-    function clearOldRecords() {
-      const today = formatDate(new Date());
-      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
-      const todayRecords = records.filter(r => r.date === today);
-      localStorage.setItem("taskRecords", JSON.stringify(todayRecords));
-    }
-
+    // 初始化页面时渲染历史和日期选项
     window.onload = () => {
-      clearOldRecords();
       renderHistory();
       renderDailyUnfinished();
     };
