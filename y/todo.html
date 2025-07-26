@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>📢每日任务</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+      padding: 20px;
+      background-color: #f1f1f1;
+    }
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .task {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .task.completed {
+      background-color: #d0f0d0;
+      text-decoration: line-through;
+      color: #555;
+    }
+    .task input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      color: white;
+    }
+    .submit-btn { background-color: #0078D7; }
+    .submit-btn:hover { background-color: #005fa3; }
+    .screenshot-btn { background-color: #28a745; }
+    .screenshot-btn:hover { background-color: #1e7e34; }
+  </style>
+</head>
+<body>
+  <div class="container" id="task-container">
+    <h2>每日任务</h2>
+    
+    <label for="server">区服数字：</label>
+    <input type="number" id="server" placeholder="例如：123" />
+
+    <div id="tasks">
+      <div class="task" id="task-bounty">
+        <label><input type="checkbox" onchange="toggleTask('task-bounty')">赏金猎人</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-demon">
+        <label><input type="checkbox" onchange="toggleTask('task-demon')">降魔道人</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-trial">
+        <label><input type="checkbox" onchange="toggleTask('task-trial')">试炼道人</label>
+        <span class="status"></span>
+      </div>
+      <div class="task" id="task-recycle">
+        <label><input type="checkbox" onchange="toggleTask('task-recycle')">回收金不换</label>
+        <span class="status"></span>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button class="submit-btn" onclick="submitTasks()">提交</button>
+      <button class="screenshot-btn" onclick="saveAsImage()">保存图片</button>
+    </div>
+  </div>
+
+  <!-- html2canvas library -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    function toggleTask(taskId) {
+      const task = document.getElementById(taskId);
+      const checkbox = task.querySelector("input[type='checkbox']");
+      const status = task.querySelector(".status");
+      if (checkbox.checked) {
+        task.classList.add("completed");
+        status.textContent = "✔ 已完成";
+      } else {
+        task.classList.remove("completed");
+        status.textContent = "";
+      }
+    }
+
+    function submitTasks() {
+      const server = document.getElementById("server").value;
+      const selectedTasks = [];
+
+      document.querySelectorAll(".task input[type='checkbox']").forEach((cb) => {
+        if (cb.checked) {
+          selectedTasks.push(cb.parentElement.textContent.trim());
+        }
+      });
+
+      if (!server) {
+        alert("请填写区服数字！");
+        return;
+      }
+
+      alert(`区服：${server}\n完成任务：\n${selectedTasks.join("\n") || "无"}`);
+    }
+
+    function saveAsImage() {
+      html2canvas(document.getElementById("task-container")).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = `任务记录_${Date.now()}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
