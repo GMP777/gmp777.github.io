@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>✓</title>
-  <link rel="stylesheet" href="/footer.css" />
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
   <style>
     * { box-sizing: border-box; }
     body {
@@ -26,11 +28,7 @@
       padding: 20px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-    .left-panel {
-      flex: 1;
-      min-width: 300px;
-    }
-    .right-panel {
+    .left-panel, .right-panel {
       flex: 1;
       min-width: 300px;
     }
@@ -46,9 +44,7 @@
       font-size: 16px;
     }
 
-    .task {
-      margin-bottom: 8px;
-    }
+    .task { margin-bottom: 8px; }
 
     .buttons {
       margin-top: 20px;
@@ -76,15 +72,9 @@
     }
 
     @media (max-width: 768px) {
-      .main-container {
-        flex-direction: column;
-      }
-      .buttons button {
-        flex: 1 1 100%;
-      }
-      input[type="number"], .task label {
-        font-size: 18px;
-      }
+      .main-container { flex-direction: column; }
+      .buttons button { flex: 1 1 100%; }
+      input[type="number"], .task label { font-size: 18px; }
     }
   </style>
 </head>
@@ -94,14 +84,11 @@
     <div class="left-panel">
       <h2>任务填写</h2>
       <input type="number" id="server" placeholder="请输入区服数字，例如123" />
-
       <div style="margin: 10px 0;">
         <button onclick="checkAllTasks()">✅ 全部勾选</button>
         <button onclick="uncheckAllTasks()">❌ 全部取消</button>
       </div>
-
       <div id="task-list"></div>
-
       <div class="buttons">
         <button class="submit-btn" onclick="submitTasks()">提交</button>
         <button class="export-btn" onclick="exportToText('txt')">导出TXT</button>
@@ -126,8 +113,7 @@
     const DAILY_TASKS = [
       '赏金猎人', '降魔道人', '试炼道人', '回收金不换',
       '封神法器1/4', '封神法器2/4', '封神法器3/4', '封神法器4/4',
-      '每日充值50万钻石', '每日充值100万钻石',
-      '神秘商人5/5'
+      '每日充值50万钻石', '每日充值100万钻石', '神秘商人5/5'
     ];
 
     const DUNGEON_TASKS = [
@@ -159,10 +145,8 @@
     function createTaskList() {
       const container = document.getElementById('task-list');
       container.innerHTML = '';
-      const dailyGroup = createTaskGroup("🟢 日常项目", DAILY_TASKS, 0);
-      const dungeonGroup = createTaskGroup("🔵 副本项目", DUNGEON_TASKS, DAILY_TASKS.length);
-      container.appendChild(dailyGroup);
-      container.appendChild(dungeonGroup);
+      container.appendChild(createTaskGroup("🟢 日常项目", DAILY_TASKS, 0));
+      container.appendChild(createTaskGroup("🔵 副本项目", DUNGEON_TASKS, DAILY_TASKS.length));
     }
 
     function getCheckedTasks() {
@@ -175,51 +159,61 @@
     }
 
     function updateStatus() {
-  const summary = document.getElementById('status-summary');
-  const date = new Date().toISOString().split('T')[0];
-  const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
-  const today = records.filter(r => r.date === date);
-  if (today.length === 0) {
-    summary.innerHTML = `<p>暂无今日记录</p>`;
-    return;
-  }
+      const summary = document.getElementById('status-summary');
+      const date = new Date().toISOString().split('T')[0];
+      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      const today = records.filter(r => r.date === date);
+      if (today.length === 0) {
+        summary.innerHTML = `<p>暂无今日记录</p>`;
+        return;
+      }
 
-  const zoneMap = {};
-  today.forEach(r => {
-    if (!zoneMap[r.server]) zoneMap[r.server] = new Set();
-    r.tasks.forEach(task => zoneMap[r.server].add(task));
-  });
+      const zoneMap = {};
+      today.forEach(r => {
+        if (!zoneMap[r.server]) zoneMap[r.server] = new Set();
+        r.tasks.forEach(task => zoneMap[r.server].add(task));
+      });
 
-  let html = '';
-  for (const zone in zoneMap) {
-    const doneSet = zoneMap[zone];
+      let html = '';
+      for (const zone in zoneMap) {
+        const doneSet = zoneMap[zone];
 
-    const doneDaily = DAILY_TASKS.filter(t => doneSet.has(t));
-    const doneDungeon = DUNGEON_TASKS.filter(t => doneSet.has(t));
+        const doneDaily = DAILY_TASKS.filter(t => doneSet.has(t));
+        const doneDungeon = DUNGEON_TASKS.filter(t => doneSet.has(t));
 
-    const percentDaily = Math.round((doneDaily.length / DAILY_TASKS.length) * 100);
-    const percentDungeon = Math.round((doneDungeon.length / DUNGEON_TASKS.length) * 100);
+        const undoneDaily = DAILY_TASKS.filter(t => !doneSet.has(t));
+        const undoneDungeon = DUNGEON_TASKS.filter(t => !doneSet.has(t));
 
-    html += `
-      <div style="margin-bottom: 24px;">
-        <strong>${zone}区</strong><br/>
+        const percentDaily = Math.round((doneDaily.length / DAILY_TASKS.length) * 100);
+        const percentDungeon = Math.round((doneDungeon.length / DUNGEON_TASKS.length) * 100);
 
-        🟢 日常任务：${doneDaily.length} / ${DAILY_TASKS.length}
-        <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin:6px 0;">
-          <div style="width:${percentDaily}%;background:#28a745;height:100%;transition:width 0.3s;"></div>
-        </div>
+        html += `
+          <div style="margin-bottom: 24px;">
+            <strong>${zone}区</strong><br/>
 
-        🔵 副本任务：${doneDungeon.length} / ${DUNGEON_TASKS.length}
-        <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin:6px 0;">
-          <div style="width:${percentDungeon}%;background:#007bff;height:100%;transition:width 0.3s;"></div>
-        </div>
-      </div>
-    `;
-  }
+            🟢 日常任务：${doneDaily.length} / ${DAILY_TASKS.length}
+            <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin:6px 0;">
+              <div style="width:${percentDaily}%;background:#28a745;height:100%;transition:width 0.3s;"></div>
+            </div>
 
-  summary.innerHTML = html;
-}
+            🔵 副本任务：${doneDungeon.length} / ${DUNGEON_TASKS.length}
+            <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin:6px 0;">
+              <div style="width:${percentDungeon}%;background:#007bff;height:100%;transition:width 0.3s;"></div>
+            </div>
 
+            <details style="margin-top: 10px;">
+              <summary style="cursor:pointer;">📋 查看未完成任务列表</summary>
+              <div style="padding: 8px 12px; background: #f9f9f9; border-left: 4px solid #ccc; margin-top: 8px;">
+                ${undoneDaily.length ? `🟢 <strong>日常未完成：</strong> ${undoneDaily.join('，')}` : '🟢 日常全部完成'}<br/>
+                ${undoneDungeon.length ? `🔵 <strong>副本未完成：</strong> ${undoneDungeon.join('，')}` : '🔵 副本全部完成'}
+              </div>
+            </details>
+          </div>
+        `;
+      }
+
+      summary.innerHTML = html;
+    }
 
     function submitTasks() {
       const server = document.getElementById("server").value.trim();
@@ -345,10 +339,11 @@
     createTaskList();
     updateStatus();
   </script>
-
+    <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
+<!-- footer -->
 </body>
 </html>
