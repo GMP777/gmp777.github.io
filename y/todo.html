@@ -42,7 +42,7 @@
     input[type="number"] {
       width: 100%;
       padding: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 16px;
@@ -102,12 +102,14 @@
     <!-- 左栏 -->
     <div class="left-panel">
       <h2>任务填写</h2>
-      <label for="server">区服数字：</label>
-      <input type="number" id="server" placeholder="请输入区服号..." />
+      <input type="number" id="server" placeholder="请输入区服数字，例如123" />
 
-      <div id="task-list">
-        <!-- 任务项目会在 JS 中动态生成 -->
+      <div style="margin: 10px 0;">
+        <button onclick="checkAllTasks()">✅ 全部勾选</button>
+        <button onclick="uncheckAllTasks()">❌ 全部取消</button>
       </div>
+
+      <div id="task-list"></div>
 
       <div class="buttons">
         <button class="submit-btn" onclick="submitTasks()">提交</button>
@@ -140,7 +142,18 @@
       '封神法器3/4',
       '封神法器4/4',
       '每日充值50万钻石',
-      '每日充值100万钻石'
+      '每日充值100万钻石',
+      '魔宫试炼1/3',
+      '魔宫试炼2/3',
+      '魔宫试炼3/3',
+      '异界时空5/15',
+      '异界时空10/15',
+      '异界时空15/15',
+      '神秘商人5/5',
+      '魔灵幻狱/沙海魔楼1/4',
+      '魔灵幻狱/沙海魔楼2/4',
+      '魔灵幻狱/沙海魔楼3/4',
+      '魔灵幻狱/沙海魔楼4/4'
     ];
 
     function createTaskList() {
@@ -272,6 +285,22 @@
         localStorage.removeItem("taskRecords");
         showMessage("已清除所有记录");
       }
+    }
+
+    function checkAllTasks() {
+      TASKS.forEach((_, idx) => {
+        const cb = document.getElementById(`task-${idx}`);
+        if (cb) cb.checked = true;
+      });
+      updateStatus();
+    }
+
+    function uncheckAllTasks() {
+      TASKS.forEach((_, idx) => {
+        const cb = document.getElementById(`task-${idx}`);
+        if (cb) cb.checked = false;
+      });
+      updateStatus();
     }
 
     // 初始化
