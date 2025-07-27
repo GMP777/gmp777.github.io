@@ -12,7 +12,7 @@
 |切割传奇|<https://gmp777.github.io/q/index.html>|
 |赤焰无双|<https://gmp777.github.io/c/index.html>|
 |典狱长刷新预测|[v.1.0](/boss.html)`2025-07-27 13:15:23`|
-|每日任务打卡|[v.1.0](/todo.html)`2025-07-28 00:11:56`|
+|每日任务打卡|[v.2.0](/todo.html)`2025-07-28 02:43:54`|
 
   <!-- Footer -->
   <div class="footer-wrapper">
