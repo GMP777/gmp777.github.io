@@ -11,7 +11,7 @@
 |悠久传奇|<https://gmp777.github.io/y/index.html>|
 |切割传奇|<https://gmp777.github.io/q/index.html>|
 |赤焰无双|<https://gmp777.github.io/c/index.html>|
-|典狱长刷新预测|[v.1.0](/boss.html)|
+|典狱长刷新预测|[v.1.0 `2025-07-27 13:15:23`](/boss.html)|
 
   <!-- Footer -->
   <div class="footer-wrapper">
