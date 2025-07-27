@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>✓</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
   <style>
     * { box-sizing: border-box; }
     body {
@@ -36,8 +34,8 @@
       flex: 1;
       min-width: 300px;
     }
-
     h2 { margin-top: 0; text-align: center; }
+    h3 { margin: 16px 0 10px; color: #333; font-size: 18px; }
 
     input[type="number"] {
       width: 100%;
@@ -77,22 +75,15 @@
       line-height: 1.8;
     }
 
-    .status-summary .ok {
-      color: green;
-      font-weight: bold;
-    }
-
-    .status-summary .error {
-      color: red;
-      font-weight: bold;
-    }
-
     @media (max-width: 768px) {
       .main-container {
         flex-direction: column;
       }
       .buttons button {
         flex: 1 1 100%;
+      }
+      input[type="number"], .task label {
+        font-size: 18px;
       }
     }
   </style>
@@ -132,38 +123,46 @@
   </div>
 
   <script>
-    const TASKS = [
-      '赏金猎人',
-      '降魔道人',
-      '试炼道人',
-      '回收金不换',
-      '封神法器1/4',
-      '封神法器2/4',
-      '封神法器3/4',
-      '封神法器4/4',
-      '每日充值50万钻石',
-      '每日充值100万钻石',
-      '魔宫试炼1/3',
-      '魔宫试炼2/3',
-      '魔宫试炼3/3',
-      '异界时空5/15',
-      '异界时空10/15',
-      '异界时空15/15',
-      '神秘商人5/5',
-      '魔灵幻狱/沙海魔楼1/4',
-      '魔灵幻狱/沙海魔楼2/4',
-      '魔灵幻狱/沙海魔楼3/4',
-      '魔灵幻狱/沙海魔楼4/4'
+    const DAILY_TASKS = [
+      '赏金猎人', '降魔道人', '试炼道人', '回收金不换',
+      '封神法器1/4', '封神法器2/4', '封神法器3/4', '封神法器4/4',
+      '每日充值50万钻石', '每日充值100万钻石',
+      '神秘商人5/5'
     ];
 
-    function createTaskList() {
-      const container = document.getElementById('task-list');
-      TASKS.forEach((task, idx) => {
+    const DUNGEON_TASKS = [
+      '魔宫试炼1/3', '魔宫试炼2/3', '魔宫试炼3/3',
+      '异界时空5/15', '异界时空10/15', '异界时空15/15',
+      '魔灵幻狱/沙海魔楼1/4', '魔灵幻狱/沙海魔楼2/4',
+      '魔灵幻狱/沙海魔楼3/4', '魔灵幻狱/沙海魔楼4/4'
+    ];
+
+    const TASKS = [...DAILY_TASKS, ...DUNGEON_TASKS];
+
+    function createTaskGroup(title, tasks, startIndex) {
+      const wrapper = document.createElement('div');
+      const heading = document.createElement('h3');
+      heading.textContent = title;
+      wrapper.appendChild(heading);
+
+      tasks.forEach((task, i) => {
+        const idx = startIndex + i;
         const div = document.createElement('div');
         div.className = 'task';
         div.innerHTML = `<label><input type="checkbox" id="task-${idx}" onchange="updateStatus()"> ${task}</label>`;
-        container.appendChild(div);
+        wrapper.appendChild(div);
       });
+
+      return wrapper;
+    }
+
+    function createTaskList() {
+      const container = document.getElementById('task-list');
+      container.innerHTML = '';
+      const dailyGroup = createTaskGroup("🟢 日常项目", DAILY_TASKS, 0);
+      const dungeonGroup = createTaskGroup("🔵 副本项目", DUNGEON_TASKS, DAILY_TASKS.length);
+      container.appendChild(dailyGroup);
+      container.appendChild(dungeonGroup);
     }
 
     function getCheckedTasks() {
@@ -194,13 +193,20 @@
       let html = '';
       for (const zone in zoneMap) {
         const done = Array.from(zoneMap[zone]);
-        const missing = TASKS.filter(t => !done.includes(t));
-        if (missing.length === 0) {
-          html += `<p><strong>${zone}区</strong> ✅ 所有任务已完成</p>`;
-        } else {
-          html += `<p><strong>${zone}区</strong> ❌ 未完成：${missing.join('，')}</p>`;
-        }
+        const doneCount = done.length;
+        const percent = Math.round((doneCount / TASKS.length) * 100);
+        const barColor = percent === 100 ? '#28a745' : '#dc3545';
+
+        html += `
+          <div style="margin-bottom: 16px;">
+            <strong>${zone}区</strong> - ${doneCount} / ${TASKS.length} 项完成
+            <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin-top:6px;">
+              <div style="width:${percent}%;background:${barColor};height:100%;transition:width 0.3s;"></div>
+            </div>
+          </div>
+        `;
       }
+
       summary.innerHTML = html;
     }
 
@@ -328,11 +334,10 @@
     createTaskList();
     updateStatus();
   </script>
-    <!-- Footer -->
+
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
