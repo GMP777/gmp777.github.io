@@ -124,7 +124,7 @@
 
     <!-- 右栏 -->
     <div class="right-panel">
-      <h2>完成状态</h2>
+      <h2>今日状态汇总</h2>
       <div class="status-summary" id="status-summary">
         <p>请勾选任务以查看完成情况。</p>
       </div>
@@ -176,14 +176,32 @@
     }
 
     function updateStatus() {
-      const checked = getCheckedTasks();
       const summary = document.getElementById('status-summary');
-      if (checked.length === TASKS.length) {
-        summary.innerHTML = `<p class="ok">✅ 所有任务已完成！</p>`;
-      } else {
-        const missing = TASKS.filter(t => !checked.includes(t));
-        summary.innerHTML = `<p class="error">❌ 未完成任务：</p><ul>${missing.map(t => `<li>${t}</li>`).join('')}</ul>`;
+      const date = new Date().toISOString().split('T')[0];
+      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+      const today = records.filter(r => r.date === date);
+      if (today.length === 0) {
+        summary.innerHTML = `<p>暂无今日记录</p>`;
+        return;
       }
+
+      const zoneMap = {};
+      today.forEach(r => {
+        if (!zoneMap[r.server]) zoneMap[r.server] = new Set();
+        r.tasks.forEach(task => zoneMap[r.server].add(task));
+      });
+
+      let html = '';
+      for (const zone in zoneMap) {
+        const done = Array.from(zoneMap[zone]);
+        const missing = TASKS.filter(t => !done.includes(t));
+        if (missing.length === 0) {
+          html += `<p><strong>${zone}区</strong> ✅ 所有任务已完成</p>`;
+        } else {
+          html += `<p><strong>${zone}区</strong> ❌ 未完成：${missing.join('，')}</p>`;
+        }
+      }
+      summary.innerHTML = html;
     }
 
     function submitTasks() {
@@ -204,6 +222,7 @@
       all.unshift(record);
       localStorage.setItem("taskRecords", JSON.stringify(all));
       showMessage("记录已提交");
+      updateStatus();
     }
 
     function showMessage(text, type = "ok") {
@@ -273,6 +292,7 @@
           if (!Array.isArray(data)) throw new Error("格式错误");
           localStorage.setItem("taskRecords", JSON.stringify(data));
           showMessage("导入成功");
+          updateStatus();
         } catch {
           showMessage("导入失败", "error");
         }
@@ -284,6 +304,7 @@
       if (confirm("确定清除所有任务记录？")) {
         localStorage.removeItem("taskRecords");
         showMessage("已清除所有记录");
+        updateStatus();
       }
     }
 
@@ -305,6 +326,7 @@
 
     // 初始化
     createTaskList();
+    updateStatus();
   </script>
     <!-- Footer -->
   <div class="footer-wrapper">
