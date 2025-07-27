@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>典狱长CD刷新预测</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f0f0f0; }
+    button { padding: 6px 12px; font-size: 14px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<table id="resultTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>游戏名称</th>
+      <th>区服</th>
+      <th>复活时间</th>
+      <th>击败时间</th>
+      <th>预计下一次复活时间</th>
+      <th>使用CD类型</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+// 固定 JSON 数据（不可前端更改）
+const bossData = [
+  {
+    game: "悠久传奇",
+    server: "104",
+    revive: "2025-07-27T11:57",
+    defeat: "2025-07-27T12:00"
+  },
+  {
+    game: "切割神域",
+    server: "263",
+    revive: "2025-07-26T02:43"
+  },
+  {
+    game: "悠久传奇",
+    server: "103~111",
+    revive: "2025-07-26T02:41"
+  }
+];
+
+const CD_HIT = 385;  // 击败CD，分钟
+const CD_MISS = 391; // 未击败CD，分钟
+
+function formatDate(dt) {
+  return dt.getFullYear() + '-' +
+         String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+         String(dt.getDate()).padStart(2, '0') + ' ' +
+         String(dt.getHours()).padStart(2, '0') + ':' +
+         String(dt.getMinutes()).padStart(2, '0');
+}
+
+function renderTable() {
+  const tbody = document.querySelector("#resultTable tbody");
+  tbody.innerHTML = '';
+  const now = new Date();
+
+  bossData.forEach((item, index) => {
+    let nextRevive = null;
+    let cdType = '';
+
+    if (item.defeat && item.revive) {
+      // 击败+复活 → 使用击败CD
+      const base = new Date(item.defeat);
+      nextRevive = new Date(base.getTime() + CD_HIT * 60000);
+      cdType = '击败CD';
+    } else if (item.revive && !item.defeat) {
+      // 只有复活 → 未击败CD
+      const base = new Date(item.revive);
+      nextRevive = new Date(base.getTime() + CD_MISS * 60000);
+      cdType = '未击败CD';
+    } else if (item.defeat && !item.revive) {
+      // 只有击败 → 假设前次未击败，使用未击败CD
+      const base = new Date(item.defeat);
+      nextRevive = new Date(base.getTime() + CD_MISS * 60000);
+      cdType = '未知复活 → 未击败CD';
+    }
+
+    // 循环预测直到时间大于现在
+    while (nextRevive && nextRevive < now) {
+      const offset = cdType.includes('击败') ? CD_HIT : CD_MISS;
+      nextRevive = new Date(nextRevive.getTime() + offset * 60000);
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${item.game}</td>
+      <td>${item.server}</td>
+      <td>${item.revive ? formatDate(new Date(item.revive)) : '-'}</td>
+      <td>${item.defeat ? formatDate(new Date(item.defeat)) : '-'}</td>
+      <td>${nextRevive ? formatDate(nextRevive) : '—'}</td>
+      <td>${cdType}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+window.onload = renderTable;
+</script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
