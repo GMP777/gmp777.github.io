@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>换算器</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 50px;
+      text-align: center;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      width: 250px;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <input type="number" id="current" placeholder="现有屠龙币" oninput="calculate()">
+  <br>
+  <input type="number" id="required" placeholder="需要的屠龙币" oninput="calculate()">
+
+  <div class="result" id="output"></div>
+
+  <script>
+    function calculate() {
+      const current = parseInt(document.getElementById('current').value) || 0;
+      const required = parseInt(document.getElementById('required').value) || 0;
+      const needed = required - current;
+
+      if (needed <= 0) {
+        document.getElementById('output').innerText = "你已经拥有足够的屠龙币。";
+        return;
+      }
+
+      const exchangeRate = 5000; // 每次兑换得5000屠龙币
+      const diamondPerExchange = 1000;
+      const yuanbaoPerExchange = 100; // 单位：万元宝
+
+      const exchanges = Math.ceil(needed / exchangeRate);
+      const totalDiamonds = exchanges * diamondPerExchange;
+      const totalYuanbao = exchanges * yuanbaoPerExchange;
+
+      document.getElementById('output').innerText = 
+        `你还需要 ${needed} 屠龙币\n` +
+        `需要消耗：${totalDiamonds} 钻石 和 ${totalYuanbao} 万元宝`;
+    }
+  </script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
