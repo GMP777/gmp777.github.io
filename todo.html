@@ -175,40 +175,51 @@
     }
 
     function updateStatus() {
-      const summary = document.getElementById('status-summary');
-      const date = new Date().toISOString().split('T')[0];
-      const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
-      const today = records.filter(r => r.date === date);
-      if (today.length === 0) {
-        summary.innerHTML = `<p>暂无今日记录</p>`;
-        return;
-      }
+  const summary = document.getElementById('status-summary');
+  const date = new Date().toISOString().split('T')[0];
+  const records = JSON.parse(localStorage.getItem("taskRecords") || "[]");
+  const today = records.filter(r => r.date === date);
+  if (today.length === 0) {
+    summary.innerHTML = `<p>暂无今日记录</p>`;
+    return;
+  }
 
-      const zoneMap = {};
-      today.forEach(r => {
-        if (!zoneMap[r.server]) zoneMap[r.server] = new Set();
-        r.tasks.forEach(task => zoneMap[r.server].add(task));
-      });
+  const zoneMap = {};
+  today.forEach(r => {
+    if (!zoneMap[r.server]) zoneMap[r.server] = new Set();
+    r.tasks.forEach(task => zoneMap[r.server].add(task));
+  });
 
-      let html = '';
-      for (const zone in zoneMap) {
-        const done = Array.from(zoneMap[zone]);
-        const doneCount = done.length;
-        const percent = Math.round((doneCount / TASKS.length) * 100);
-        const barColor = percent === 100 ? '#28a745' : '#dc3545';
+  let html = '';
+  for (const zone in zoneMap) {
+    const doneSet = zoneMap[zone];
 
-        html += `
-          <div style="margin-bottom: 16px;">
-            <strong>${zone}区</strong> - ${doneCount} / ${TASKS.length} 项完成
-            <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin-top:6px;">
-              <div style="width:${percent}%;background:${barColor};height:100%;transition:width 0.3s;"></div>
-            </div>
-          </div>
-        `;
-      }
+    const doneDaily = DAILY_TASKS.filter(t => doneSet.has(t));
+    const doneDungeon = DUNGEON_TASKS.filter(t => doneSet.has(t));
 
-      summary.innerHTML = html;
-    }
+    const percentDaily = Math.round((doneDaily.length / DAILY_TASKS.length) * 100);
+    const percentDungeon = Math.round((doneDungeon.length / DUNGEON_TASKS.length) * 100);
+
+    html += `
+      <div style="margin-bottom: 24px;">
+        <strong>${zone}区</strong><br/>
+
+        🟢 日常任务：${doneDaily.length} / ${DAILY_TASKS.length}
+        <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin:6px 0;">
+          <div style="width:${percentDaily}%;background:#28a745;height:100%;transition:width 0.3s;"></div>
+        </div>
+
+        🔵 副本任务：${doneDungeon.length} / ${DUNGEON_TASKS.length}
+        <div style="background:#eee;border-radius:6px;overflow:hidden;height:16px;margin:6px 0;">
+          <div style="width:${percentDungeon}%;background:#007bff;height:100%;transition:width 0.3s;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  summary.innerHTML = html;
+}
+
 
     function submitTasks() {
       const server = document.getElementById("server").value.trim();
