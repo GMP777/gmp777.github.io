@@ -1,41 +1,90 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🗓</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f4f4f4; }
-    input, select { padding: 5px; margin-right: 10px; }
-    .day3 { background-color: #d1ffd1; }
+    /* 样式保持不变 */
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #f9f9f9;
+    }
+    h2 {
+      text-align: center;
+    }
+    label, select {
+      font-size: 1rem;
+      margin-right: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      background: white;
+      margin-top: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 10px;
+      text-align: center;
+      word-break: break-word;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .day3 {
+      background-color: #d1ffd1;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      table, th, td {
+        font-size: 0.9rem;
+      }
+      label, select {
+        font-size: 0.9rem;
+      }
+    }
+    a {
+      color: #337ab7;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    button {
+      padding: 6px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-
-  <label for="gameId">Game ID:</label>
-  <select id="gameId">
-    <option value="115">115</option>
-    <option value="111">111</option>
+  <label for="gameSelect">选择 Game ID:</label>
+  <select id="gameSelect" onchange="renderTable()">
+    <option value='{"gameId":"115","server":"112"}'>悠久传奇</option>
+    <option value='{"gameId":"111","server":"265"}'>切割神域</option>
   </select>
-
-  <label for="server">区服:</label>
-  <input type="number" id="server" value="1" min="1" />
 
   <button onclick="renderTable()">更新表格</button>
 
-  <table id="accountTable">
+  <table id="accountTable" aria-label="账号信息表">
     <thead>
       <tr>
         <th>平台名称</th>
         <th>备注</th>
         <th>创建日期</th>
         <th>是否第3天</th>
-        <th>游戏主页链接</th>
+        <th>游戏链接</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -55,8 +104,8 @@
     ];
 
     function renderTable() {
-      const gameId = document.getElementById('gameId').value;
-      const server = document.getElementById('server').value;
+      const selection = document.getElementById('gameSelect').value;
+      const { gameId, server } = JSON.parse(selection);
       const today = new Date();
 
       const tbody = document.querySelector('#accountTable tbody');
@@ -76,16 +125,17 @@
           <td>${acc.account}</td>
           <td>${acc.createDate}</td>
           <td>${isDay3 ? '✅ 是' : '❌ 否'}</td>
-          <td><a href="${gameUrl}" target="_blank">进入游戏</a></td>
+          <td><a href="${gameUrl}" target="_blank" rel="noopener noreferrer">进入游戏</a></td>
         `;
 
         tbody.appendChild(row);
       });
     }
 
+    // 页面加载时渲染表格
     renderTable();
   </script>
-  <!-- Footer -->
+    <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
