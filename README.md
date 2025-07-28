@@ -12,9 +12,9 @@
 |切割传奇|<https://gmp777.github.io/q/>|
 |赤焰无双|<https://gmp777.github.io/c/>|
 |小号走起|[v.1.0](/x.html)|
-|典狱长刷新预测|[v.1.0](/boss.html)`2025-07-27 13:15:23`|
-|每日任务打卡|[v.2.0](/todo.html)`2025-07-28 02:43:54`|
-|今天是第三天吗|[v.1.0](/day.html)`2025-07-29 02:08:53`|
+|典狱长刷新预测|[v.1.0](https://gmp777.github.io/boss.html)`2025-07-27 13:15:23`|
+|每日任务打卡|[v.2.0](https://gmp777.github.io/todo.html)`2025-07-28 02:43:54`|
+|今天是第三天吗|[v.1.0](https://gmp777.github.io/day.html)`2025-07-29 02:08:53`|
 
   <!-- Footer -->
   <div class="footer-wrapper">
