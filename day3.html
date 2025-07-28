@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>🗓</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f4f4f4; }
+    input, select { padding: 5px; margin-right: 10px; }
+    .day3 { background-color: #d1ffd1; }
+  </style>
+</head>
+<body>
+
+  <label for="gameId">Game ID:</label>
+  <select id="gameId">
+    <option value="115">115</option>
+    <option value="111">111</option>
+  </select>
+
+  <label for="server">区服:</label>
+  <input type="number" id="server" value="1" min="1" />
+
+  <button onclick="renderTable()">更新表格</button>
+
+  <table id="accountTable">
+    <thead>
+      <tr>
+        <th>平台名称</th>
+        <th>备注</th>
+        <th>创建日期</th>
+        <th>是否第3天</th>
+        <th>游戏主页链接</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const accounts = [
+      { name: "xayxms", base: "http://gm.xayxms.cn", account: "xxxx", createDate: "2025-07-26" },
+      { name: "395wan", base: "http://game.395wan.com", account: "qqq,aaa", createDate: "2025-07-27" },
+      { name: "99yn", base: "http://gm.99yn.cn", account: "qqq", createDate: "2025-07-25" },
+      { name: "8kyou", base: "http://www.8kyou.com:81", account: "qqq", createDate: "2025-07-28" },
+      { name: "336buy", base: "http://gm.336buy.com", account: "无", createDate: "2025-07-26" },
+      { name: "lovedfm", base: "http://mv.lovedfm.com", account: "无", createDate: "2025-07-27" },
+      { name: "42uc", base: "http://gm.42uc.com", account: "无", createDate: "2025-07-26" },
+      { name: "962yx", base: "http://gm.962yx.com/games/138.html", account: "无", createDate: "2025-07-25" },
+      { name: "32sf", base: "http://mv.32sf.cn", account: "无", createDate: "2025-07-24" }
+    ];
+
+    function renderTable() {
+      const gameId = document.getElementById('gameId').value;
+      const server = document.getElementById('server').value;
+      const today = new Date();
+
+      const tbody = document.querySelector('#accountTable tbody');
+      tbody.innerHTML = '';
+
+      accounts.forEach(acc => {
+        const createDate = new Date(acc.createDate);
+        const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
+        const isDay3 = days === 3;
+        const gameUrl = `${acc.base}/login/${gameId}/${server}.html`;
+
+        const row = document.createElement('tr');
+        if (isDay3) row.classList.add('day3');
+
+        row.innerHTML = `
+          <td>${acc.name}</td>
+          <td>${acc.account}</td>
+          <td>${acc.createDate}</td>
+          <td>${isDay3 ? '✅ 是' : '❌ 否'}</td>
+          <td><a href="${gameUrl}" target="_blank">进入游戏</a></td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    renderTable();
+  </script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
