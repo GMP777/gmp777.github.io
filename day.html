@@ -16,15 +16,36 @@
     h2 {
       text-align: center;
     }
-    label, select {
-      font-size: 1rem;
-      margin-right: 10px;
+    .button-group-wrapper {
+      margin-bottom: 20px;
+    }
+    .group-title {
+      font-weight: bold;
+      margin: 10px 0 5px;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .button-group button {
+      padding: 8px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #fff;
+      border: 1px solid #888;
+      border-radius: 5px;
+    }
+    .button-group button.active {
+      background: #337ab7;
+      color: #fff;
+      border-color: #337ab7;
     }
     table {
       border-collapse: collapse;
       width: 100%;
       background: white;
-      margin-top: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     th, td {
@@ -39,8 +60,12 @@
       background-color: #d1ffd1;
     }
     @media (max-width: 600px) {
-      body { padding: 10px; }
-      table, th, td { font-size: 0.9rem; }
+      .button-group {
+        flex-direction: column;
+      }
+      table, th, td {
+        font-size: 0.9rem;
+      }
     }
     a {
       color: #337ab7;
@@ -52,19 +77,12 @@
   </style>
 </head>
 <body>
-
-  <label for="gameSelect">选择服务器:</label>
-  <select id="gameSelect" onchange="renderTable()">
-    <option value='{"gameId":"115","server":"110"}'>悠久传奇110</option>
-    <option value='{"gameId":"115","server":"111"}'>悠久传奇111</option>
-    <option value='{"gameId":"115","server":"112"}'>悠久传奇112</option>
-    <option value='{"gameId":"111","server":"265"}'>切割神域265</option>
-  </select>
+  <div class="button-group-wrapper" id="buttonGroups"></div>
 
   <table id="accountTable">
     <thead>
       <tr>
-        <th>平台名称</th>
+        <th>平台</th>
         <th>备注</th>
         <th>创建日期</th>
         <th>第3天</th>
@@ -75,6 +93,16 @@
   </table>
 
   <script>
+    const serverGroups = {
+      "115": ["112", "113", "114"],
+      "111": ["264","265"]
+    };
+
+    const gameConfigs = [];
+    Object.entries(serverGroups).forEach(([gameId, servers]) => {
+      servers.forEach(server => gameConfigs.push({ gameId, server }));
+    });
+
     const accounts = [
       {
         name: "xayxms",
@@ -82,6 +110,8 @@
         account: "xxxx",
         createDates: {
           "112": "2025-07-29",
+          "113": "2025-07-30",
+          "114": "2025-07-31",
           "265": "2025-07-29"
         }
       },
@@ -90,7 +120,9 @@
         base: "http://game.395wan.com",
         account: "qqq,aaa",
         createDates: {
-          "112": "2025-07-30",
+          "112": "2025-07-27",
+          "113": "2025-07-28",
+          "114": "2025-07-29",
           "265": "2025-07-28"
         }
       },
@@ -100,6 +132,8 @@
         account: "qqq",
         createDates: {
           "112": "2025-07-28",
+          "113": "2025-07-29",
+          "114": "2025-07-30",
           "265": "2025-07-27"
         }
       },
@@ -109,6 +143,8 @@
         account: "qqq",
         createDates: {
           "112": "2025-07-27",
+          "113": "2025-07-28",
+          "114": "2025-07-29",
           "265": "2025-07-26"
         }
       },
@@ -118,20 +154,61 @@
         account: "无",
         createDates: {
           "112": "2025-07-29",
+          "113": "2025-07-30",
+          "114": "2025-07-31",
           "265": "2025-07-29"
         }
       }
     ];
 
+    let currentGame = gameConfigs[0];
+
+    function createGroupedButtons() {
+      const container = document.getElementById('buttonGroups');
+      container.innerHTML = '';
+
+      const grouped = {};
+      gameConfigs.forEach(cfg => {
+        if (!grouped[cfg.gameId]) grouped[cfg.gameId] = [];
+        grouped[cfg.gameId].push(cfg);
+      });
+
+      Object.keys(grouped).forEach(gameId => {
+        const title = document.createElement('div');
+        title.className = 'group-title';
+        title.textContent = '游戏 ' + gameId;
+        container.appendChild(title);
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'button-group';
+
+        grouped[gameId].forEach(cfg => {
+          const btn = document.createElement('button');
+          btn.textContent = `${cfg.gameId}-${cfg.server}`;
+          btn.onclick = () => {
+            currentGame = cfg;
+            document.querySelectorAll('.button-group button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderTable();
+          };
+          if (cfg === currentGame) btn.classList.add('active');
+          groupDiv.appendChild(btn);
+        });
+
+        container.appendChild(groupDiv);
+      });
+    }
+
     function renderTable() {
-      const { gameId, server } = JSON.parse(document.getElementById('gameSelect').value);
+      const { gameId, server } = currentGame;
       const today = new Date();
       const tbody = document.querySelector('#accountTable tbody');
       tbody.innerHTML = '';
 
       accounts.forEach(acc => {
         const createDateStr = acc.createDates[server];
-        if (!createDateStr) return; // 无此区服数据，跳过
+        if (!createDateStr) return;
+
         const createDate = new Date(createDateStr);
         const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
         const isDay3 = days === 3;
@@ -147,11 +224,11 @@
           <td>${isDay3 ? '✅ 是' : '❌ 否'}</td>
           <td><a href="${gameUrl}" target="_blank">进入游戏</a></td>
         `;
-
         tbody.appendChild(row);
       });
     }
 
+    createGroupedButtons();
     renderTable();
   </script>
     <!-- Footer -->
