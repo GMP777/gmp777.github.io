@@ -8,12 +8,10 @@
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
   <style>
-    /* 样式保持不变 */
     body {
       font-family: sans-serif;
       padding: 20px;
-      margin: 0;
-      background: #f9f9f9;
+      background: #f5f5f5;
     }
     h2 {
       text-align: center;
@@ -25,8 +23,6 @@
     table {
       border-collapse: collapse;
       width: 100%;
-      max-width: 100%;
-      overflow-x: auto;
       background: white;
       margin-top: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
@@ -35,24 +31,16 @@
       border: 1px solid #ccc;
       padding: 8px 10px;
       text-align: center;
-      word-break: break-word;
     }
     th {
-      background-color: #f4f4f4;
+      background-color: #f0f0f0;
     }
     .day3 {
       background-color: #d1ffd1;
     }
     @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-      table, th, td {
-        font-size: 0.9rem;
-      }
-      label, select {
-        font-size: 0.9rem;
-      }
+      body { padding: 10px; }
+      table, th, td { font-size: 0.9rem; }
     }
     a {
       color: #337ab7;
@@ -61,15 +49,11 @@
     a:hover {
       text-decoration: underline;
     }
-    button {
-      padding: 6px 12px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
-  <label for="gameSelect">选择 Game ID:</label>
+
+  <label for="gameSelect">选择服务器:</label>
   <select id="gameSelect" onchange="renderTable()">
     <option value='{"gameId":"115","server":"110"}'>悠久传奇110</option>
     <option value='{"gameId":"115","server":"111"}'>悠久传奇111</option>
@@ -77,13 +61,13 @@
     <option value='{"gameId":"111","server":"265"}'>切割神域265</option>
   </select>
 
-  <table id="accountTable" aria-label="账号信息表">
+  <table id="accountTable">
     <thead>
       <tr>
         <th>平台名称</th>
         <th>备注</th>
         <th>创建日期</th>
-        <th>是否第3天</th>
+        <th>第3天</th>
         <th>游戏链接</th>
       </tr>
     </thead>
@@ -92,27 +76,63 @@
 
   <script>
     const accounts = [
-      { name: "xayxms", base: "http://gm.xayxms.cn", account: "xxxx", createDate: "2025-07-29" },
-      { name: "395wan", base: "http://game.395wan.com", account: "qqq,aaa", createDate: "2025-07-29" },
-      { name: "99yn", base: "http://gm.99yn.cn", account: "qqq", createDate: "2025-07-29" },
-      { name: "8kyou", base: "http://www.8kyou.com:81", account: "qqq", createDate: "2025-07-29" },
-      { name: "336buy", base: "http://gm.336buy.com", account: "无", createDate: "2025-07-29" },
-      { name: "lovedfm", base: "http://mv.lovedfm.com", account: "无", createDate: "2025-07-29" },
-      { name: "42uc", base: "http://gm.42uc.com", account: "无", createDate: "2025-07-29" },
-      { name: "962yx", base: "http://gm.962yx.com/games/138.html", account: "无", createDate: "2025-07-29" },
-      { name: "32sf", base: "http://mv.32sf.cn", account: "无", createDate: "2025-07-29" }
+      {
+        name: "xayxms",
+        base: "http://gm.xayxms.cn",
+        account: "xxxx",
+        createDates: {
+          "112": "2025-07-29",
+          "265": "2025-07-29"
+        }
+      },
+      {
+        name: "395wan",
+        base: "http://game.395wan.com",
+        account: "qqq,aaa",
+        createDates: {
+          "112": "2025-07-30",
+          "265": "2025-07-28"
+        }
+      },
+      {
+        name: "99yn",
+        base: "http://gm.99yn.cn",
+        account: "qqq",
+        createDates: {
+          "112": "2025-07-28",
+          "265": "2025-07-27"
+        }
+      },
+      {
+        name: "8kyou",
+        base: "http://www.8kyou.com:81",
+        account: "qqq",
+        createDates: {
+          "112": "2025-07-27",
+          "265": "2025-07-26"
+        }
+      },
+      {
+        name: "336buy",
+        base: "http://gm.336buy.com",
+        account: "无",
+        createDates: {
+          "112": "2025-07-29",
+          "265": "2025-07-29"
+        }
+      }
     ];
 
     function renderTable() {
-      const selection = document.getElementById('gameSelect').value;
-      const { gameId, server } = JSON.parse(selection);
+      const { gameId, server } = JSON.parse(document.getElementById('gameSelect').value);
       const today = new Date();
-
       const tbody = document.querySelector('#accountTable tbody');
       tbody.innerHTML = '';
 
       accounts.forEach(acc => {
-        const createDate = new Date(acc.createDate);
+        const createDateStr = acc.createDates[server];
+        if (!createDateStr) return; // 无此区服数据，跳过
+        const createDate = new Date(createDateStr);
         const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
         const isDay3 = days === 3;
         const gameUrl = `${acc.base}/login/${gameId}/${server}.html`;
@@ -123,16 +143,15 @@
         row.innerHTML = `
           <td>${acc.name}</td>
           <td>${acc.account}</td>
-          <td>${acc.createDate}</td>
+          <td>${createDateStr}</td>
           <td>${isDay3 ? '✅ 是' : '❌ 否'}</td>
-          <td><a href="${gameUrl}" target="_blank" rel="noopener noreferrer">进入游戏</a></td>
+          <td><a href="${gameUrl}" target="_blank">进入游戏</a></td>
         `;
 
         tbody.appendChild(row);
       });
     }
 
-    // 页面加载时渲染表格
     renderTable();
   </script>
     <!-- Footer -->
