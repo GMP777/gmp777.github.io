@@ -2,76 +2,49 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🎮</title>
-  <link rel="stylesheet" href="/footer.css" />
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
   <style>
     body {
-      font-family: Arial, sans-serif;
-      max-width: 1200px;
-      margin: 30px auto;
+      font-family: sans-serif;
       padding: 20px;
+      background: #f5f5f5;
+    }
+    select {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      padding: 6px 10px;
     }
     table {
       border-collapse: collapse;
       width: 100%;
-      margin-bottom: 40px;
+      background: white;
+      margin-top: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       table-layout: fixed;
-      word-wrap: break-word;
     }
     th, td {
       border: 1px solid #ccc;
       padding: 10px 8px;
       text-align: center;
-      white-space: normal;
-      vertical-align: middle;
+      word-wrap: break-word;
     }
     th {
-      background-color: #f2f2f2;
+      background-color: #f0f0f0;
     }
     a {
-      color: #007bff;
+      color: #337ab7;
       text-decoration: none;
-      display: inline-block;
-      margin: 2px 0;
     }
     a:hover {
       text-decoration: underline;
     }
-    .remark {
-      font-size: 0.85em;
-      color: #666;
-      display: block;
-      margin-top: 4px;
-    }
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-    }
-    .tab-btn {
-      cursor: pointer;
-      border: 1px solid #007bff;
-      background: white;
-      color: #007bff;
-      padding: 6px 14px;
-      border-radius: 4px;
-      font-size: 1em;
-      transition: 0.3s;
-      user-select: none;
-    }
-    .tab-btn.active,
-    .tab-btn:hover {
-      background: #007bff;
-      color: white;
-    }
-    .hidden {
-      display: none;
-    }
     @media (max-width: 600px) {
-      th, td {
-        font-size: 0.85em;
+      table, th, td {
+        font-size: 0.85rem;
         padding: 8px 4px;
       }
     }
@@ -79,25 +52,38 @@
 </head>
 <body>
 
-<div class="tabs" id="tabs"></div>
-<div id="game-tables"></div>
+  <label for="gameSelect">选择游戏：</label>
+  <select id="gameSelect" onchange="renderTable()"></select>
 
-<script>
-  const gameData = {
-    "111": {
-      name: "满V切割神域",
-      servers: [263, 264],
-      remark: "新服"
-    },
-    "115": {
-      name: "满V悠久传奇",
-      servers: [107, 108, 110],
-      remark: "刷58品阶装备"
-    }
-  };
+  <table id="linkTable">
+    <thead>
+      <tr>
+        <th>游戏平台</th>
+        <th>备注</th>
+        <th>区服链接</th>
+        <th>区服链接</th>
+        <th>游戏主页</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  const mirrorSites = [
-    { name: "xayxms", base: "http://gm.xayxms.cn", remark: "xxxx" },
+  <script>
+    // ✅ 游戏配置数据
+    const gameData = {
+      "111": {
+        name: "切割神域",
+        servers: ["263", "264","265"]
+      },
+      "115": {
+        name: "悠久传奇",
+        servers: ["107","108","110", "112"]
+      }
+    };
+
+    // ✅ 各平台数据
+    const platforms = [
+      { name: "xayxms", base: "http://gm.xayxms.cn", remark: "xxxx" },
     { name: "395wan", base: "http://game.395wan.com", remark: "qqq,aaa" },
     { name: "99yn", base: "http://gm.99yn.cn", remark: "qqq" },
     { name: "8kyou", base: "http://www.8kyou.com:81", remark: "qqq" },
@@ -105,73 +91,53 @@
     { name: "lovedfm", base: "http://mv.lovedfm.com", remark: "无" },
     { name: "42uc", base: "http://gm.42uc.com", remark: "无" },
     { name: "32sf", base: "http://mv.32sf.cn", remark: "无" }
-  ];
+    ];
 
-  const tabsContainer = document.getElementById('tabs');
-  const tablesContainer = document.getElementById('game-tables');
+    const gameSelect = document.getElementById('gameSelect');
+    const tbody = document.querySelector('#linkTable tbody');
 
-  for (const [gameId, game] of Object.entries(gameData)) {
-    const tabBtn = document.createElement('button');
-    tabBtn.textContent = game.name;
-    tabBtn.className = 'tab-btn';
-    tabBtn.onclick = () => {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      tabBtn.classList.add('active');
-      document.querySelectorAll('.game-table').forEach(tbl => tbl.classList.add('hidden'));
-      document.getElementById(`game-${gameId}`).classList.remove('hidden');
-    };
-    tabsContainer.appendChild(tabBtn);
-
-    const tableWrapper = document.createElement('div');
-    tableWrapper.id = `game-${gameId}`;
-    tableWrapper.className = 'game-table hidden';
-
-    // 按照最多5列来切分 mirrorSites
-    const chunkSize = 5;
-    for(let i = 0; i < mirrorSites.length; i += chunkSize) {
-      const sitesChunk = mirrorSites.slice(i, i + chunkSize);
-      const table = document.createElement('table');
-
-      // 表头
-      const thead = document.createElement('thead');
-      const headRow = document.createElement('tr');
-      sitesChunk.forEach(site => {
-        headRow.innerHTML += `<th>${site.name}<br><span class="remark">${site.remark}</span></th>`;
-      });
-      thead.appendChild(headRow);
-      table.appendChild(thead);
-
-      // 表体
-      const tbody = document.createElement('tbody');
-      game.servers.forEach(server => {
-        const row = document.createElement('tr');
-        sitesChunk.forEach(site => {
-          const loginURL = `${site.base}/login/${gameId}/${server}.html`;
-          const homeURL = `${site.base}/games/${gameId}.html`;
-
-          row.innerHTML += `<td>
-            <a href="${loginURL}" target="_blank">进入${server}区</a><br>
-            <a href="${homeURL}" target="_blank">游戏主页</a>
-          </td>`;
-        });
-        tbody.appendChild(row);
-      });
-
-      table.appendChild(tbody);
-      tableWrapper.appendChild(table);
+    // ✅ 初始化游戏下拉选项
+    for (const [gameId, game] of Object.entries(gameData)) {
+      const opt = document.createElement('option');
+      opt.value = gameId;
+      opt.textContent = game.name;
+      gameSelect.appendChild(opt);
     }
 
-    tablesContainer.appendChild(tableWrapper);
-  }
+    function renderTable() {
+      const gameId = gameSelect.value;
+      const { name, servers } = gameData[gameId];
 
-  // 默认激活第一个游戏
-  document.querySelectorAll('.tab-btn')[0].click();
-</script>
+      tbody.innerHTML = '';
 
-<!-- Footer -->
-<div class="footer-wrapper">
-  <footer id="footer-container">加载中...</footer>
-</div>
-<script src="/load-footer.js"></script>
+      platforms.forEach(pf => {
+        const row = document.createElement('tr');
+
+        // 区服链接列（最多两列）
+        const serverLinks = servers.map(sid => 
+          `<a href="${pf.base}/login/${gameId}/${sid}.html" target="_blank">${sid}区</a>`
+        );
+
+        row.innerHTML = `
+          <td>${pf.name}</td>
+          <td>${pf.remark}</td>
+          <td>${serverLinks[0] || "-"}</td>
+          <td>${serverLinks[1] || "-"}</td>
+          <td><a href="${pf.base}/games/${gameId}.html" target="_blank">主页</a></td>
+        `;
+
+        tbody.appendChild(row);
+      });
+    }
+
+    // 默认显示第一个游戏
+    renderTable();
+  </script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
 </body>
 </html>
