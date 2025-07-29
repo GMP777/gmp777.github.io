@@ -13,10 +13,26 @@
       padding: 20px;
       background: #f5f5f5;
     }
-    select {
+    .btn-group {
+      margin-bottom: 15px;
+    }
+    .btn-group button {
+      margin-right: 10px;
+      padding: 8px 14px;
       font-size: 1rem;
-      margin-bottom: 20px;
-      padding: 6px 10px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      background-color: white;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .btn-group button.active {
+      background-color: #337ab7;
+      color: white;
+      border-color: #2a6496;
+    }
+    .btn-group button:hover:not(.active) {
+      background-color: #e6e6e6;
     }
     table {
       border-collapse: collapse;
@@ -47,43 +63,47 @@
         font-size: 0.85rem;
         padding: 8px 4px;
       }
+      .btn-group button {
+        padding: 6px 10px;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <label for="gameSelect">选择游戏：</label>
-  <select id="gameSelect" onchange="renderTable()"></select>
+  <div>
+    <div><strong>选择游戏：</strong></div>
+    <div id="gameButtons" class="btn-group"></div>
+  </div>
+
+  <div>
+    <div><strong>选择区服：</strong></div>
+    <div id="serverButtons" class="btn-group"></div>
+  </div>
 
   <table id="linkTable">
     <thead>
       <tr>
         <th>游戏平台</th>
         <th>备注</th>
-        <th>区服链接</th>
-        <th>区服链接</th>
+        <th>登录区服链接</th>
         <th>游戏主页</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <script>
-    // ✅ 游戏配置数据
-    const gameData = {
-      "111": {
-        name: "切割神域",
-        servers: ["263", "264","265"]
-      },
-      "115": {
-        name: "悠久传奇",
-        servers: ["107","108","110", "112"]
-      }
-    };
+<script>
+  // 游戏和区服数据
+  const gameData = {
+    "111": { name: "切割神域", servers: ["263", "264", "265"] },
+    "115": { name: "悠久传奇", servers: ["107", "108", "110", "112"] }
+  };
 
-    // ✅ 各平台数据
-    const platforms = [
-      { name: "xayxms", base: "http://gm.xayxms.cn", remark: "xxxx" },
+  // 各平台数据
+  const platforms = [
+    { name: "xayxms", base: "http://gm.xayxms.cn", remark: "xxxx" },
     { name: "395wan", base: "http://game.395wan.com", remark: "qqq,aaa" },
     { name: "99yn", base: "http://gm.99yn.cn", remark: "qqq" },
     { name: "8kyou", base: "http://www.8kyou.com:81", remark: "qqq" },
@@ -91,48 +111,98 @@
     { name: "lovedfm", base: "http://mv.lovedfm.com", remark: "无" },
     { name: "42uc", base: "http://gm.42uc.com", remark: "无" },
     { name: "32sf", base: "http://mv.32sf.cn", remark: "无" }
-    ];
+  ];
 
-    const gameSelect = document.getElementById('gameSelect');
-    const tbody = document.querySelector('#linkTable tbody');
+  const gameButtons = document.getElementById('gameButtons');
+  const serverButtons = document.getElementById('serverButtons');
+  const tbody = document.querySelector('#linkTable tbody');
 
-    // ✅ 初始化游戏下拉选项
+  let selectedGameId = null;
+  let selectedServerId = null;
+
+  // 生成游戏按钮
+  function renderGameButtons() {
+    gameButtons.innerHTML = '';
     for (const [gameId, game] of Object.entries(gameData)) {
-      const opt = document.createElement('option');
-      opt.value = gameId;
-      opt.textContent = game.name;
-      gameSelect.appendChild(opt);
-    }
-
-    function renderTable() {
-      const gameId = gameSelect.value;
-      const { name, servers } = gameData[gameId];
-
-      tbody.innerHTML = '';
-
-      platforms.forEach(pf => {
-        const row = document.createElement('tr');
-
-        // 区服链接列（最多两列）
-        const serverLinks = servers.map(sid => 
-          `<a href="${pf.base}/login/${gameId}/${sid}.html" target="_blank">${sid}区</a>`
-        );
-
-        row.innerHTML = `
-          <td>${pf.name}</td>
-          <td>${pf.remark}</td>
-          <td>${serverLinks[0] || "-"}</td>
-          <td>${serverLinks[1] || "-"}</td>
-          <td><a href="${pf.base}/games/${gameId}.html" target="_blank">主页</a></td>
-        `;
-
-        tbody.appendChild(row);
+      const btn = document.createElement('button');
+      btn.textContent = game.name;
+      btn.dataset.gameId = gameId;
+      btn.addEventListener('click', () => {
+        if (selectedGameId !== gameId) {
+          selectedGameId = gameId;
+          selectedServerId = gameData[gameId].servers[0]; // 默认选第一个区服
+          updateActiveButtons();
+          renderServerButtons();
+          renderTable();
+        }
       });
+      gameButtons.appendChild(btn);
     }
+  }
 
-    // 默认显示第一个游戏
+  // 生成区服按钮
+  function renderServerButtons() {
+    serverButtons.innerHTML = '';
+    if (!selectedGameId) return;
+    const servers = gameData[selectedGameId].servers;
+    servers.forEach(sid => {
+      const btn = document.createElement('button');
+      btn.textContent = sid + '区';
+      btn.dataset.serverId = sid;
+      btn.addEventListener('click', () => {
+        if (selectedServerId !== sid) {
+          selectedServerId = sid;
+          updateActiveButtons();
+          renderTable();
+        }
+      });
+      serverButtons.appendChild(btn);
+    });
+  }
+
+  // 更新按钮高亮状态
+  function updateActiveButtons() {
+    [...gameButtons.children].forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.gameId === selectedGameId);
+    });
+    [...serverButtons.children].forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.serverId === selectedServerId);
+    });
+  }
+
+  // 渲染表格内容
+  function renderTable() {
+    if (!selectedGameId || !selectedServerId) return;
+    tbody.innerHTML = '';
+
+    platforms.forEach(pf => {
+      const loginUrl = `${pf.base}/login/${selectedGameId}/${selectedServerId}.html`;
+      const homeUrl = `${pf.base}/games/${selectedGameId}.html`;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${pf.name}</td>
+        <td>${pf.remark}</td>
+        <td><a href="${loginUrl}" target="_blank">${selectedServerId}区登录</a></td>
+        <td><a href="${homeUrl}" target="_blank">主页</a></td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // 初始化，默认选第一个游戏和第一个区服
+  function init() {
+    renderGameButtons();
+    // 默认选第一个游戏
+    selectedGameId = Object.keys(gameData)[0];
+    selectedServerId = gameData[selectedGameId].servers[0];
+    updateActiveButtons();
+    renderServerButtons();
     renderTable();
-  </script>
+  }
+
+  init();
+</script>
   <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
