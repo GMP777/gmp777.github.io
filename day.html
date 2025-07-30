@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🗓</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
   <style>
     body {
       font-family: sans-serif;
@@ -85,6 +83,7 @@
         <th>平台</th>
         <th>备注</th>
         <th>创建日期</th>
+        <th>第几天</th>
         <th>第3天</th>
         <th>游戏链接</th>
       </tr>
@@ -199,17 +198,33 @@
       });
     }
 
+    function getUTC8DateOnly(dateStr) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(year, month - 1, day, -8, 0, 0));
+    }
+
+    function getTodayUTC8DateOnly() {
+      const now = new Date();
+      const utc8 = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+      const year = utc8.getUTCFullYear();
+      const month = utc8.getUTCMonth();
+      const day = utc8.getUTCDate();
+      return new Date(Date.UTC(year, month, day, -8, 0, 0));
+    }
+
     function renderTable() {
       const { gameId, server } = currentGame;
-      const today = new Date();
+      const today = getTodayUTC8DateOnly();
       const tbody = document.querySelector('#accountTable tbody');
       tbody.innerHTML = '';
+
+      let hasData = false;
 
       accounts.forEach(acc => {
         const createDateStr = acc.createDates[server];
         if (!createDateStr) return;
 
-        const createDate = new Date(createDateStr);
+        const createDate = getUTC8DateOnly(createDateStr);
         const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
         const isDay3 = days === 3;
         const gameUrl = `${acc.base}/login/${gameId}/${server}.html`;
@@ -221,21 +236,29 @@
           <td>${acc.name}</td>
           <td>${acc.account}</td>
           <td>${createDateStr}</td>
+          <td>第 ${days} 天</td>
           <td>${isDay3 ? '✅ 是' : '❌ 否'}</td>
           <td><a href="${gameUrl}" target="_blank">进入游戏</a></td>
         `;
+
         tbody.appendChild(row);
+        hasData = true;
       });
+
+      if (!hasData) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="6">无账号数据</td>`;
+        tbody.appendChild(row);
+      }
     }
 
     createGroupedButtons();
     renderTable();
   </script>
-    <!-- Footer -->
+
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
