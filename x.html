@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🎮</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
   <style>
     body {
       font-family: sans-serif;
@@ -73,13 +71,8 @@
 <body>
 
   <div>
-    <div><strong>选择游戏：</strong></div>
-    <div id="gameButtons" class="btn-group"></div>
-  </div>
-
-  <div>
-    <div><strong>选择区服：</strong></div>
-    <div id="serverButtons" class="btn-group"></div>
+    <div><strong>选择游戏区服：</strong></div>
+    <div id="combinedButtons" class="btn-group"></div>
   </div>
 
   <table id="linkTable">
@@ -113,64 +106,30 @@
     { name: "32sf", base: "http://mv.32sf.cn", remark: "无" }
   ];
 
-  const gameButtons = document.getElementById('gameButtons');
-  const serverButtons = document.getElementById('serverButtons');
+  const combinedButtons = document.getElementById('combinedButtons');
   const tbody = document.querySelector('#linkTable tbody');
 
   let selectedGameId = null;
   let selectedServerId = null;
 
-  // 生成游戏按钮
-  function renderGameButtons() {
-    gameButtons.innerHTML = '';
+  function renderCombinedButtons() {
+    combinedButtons.innerHTML = '';
     for (const [gameId, game] of Object.entries(gameData)) {
-      const btn = document.createElement('button');
-      btn.textContent = game.name;
-      btn.dataset.gameId = gameId;
-      btn.addEventListener('click', () => {
-        if (selectedGameId !== gameId) {
+      game.servers.forEach(serverId => {
+        const btn = document.createElement('button');
+        btn.textContent = `${game.name}${serverId}服`;
+        btn.addEventListener('click', () => {
           selectedGameId = gameId;
-          selectedServerId = gameData[gameId].servers[0]; // 默认选第一个区服
-          updateActiveButtons();
-          renderServerButtons();
+          selectedServerId = serverId;
           renderTable();
-        }
+          [...combinedButtons.children].forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+        combinedButtons.appendChild(btn);
       });
-      gameButtons.appendChild(btn);
     }
   }
 
-  // 生成区服按钮
-  function renderServerButtons() {
-    serverButtons.innerHTML = '';
-    if (!selectedGameId) return;
-    const servers = gameData[selectedGameId].servers;
-    servers.forEach(sid => {
-      const btn = document.createElement('button');
-      btn.textContent = sid + '区';
-      btn.dataset.serverId = sid;
-      btn.addEventListener('click', () => {
-        if (selectedServerId !== sid) {
-          selectedServerId = sid;
-          updateActiveButtons();
-          renderTable();
-        }
-      });
-      serverButtons.appendChild(btn);
-    });
-  }
-
-  // 更新按钮高亮状态
-  function updateActiveButtons() {
-    [...gameButtons.children].forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.gameId === selectedGameId);
-    });
-    [...serverButtons.children].forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.serverId === selectedServerId);
-    });
-  }
-
-  // 渲染表格内容
   function renderTable() {
     if (!selectedGameId || !selectedServerId) return;
     tbody.innerHTML = '';
@@ -183,31 +142,30 @@
       row.innerHTML = `
         <td>${pf.name}</td>
         <td>${pf.remark}</td>
-        <td><a href="${loginUrl}" target="_blank">${selectedServerId}区登录</a></td>
+        <td><a href="${loginUrl}" target="_blank">${gameData[selectedGameId].name}${selectedServerId}服</a></td>
         <td><a href="${homeUrl}" target="_blank">主页</a></td>
       `;
       tbody.appendChild(row);
     });
   }
 
-  // 初始化，默认选第一个游戏和第一个区服
   function init() {
-    renderGameButtons();
-    // 默认选第一个游戏
-    selectedGameId = Object.keys(gameData)[0];
-    selectedServerId = gameData[selectedGameId].servers[0];
-    updateActiveButtons();
-    renderServerButtons();
+    renderCombinedButtons();
+    // 默认选中第一个按钮
+    const firstGameId = Object.keys(gameData)[0];
+    selectedGameId = firstGameId;
+    selectedServerId = gameData[firstGameId].servers[0];
     renderTable();
+    document.querySelector('#combinedButtons button')?.classList.add('active');
   }
 
   init();
 </script>
-  <!-- Footer -->
+
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
-<!-- footer -->
+
 </body>
 </html>
