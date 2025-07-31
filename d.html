@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🗓</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
   <style>
     body {
       font-family: sans-serif;
@@ -92,7 +95,7 @@
 
   <script>
     const serverGroups = {
-      "115": ["112", "113", "114"],
+      "115": ["112","111", "113", "114"],
       "111": ["265", "264"]
     };
 
@@ -116,6 +119,9 @@
         { name: "395wan", date: "2025-07-31", tag: "aaa" },
         { name: "xayxms", date: "2025-07-31", tag: "x01" },
         { name: "99yn", date: "2025-07-31", tag: "q0-7" }
+      ],
+      "111": [
+        { name: "395wan", date: "2025-08-01", tag: "qqq" },
       ],
       "113": [
         { name: "395wan", date: "2025-07-11" },
@@ -232,5 +238,11 @@
     createGroupedButtons();
     renderTable();
   </script>
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
 </body>
 </html>
