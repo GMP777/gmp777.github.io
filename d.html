@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🗓</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
   <style>
     body {
       font-family: sans-serif;
@@ -108,14 +105,6 @@
         base: "http://game.395wan.com",
         account: "qqq,aaa"
       },
-      "99yn": {
-        base: "http://gm.99yn.cn",
-        account: "qqq"
-      },
-      "8kyou": {
-        base: "http://www.8kyou.com:81",
-        account: "qqq"
-      },
       "336buy": {
         base: "http://gm.336buy.com",
         account: "无"
@@ -124,12 +113,21 @@
 
     const serverAccounts = {
       "112": [
-        { name: "395wan", date: "2025-07-30" },
-        { name: "xayxms", date: "2025-07-31" }
+        { name: "395wan", date: "2025-07-31", tag: "aaa" },
+        { name: "xayxms", date: "2025-07-29", tag: "x01" }
+      ],
+      "113": [
+        { name: "395wan", date: "2025-07-11" },
+        { name: "xayxms", date: "2025-07-11" }
+      ],
+      "114": [
+        { name: "395wan", date: "2025-07-11" },
+        { name: "xayxms", date: "2025-07-11" }
       ],
       "265": [
-        { name: "395wan", date: "2025-07-30" },
-        { name: "xayxms", date: "2025-07-30" },
+        { name: "395wan", date: "2025-07-30", tag: "主号" },
+        { name: "395wan", date: "2025-07-30", tag: "刷资源" },
+        { name: "336buy", date: "2025-07-11" }
       ]
     };
 
@@ -205,7 +203,7 @@
         return;
       }
 
-      platformList.forEach(({ name, date }) => {
+      platformList.forEach(({ name, date, tag }) => {
         const platform = platforms[name];
         if (!platform) return;
 
@@ -218,7 +216,7 @@
         if (isDay3) row.classList.add('day3');
 
         row.innerHTML = `
-          <td>${name}</td>
+          <td>${tag ? `${name}（${tag}）` : name}</td>
           <td>${platform.account || '—'}</td>
           <td>${date}</td>
           <td>第 ${days} 天</td>
@@ -233,11 +231,5 @@
     createGroupedButtons();
     renderTable();
   </script>
-    <!-- Footer -->
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
