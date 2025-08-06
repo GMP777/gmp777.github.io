@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🗓</title>
-  <!-- 载入 footer 样式 -->
   <link rel="stylesheet" href="/footer.css" />
   <style>
     body {
@@ -12,12 +11,7 @@
       padding: 20px;
       background: #f5f5f5;
     }
-    h2 {
-      text-align: center;
-    }
-    .button-group-wrapper {
-      margin-bottom: 20px;
-    }
+    .button-group-wrapper { margin-bottom: 20px; }
     .group-title {
       font-weight: bold;
       margin: 10px 0 5px;
@@ -59,12 +53,8 @@
       background-color: #d1ffd1;
     }
     @media (max-width: 600px) {
-      .button-group {
-        flex-direction: column;
-      }
-      table, th, td {
-        font-size: 0.9rem;
-      }
+      .button-group { flex-direction: column; }
+      table, th, td { font-size: 0.9rem; }
     }
     a {
       color: #337ab7;
@@ -87,7 +77,7 @@
         <th>第几天</th>
         <th>第3天</th>
         <th>游戏链接</th>
-        <th>完成状态</th>
+        <th>状态</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -95,44 +85,33 @@
 
   <script>
     const serverGroups = {
-      "115": ["112","111", "113", "114"],
+      "115": ["112", "111", "113", "114"],
       "111": ["265", "264"]
     };
 
     const platforms = {
-      "xayxms": {
-        base: "http://gm.xayxms.cn",
-        account: "xxxx"
-      },
-      "395wan": {
-        base: "http://game.395wan.com",
-        account: "qqq,aaa"
-      },
-      "8kyou": {
-        base: "http://www.8kyou.com:81",
-        account: "aaa1-5"
-      },
-      "99yn": {
-        base: "http://gm.99yn.cn",
-        account: "qqq"
-      }
+      "xayxms": { base: "http://gm.xayxms.cn", account: "xxxx" },
+      "395wan": { base: "http://game.395wan.com", account: "qqq,aaa" },
+      "8kyou": { base: "http://www.8kyou.com:81", account: "aaa1-5" },
+      "99yn": { base: "http://gm.99yn.cn", account: "qqq" }
     };
 
     const serverAccounts = {
       "112": [
-        { name: "8kyou", date: "2025-08-04", tag: "a1-5", done: true },
-        { name: "395wan", date: "2025-08-04", tag: "q2-9,a1-9" },
-        { name: "xayxms", date: "2025-08-03" },
+        { name: "8kyou",  status: "not" },
+        { name: "395wan", date: "2025-07-31"},
+        { name: "xayxms", status: "not" }
       ],
       "111": [
-        { name: "8kyou", date: "2025-08-06", tag: "a1-5" },
-        { name: "395wan", date: "2025-08-04", tag: "q2-9,a1-9", done: true },
-        { name: "xayxms", date: "2025-08-03" },
+        { name: "8kyou", date: "2025-08-05", tag: "a1-5" },
+        { name: "395wan", date: "2025-08-04", tag: "q2-9,a1-9" },
+        { name: "xayxms", date: "2025-08-03" }
       ],
       "113": [
-        { name: "8kyou", date: "2025-08-06", tag: "a1-5" },
+        { name: "8kyou", date: "2025-08-06", status: "done"},
         { name: "395wan", date: "2025-08-05", tag: "q" },
-        { name: "xayxms", date: "2025-08-03", done: true }
+        { name: "395wan", date: "2025-08-06", tag: "a" },
+        { name: "xayxms", date: "2025-08-03" }
       ]
     };
 
@@ -146,8 +125,8 @@
     function createGroupedButtons() {
       const container = document.getElementById('buttonGroups');
       container.innerHTML = '';
-
       const grouped = {};
+
       gameConfigs.forEach(cfg => {
         if (!grouped[cfg.gameId]) grouped[cfg.gameId] = [];
         grouped[cfg.gameId].push(cfg);
@@ -179,15 +158,14 @@
       });
     }
 
-    function parseDateAsUTC8(dateStr) {
-      const [y, m, d] = dateStr.split('-').map(Number);
+    function parseDateUTC8(str) {
+      const [y, m, d] = str.split('-').map(Number);
       return new Date(Date.UTC(y, m - 1, d, 0, 0, 0) - 8 * 3600 * 1000);
     }
 
     function getTodayUTC8() {
       const now = new Date();
-      const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-      return new Date(Date.UTC(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate(), 0, 0, 0) - 8 * 3600 * 1000);
+      return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0) - 8 * 3600 * 1000);
     }
 
     function renderTable() {
@@ -196,40 +174,44 @@
       const tbody = document.querySelector('#accountTable tbody');
       tbody.innerHTML = '';
 
-      const platformList = serverAccounts[server] || [];
-
-      if (platformList.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td colspan="7">该区服无平台数据</td>`;
-        tbody.appendChild(row);
+      const list = serverAccounts[server] || [];
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">该区服无平台数据</td></tr>`;
         return;
       }
 
-      platformList.forEach(({ name, date, tag, done }) => {
+      list.forEach(({ name, date, tag, status }) => {
         const platform = platforms[name];
         if (!platform) return;
 
-        const createDate = parseDateAsUTC8(date);
-        const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
-        const isDay3 = days === 3;
-        const gameUrl = `${platform.base}/login/${gameId}/${server}.html`;
+        const remark = tag || platform.account || '—';
+        const url = `${platform.base}/login/${gameId}/${server}.html`;
 
-        const remark = tag ? tag.split(",").join("、") : (platform.account || '—');
+        let daysText = "—", day3 = false, state = "";
 
-        const row = document.createElement('tr');
-        if (isDay3) row.classList.add('day3');
+        if (status === "not") {
+          state = "未注册❌";
+        } else if (date) {
+          const createDate = parseDateUTC8(date);
+          const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
+          daysText = `第 ${days} 天`;
+          day3 = days === 3;
+          if (day3) state = "已完成✅";
+        }
 
-        row.innerHTML = `
+        const tr = document.createElement("tr");
+        if (day3) tr.classList.add("day3");
+
+        tr.innerHTML = `
           <td>${name}</td>
           <td>${remark}</td>
-          <td>${date}</td>
-          <td>第 ${days} 天</td>
-          <td>${isDay3 ? '✅ 是' : '❌ 否'}</td>
-          <td><a href="${gameUrl}" target="_blank" rel="noopener">进入游戏</a></td>
-          <td>${done ? '已完成✅' : ''}</td>
+          <td>${date || "—"}</td>
+          <td>${daysText}</td>
+          <td>${day3 ? '✅ 是' : '❌ 否'}</td>
+          <td><a href="${url}" target="_blank">进入游戏</a></td>
+          <td>${state}</td>
         `;
-
-        tbody.appendChild(row);
+        tbody.appendChild(tr);
       });
     }
 
@@ -237,7 +219,6 @@
     renderTable();
   </script>
 
-  <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
