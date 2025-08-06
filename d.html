@@ -77,7 +77,6 @@
         <th>第几天</th>
         <th>第3天</th>
         <th>游戏链接</th>
-        <th>状态</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -176,7 +175,7 @@
 
       const list = serverAccounts[server] || [];
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7">该区服无平台数据</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6">该区服无平台数据</td></tr>`;
         return;
       }
 
@@ -187,16 +186,16 @@
         const remark = tag || platform.account || '—';
         const url = `${platform.base}/login/${gameId}/${server}.html`;
 
-        let daysText = "—", day3 = false, state = "";
+        let daysText = "—", day3 = false, statusIcon = "";
 
         if (status === "not") {
-          state = "未注册❌";
+          statusIcon = " ❌";
         } else if (date) {
           const createDate = parseDateUTC8(date);
           const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
           daysText = `第 ${days} 天`;
           day3 = days === 3;
-          if (day3) state = "已完成✅";
+          if (day3) statusIcon = " ✅";
         }
 
         const tr = document.createElement("tr");
@@ -208,8 +207,7 @@
           <td>${date || "—"}</td>
           <td>${daysText}</td>
           <td>${day3 ? '✅ 是' : '❌ 否'}</td>
-          <td><a href="${url}" target="_blank">进入游戏</a></td>
-          <td>${state}</td>
+          <td><a href="${url}" target="_blank">进入游戏</a>${statusIcon}</td>
         `;
         tbody.appendChild(tr);
       });
