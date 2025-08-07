@@ -49,7 +49,7 @@
     th {
       background-color: #f0f0f0;
     }
-    .day3 {
+    .highlight {
       background-color: #d1ffd1;
     }
     @media (max-width: 600px) {
@@ -185,27 +185,33 @@
         const remark = tag || platform.account || '—';
         const url = `${platform.base}/login/${gameId}/${server}.html`;
 
-        let daysText = "—";
+        let dayStatus = "—";
+        let isHighlight = false;
+
         if (status === "not") {
-          daysText = "❌ 未注册";
+          dayStatus = "❌ 未注册";
         } else if (date) {
           const createDate = parseDateUTC8(date);
           const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
+
           if (days === 3) {
-            daysText = "🎡 可抽奖";
+            dayStatus = "🎡 可抽奖";
+            isHighlight = true;
           } else if (days > 3) {
-            daysText = "✅ 已完成";
+            dayStatus = "✅ 已完成";
           } else {
-            daysText = `第 ${days} 天 ⏳`;
+            dayStatus = `第 ${days} 天 ⏳`;
           }
         }
 
         const tr = document.createElement("tr");
+        if (isHighlight) tr.classList.add("highlight");
+
         tr.innerHTML = `
           <td>${name}</td>
           <td>${remark}</td>
           <td>${date || "—"}</td>
-          <td>${daysText}</td>
+          <td>${dayStatus}</td>
           <td><a href="${url}" target="_blank">进入游戏</a></td>
         `;
         tbody.appendChild(tr);
