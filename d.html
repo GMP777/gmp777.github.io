@@ -102,7 +102,7 @@
       ],
       "111": [
         { name: "8kyou", date: "2025-08-06", tag: "a1-5" },
-        { name: "395wan", date: "2025-08-03" },
+        { name: "395wan", date: "2025-08-03", tag: "q2-9,a1-9" },
         { name: "xayxms", date: "2025-08-03" }
       ],
       "113": [
@@ -186,22 +186,21 @@
         const url = `${platform.base}/login/${gameId}/${server}.html`;
 
         let daysText = "—";
-
         if (status === "not") {
-          daysText = "未注册 ❌";
+          daysText = "❌ 未注册";
         } else if (date) {
           const createDate = parseDateUTC8(date);
           const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
-          if (days >= 3) {
+          if (days === 3) {
             daysText = "🎡 可抽奖";
+          } else if (days > 3) {
+            daysText = "✅ 已完成";
           } else {
-            daysText = `第 ${days} 天⏳`;
+            daysText = `第 ${days} 天 ⏳`;
           }
         }
 
         const tr = document.createElement("tr");
-        if (daysText.includes("🎡")) tr.classList.add("day3");
-
         tr.innerHTML = `
           <td>${name}</td>
           <td>${remark}</td>
