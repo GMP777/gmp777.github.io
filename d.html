@@ -196,7 +196,7 @@
           dayStatus = "❌ 未注册";
         } else if (date) {
           const createDate = parseDateUTC8(date);
-          const days = Math.floor((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
+          const days = Math.ceil((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
 
           if (days === 3) {
             dayStatus = "🎡 可抽奖";
