@@ -2,9 +2,7 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
   <title>🎮</title>
   <style>
     body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
@@ -65,7 +63,7 @@
       id: '111',
       name: '满V切割神域',
       servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261, 262, 263, 264, 265],
-      lords: [235, 237, 250],
+      lords: [262, 263, 264, 265], // 👈 城主区服
       type: 'xayxms'
     },
     {
@@ -85,8 +83,8 @@
       id: '962-115',
       name: '962平台满V悠久传奇',
       type: '962yx',
-      canHang: [86,93,102,103,104,105,107,108,110,111,112,113,114],
-      cannotHang: [87,95,101,106,109]
+      mainAccount: [103,104,105,107,108], // 主号
+      altAccount: [105] // 小号
     },
     {
       id: 'ydcs',
@@ -152,7 +150,10 @@
       });
     }
 
-    if (game.canHang || game.cannotHang) {
+    if (game.mainAccount || game.altAccount) {
+      renderSection('👑 主号', game.mainAccount);
+      renderSection('🌀 小号', game.altAccount);
+    } else if (game.canHang || game.cannotHang) {
       renderSection('✅ 刷', game.canHang);
       renderSection('⛔ 签到', game.cannotHang);
     } else {
@@ -161,13 +162,11 @@
         item.className = 'grid-item';
 
         const a = document.createElement('a');
-        if (game.type === '1100yx') {
-          a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
-        } else if (game.type === '962yx') {
-          a.href = `http://gm.962yx.com/login/115/${server}.html`;
-        } else {
-          a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
-        }
+        a.href = game.type === '1100yx'
+          ? `http://www.1100yx.com/Game_Login_8_${server}.html`
+          : game.type === '962yx'
+            ? `http://gm.962yx.com/login/115/${server}.html`
+            : `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
 
         a.target = '_blank';
 
@@ -224,11 +223,10 @@
   const btnNewGame = createTopButton('🆕', '新游戏区服', 'https://gmp777.github.io/all.html');
   tabsContainer.appendChild(btnNewGame);
 </script>
-  <!-- Footer -->
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
-<!-- footer -->
+
+<div class="footer-wrapper">
+  <footer id="footer-container">加载中...</footer>
+</div>
+<script src="/load-footer.js"></script>
 </body>
 </html>
