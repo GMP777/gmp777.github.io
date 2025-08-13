@@ -65,21 +65,28 @@
       id: '111',
       name: '满V切割神域',
       servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261, 262, 263, 264, 265],
-      lords: [265,264,263,262], // 👈 城主区服
+      lords: [235, 237, 250],
       type: 'xayxms'
     },
     {
       id: '115',
       name: '满V悠久传奇',
       type: 'xayxms',
-      canHang: [86,93,102,103,104,105,107,108,110,111,112,113,114,115],// 👈 刷钻石
-      cannotHang: [87,95,101,106,109]// 👈 纯签到
+      canHang: [86,93,102,103,104,105,107,108,110,111,112,113,114],
+      cannotHang: [87,95,101,106,109]
     },
     {
       id: '137',
       name: 'GM赤焰无双',
       servers: [1, 2, 3, 4,5,6,7,8,9,10,11,12],
       type: 'xayxms'
+    },
+    {
+      id: '962-115',
+      name: '962平台满V悠久传奇',
+      type: '962yx',
+      canHang: [86,93,102,103,104,105,107,108,110,111,112,113,114],
+      cannotHang: [87,95,101,106,109]
     },
     {
       id: 'ydcs',
@@ -97,6 +104,7 @@
       case '111': return 'http://gm.xayxms.cn/games/111.html';
       case '115': return 'http://gm.xayxms.cn/games/115.html';
       case '137': return 'http://gm.xayxms.cn/games/137.html';
+      case '962-115': return 'http://gm.962yx.com/games/115.html';
       case 'ydcs': return 'http://www.1100yx.com/game_list_8.html';
       default: return '#';
     }
@@ -125,13 +133,14 @@
         const a = document.createElement('a');
         if (game.type === '1100yx') {
           a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
+        } else if (game.type === '962yx') {
+          a.href = `http://gm.962yx.com/login/115/${server}.html`;
         } else {
           a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
         }
 
         a.target = '_blank';
 
-        // 判断是否城主
         let label = `${server}区`;
         if (game.lords && game.lords.includes(server)) {
           label += '（城主）';
@@ -143,7 +152,6 @@
       });
     }
 
-    // 判断是否分组渲染
     if (game.canHang || game.cannotHang) {
       renderSection('✅ 刷', game.canHang);
       renderSection('⛔ 签到', game.cannotHang);
@@ -153,13 +161,16 @@
         item.className = 'grid-item';
 
         const a = document.createElement('a');
-        a.href = game.type === '1100yx'
-          ? `http://www.1100yx.com/Game_Login_8_${server}.html`
-          : `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+        if (game.type === '1100yx') {
+          a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
+        } else if (game.type === '962yx') {
+          a.href = `http://gm.962yx.com/login/115/${server}.html`;
+        } else {
+          a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+        }
 
         a.target = '_blank';
 
-        // 判断是否城主
         let label = `${server}区`;
         if (game.lords && game.lords.includes(server)) {
           label += '（城主）';
@@ -171,7 +182,6 @@
       });
     }
 
-    // 添加游戏主页链接
     const homeItem = document.createElement('div');
     homeItem.className = 'grid-item';
 
@@ -187,7 +197,6 @@
     return container;
   }
 
-  // 创建游戏切换按钮和表格内容
   games.forEach((game, idx) => {
     const btn = document.createElement('button');
     btn.textContent = game.name;
@@ -203,7 +212,6 @@
     tablesContainer.appendChild(createGrid(game));
   });
 
-  // 创建顶部额外按钮
   function createTopButton(html, title, url) {
     const btn = document.createElement('button');
     btn.innerHTML = html;
