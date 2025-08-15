@@ -74,7 +74,7 @@
         <th>平台</th>
         <th>备注</th>
         <th>创建日期</th>
-        <th>第几天</th>
+        <th>状态</th>
         <th>游戏链接</th>
       </tr>
     </thead>
@@ -82,6 +82,7 @@
   </table>
 
   <script>
+    // ---- 配置 ----
     const serverGroups = {
       "115": ["115", "114","113",  "112", "111","110", "108", "107", "105", "104"]
     };
@@ -122,6 +123,7 @@
       ]
     };
 
+    // ---- 组装按钮 ----
     const gameConfigs = [];
     Object.entries(serverGroups).forEach(([gameId, servers]) => {
       servers.forEach(server => gameConfigs.push({ gameId, server }));
@@ -165,18 +167,32 @@
       });
     }
 
+    // ---- 时间与天数计算（统一按 UTC+8）----
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    // 将形如 2025-08-15 的日期视为 UTC+8 的 00:00，并返回对应的时间点
     function parseDateUTC8(str) {
       const [y, m, d] = str.split('-').map(Number);
-      return new Date(Date.UTC(y, m - 1, d, 0, 0, 0) - 8 * 3600 * 1000);
+      return new Date(Date.UTC(y, m - 1, d) - 8 * 60 * 60 * 1000);
     }
 
-    function getTodayUTC8() {
-      return new Date(); // 使用当前时刻，不截到零点
+    // 获取“今天”在 UTC+8 的 00:00 对应的时间点
+    function getTodayStartUTC8() {
+      const now = new Date();
+      // 把当前时刻平移到“UTC+8 的时钟”，再取其 UTC* 字段
+      const shifted = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+      const y = shifted.getUTCFullYear();
+      const m = shifted.getUTCMonth() + 1;
+      const d = shifted.getUTCDate();
+      // 用同样规则生成“今天 00:00 (UTC+8)”
+      const mm = String(m).padStart(2, '0');
+      const dd = String(d).padStart(2, '0');
+      return parseDateUTC8(`${y}-${mm}-${dd}`);
     }
 
     function renderTable() {
       const { gameId, server } = currentGame;
-      const today = getTodayUTC8();
+      const todayStart = getTodayStartUTC8(); // 以天为单位，避免因小时导致的偏差
       const tbody = document.querySelector('#accountTable tbody');
       tbody.innerHTML = '';
 
@@ -193,32 +209,34 @@
         const remark = tag || platform.account || '—';
         const url = `${platform.base}/login/${gameId}/${server}.html`;
 
-        let dayStatus = "—";
+        let dayStatus = '—';
         let isHighlight = false;
 
-        if (status === "not") {
-          dayStatus = "❌ 未注册";
+        if (status === 'not') {
+          dayStatus = '❌ 未注册';
         } else if (date) {
           const createDate = parseDateUTC8(date);
-          const days = Math.ceil((today - createDate) / (1000 * 60 * 60 * 24)) + 1;
+          // 关键修复：以“UTC+8 的整天”为单位进行差值，再 +1
+          let days = Math.floor((todayStart - createDate) / MS_PER_DAY) + 1;
+          if (days < 1) days = 1; // 防守：未来日期时至少显示第 1 天
 
           if (days === 3) {
-            dayStatus = "🎡 可抽奖";
+            dayStatus = '🎡 可抽奖';
             isHighlight = true;
           } else if (days > 3) {
-            dayStatus = "✅ 已完成";
+            dayStatus = '✅ 已完成';
           } else {
             dayStatus = `第 ${days} 天 ⏳`;
           }
         }
 
-        const tr = document.createElement("tr");
-        if (isHighlight) tr.classList.add("highlight");
+        const tr = document.createElement('tr');
+        if (isHighlight) tr.classList.add('highlight');
 
         tr.innerHTML = `
           <td>${name}</td>
           <td>${remark}</td>
-          <td>${date || "—"}</td>
+          <td>${date || '—'}</td>
           <td>${dayStatus}</td>
           <td><a href="${url}" target="_blank">进入游戏</a></td>
         `;
