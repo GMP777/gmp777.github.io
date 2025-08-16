@@ -45,10 +45,25 @@
       color: #007bff;
       text-decoration: none;
       white-space: nowrap;
+      transition: 0.2s;
     }
     .grid-item a:hover {
       text-decoration: underline;
     }
+
+    /* 👑 城主按钮样式 */
+    .grid-item a.lord-btn {
+      border-color: #ff9800;
+      background: #fff7e6;
+      color: #e65100;
+      font-weight: bold;
+    }
+    .grid-item a.lord-btn:hover {
+      background: #ff9800;
+      color: #fff;
+      text-decoration: none;
+    }
+
     .hidden { display: none; }
   </style>
 </head>
@@ -140,10 +155,12 @@
         a.target = '_blank';
 
         let label = `${server}区`;
-        if (game.lords && game.lords.includes(server)) {
-          label += '（城主）';
-        }
         a.textContent = label;
+
+        // 如果是城主区服，加特殊 class
+        if (game.lords && game.lords.includes(server)) {
+          a.classList.add('lord-btn');
+        }
 
         item.appendChild(a);
         container.appendChild(item);
@@ -171,10 +188,11 @@
         a.target = '_blank';
 
         let label = `${server}区`;
-        if (game.lords && game.lords.includes(server)) {
-          label += '（城主）';
-        }
         a.textContent = label;
+
+        if (game.lords && game.lords.includes(server)) {
+          a.classList.add('lord-btn');
+        }
 
         item.appendChild(a);
         container.appendChild(item);
