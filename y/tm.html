@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <!-- 载入 footer 样式 -->
   <link rel="stylesheet" href="/footer.css" />
-  <!-- 载入 footer 样式 -->
   <title>天命神装合成器</title>
   <style>
     body {
@@ -25,12 +23,13 @@
       margin-top: 12px;
       font-weight: bold;
     }
-    select, button, input[type="number"] {
+    select, button, input[type=checkbox] {
       width: 100%;
       padding: 10px;
       font-size: 1rem;
       border-radius: 5px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     button {
       background-color: #3498db;
@@ -47,7 +46,9 @@
       justify-content: center;
       gap: 10px;
     }
-    .tab button { width: 48%; }
+    .tab button {
+      width: 48%;
+    }
     .section {
       display: none;
       background: #fff;
@@ -55,21 +56,19 @@
       border-radius: 10px;
       margin-top: 20px;
     }
-    .active { display: block; }
+    .active {
+      display: block;
+    }
     #result, #output {
       margin-top: 20px;
       padding: 15px;
       background: #e8f5e9;
       border-left: 6px solid #2e7d32;
     }
-    .hint {
-      margin-top: 12px;
-      padding: 12px;
-      background: #e3f2fd;
-      border-left: 6px solid #1565c0;
-    }
     @media (max-width: 480px) {
-      body { padding: 10px; }
+      body {
+        padding: 10px;
+      }
     }
   </style>
 </head>
@@ -90,10 +89,7 @@
   <label for="endStage">目标阶数：</label>
   <select id="endStage"></select>
 
-  <label style="display:flex;align-items:center;gap:8px;font-weight:normal;margin-top:14px;">
-    <input type="checkbox" id="includeRewards" />
-    在新服七天内（自动计算需抽奖次数）
-  </label>
+  <label><input type="checkbox" id="sevenDay"> 新服七天活动内</label>
 
   <button onclick="calculateSet()">计算整套消耗</button>
 
@@ -120,13 +116,14 @@
   <label for="endSingle">目标阶数：</label>
   <select id="endSingle"></select>
 
+  <label><input type="checkbox" id="sevenDayPart"> 新服七天活动内</label>
+
   <button onclick="calculatePart()">计算部位消耗</button>
 
   <div id="output"></div>
 </div>
 
 <script>
-  // —— 升阶消耗表（保持你原来的数据） ——
   const costTable = {
     2: { normal: 200, soldier: 400 },
     3: { normal: 400, soldier: 400 },
@@ -139,32 +136,11 @@
     10: { normal: 6000, soldier: 7500 }
   };
 
-  // —— 你提供的抽奖/寻宝累计奖励（原样接入） ——
-  const milestoneRewards = {
-    1000: 1800,
-    1500: 2700,
-    2500: 4500,
-    3000: 5400,
-    4000: 7200,
-    4500: 8100,
-    5000: 11520,
-    5500: 15120,
-    6000: 17820,
-    6500: 21420,
-    7000: 23400,
-    7500: 29520,
-    8000: 33120,
-    8500: 40500,
-    9000: 45000,
-    9500: 58320,
-    10000: 79920,
-    20000: 90000
-  };
-
-  // 预先按“累计奖励”升序排序，确保按你的数据精确反推最小需要抽次数
-  const milestonesByDiamondsAsc = Object.entries(milestoneRewards)
-    .map(([times, diamonds]) => ({ times: Number(times), diamonds: Number(diamonds) }))
-    .sort((a, b) => a.diamonds - b.diamonds);
+  // 七天活动奖励表（加起来）
+  const sevenDayRewards = [
+    1800, 2700, 4500, 5400, 7200, 8100, 11520, 15120, 17820, 21420, 
+    23400, 29520, 33120, 40500, 45000, 58320, 79920, 90000
+  ];
 
   function populateSelect(id, min = 1, max = 10) {
     const select = document.getElementById(id);
@@ -191,19 +167,11 @@
     return part === "兵" || part === "甲";
   }
 
-  // 根据“所需宝钻”找到最小满足的抽奖次数（按你给的累计奖励）
-  function findRequiredDraws(need) {
-    if (need <= 0) return { times: 0, diamonds: 0 };
-    for (const m of milestonesByDiamondsAsc) {
-      if (m.diamonds >= need) return m; // 返回第一个满足的（最小累计奖励 → 最小所需抽次数）
-    }
-    return null; // 超过最大奖励（抽满 20000 次也不够）
-  }
-
   function calculateSet() {
     const start = parseInt(document.getElementById("startStage").value);
     const end = parseInt(document.getElementById("endStage").value);
     const resultDiv = document.getElementById("result");
+    const sevenDay = document.getElementById("sevenDay").checked;
 
     if (end <= start) {
       resultDiv.innerHTML = "<strong>目标阶数必须大于起始阶数。</strong>";
@@ -214,38 +182,26 @@
     for (let i = start + 1; i <= end; i++) {
       const c = costTable[i];
       if (!c) continue;
-      const normal = c.normal * 8; // 8 件：盔、戒×2、带、链、镯×2、靴
+      const normal = c.normal * 8; // 8件部件
       const soldier = (i >= 2) ? c.soldier * 2 : 0; // 兵 + 甲
       total += normal + soldier;
     }
 
-    let html = `从 <strong>${start}阶</strong> 到 <strong>${end}阶</strong><br/>
+    let msg = `从 <strong>${start}阶</strong> 到 <strong>${end}阶</strong><br/>
       整套装备需要天命宝钻总数：<strong>${total.toLocaleString()}</strong> 个`;
 
-    // 在新服七天内：自动提示至少需要抽多少次
-    if (document.getElementById("includeRewards").checked) {
-      const need = total;
-      const milestone = findRequiredDraws(need);
-      html += `<div class="hint"><strong>新服七天内奖励计算</strong><br/>`;
-      if (milestone) {
-        const extra = milestone.diamonds - need;
-        html += `为满足 <strong>${need.toLocaleString()}</strong> 个宝钻，至少需要抽奖
-          <strong>${milestone.times.toLocaleString()}</strong> 次（累计可得 <strong>${milestone.diamonds.toLocaleString()}</strong> 个）。<br/>`;
-        if (extra > 0) {
-          html += `可满足整套需求，并多出 <strong>${extra.toLocaleString()}</strong> 个。`;
-        } else {
-          html += `刚好满足整套需求。`;
-        }
+    if (sevenDay) {
+      const sevenTotal = sevenDayRewards.reduce((a,b) => a+b, 0);
+      msg += `<br/>七天活动可获得天命宝钻总数：<strong>${sevenTotal.toLocaleString()}</strong> 个`;
+      if (sevenTotal >= total) {
+        msg += "<br/>足够在新服七天活动内合成整套神装！";
       } else {
-        const max = milestonesByDiamondsAsc[milestonesByDiamondsAsc.length - 1];
-        const lack = need - max.diamonds;
-        html += `即使抽满 <strong>${max.times.toLocaleString()}</strong> 次（累计 <strong>${max.diamonds.toLocaleString()}</strong> 个），
-          仍不足以完成整套，还差 <strong>${lack.toLocaleString()}</strong> 个。`;
+        const needed = total - sevenTotal;
+        msg += `<br/>七天活动不足，需要额外天命宝钻：<strong>${needed.toLocaleString()}</strong>`;
       }
-      html += `</div>`;
     }
 
-    resultDiv.innerHTML = html;
+    resultDiv.innerHTML = msg;
   }
 
   function calculatePart() {
@@ -253,6 +209,7 @@
     const start = parseInt(document.getElementById("startSingle").value);
     const end = parseInt(document.getElementById("endSingle").value);
     const outputDiv = document.getElementById("output");
+    const sevenDay = document.getElementById("sevenDayPart").checked;
 
     if (end <= start) {
       outputDiv.innerHTML = "<strong>目标阶数必须大于起始阶数。</strong>";
@@ -266,8 +223,21 @@
       total += isSoldier(part) ? c.soldier : c.normal;
     }
 
-    outputDiv.innerHTML = `${part} 从 <strong>${start}阶</strong> 到 <strong>${end}阶</strong><br/>
+    let msg = `${part} 从 <strong>${start}阶</strong> 到 <strong>${end}阶</strong><br/>
       需要天命宝钻：<strong>${total.toLocaleString()}</strong> 个`;
+
+    if (sevenDay) {
+      const sevenTotal = sevenDayRewards.reduce((a,b) => a+b, 0);
+      msg += `<br/>七天活动可获得天命宝钻总数：<strong>${sevenTotal.toLocaleString()}</strong> 个`;
+      if (sevenTotal >= total) {
+        msg += "<br/>足够在新服七天活动内合成该部位！";
+      } else {
+        const needed = total - sevenTotal;
+        msg += `<br/>七天活动不足，需要额外天命宝钻：<strong>${needed.toLocaleString()}</strong>`;
+      }
+    }
+
+    outputDiv.innerHTML = msg;
   }
 </script>
 
@@ -276,6 +246,6 @@
   <footer id="footer-container">加载中...</footer>
 </div>
 <script src="/load-footer.js"></script>
-<!-- footer -->
+
 </body>
 </html>
