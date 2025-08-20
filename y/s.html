@@ -1,224 +1,118 @@
-<!doctype html>
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="zh">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>挂机刷钻计算器</title>
   <style>
-    :root{
-      --bg:#f6f7f9;--card:#fff;--border:#e6e8eb;--text:#0f172a;--muted:#64748b;--ring:#0ea5e9;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Ubuntu,"Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,"Apple Color Emoji","Segoe UI Emoji";background:var(--bg);color:var(--text)}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
-    .container{width:100%;max-width:1000px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 24px rgba(15,23,42,.06);padding:20px}
-    h1{margin:4px 0 0;font-size:clamp(22px,3vw,28px)}
-    .sub{color:var(--muted);margin-top:6px}
-
-    .grid{display:grid;gap:16px}
-    @media (min-width:768px){.grid{grid-template-columns:repeat(2,1fr)}}
-
-    label{font-size:13px;font-weight:600;margin-bottom:6px;color:#111827}
-    .field{display:flex;flex-direction:column}
-    input,select{height:40px;border-radius:12px;border:1px solid var(--border);padding:0 12px;font-size:14px;background:#fff;outline:none}
-    input:focus,select:focus{border-color:var(--ring);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
-    .row{display:flex;gap:8px}
-    .hint{font-size:12px;color:var(--muted)}
-
-    .stats{display:grid;gap:12px;margin-top:20px}
-    @media (min-width:768px){.stats{grid-template-columns:repeat(2,1fr)}}
-    .stat{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px}
-    .stat .t{font-size:12px;color:var(--muted)}
-    .stat .v{margin-top:4px;font-size:28px;font-weight:800}
-    .stat .s{margin-top:6px;font-size:12px;color:var(--muted)}
-
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-    .btn{height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--border);background:#fff;cursor:pointer}
-    .btn:active{transform:translateY(1px)}
-    .btn.primary{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
-    .footer{margin-top:18px;font-size:12px;color:var(--muted)}
-    .item-tag{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}
+    body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
+    .container { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h1 { font-size: 24px; margin-bottom: 10px; }
+    p { color: #555; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 16px; margin-top: 20px; }
+    label { font-size: 14px; font-weight: 600; }
+    input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px; }
+    .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .card .title { font-size: 14px; color: #777; }
+    .card .value { font-size: 22px; font-weight: bold; margin-top: 4px; }
+    .card .subtitle { font-size: 12px; color: #999; margin-top: 6px; }
+    ul { margin: 0; padding-left: 20px; }
+    .flex { display: flex; gap: 8px; align-items: center; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="container">
-      <div class="card">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between">
-          <div>
-            <h1>刷钻计算器</h1>
-            <div class="sub">道具：<span class="item-tag" title="可自行修改单价">双鱼壁★7级</span>（默认回收 <b id="labelItemValue">6,400</b> 钻/个）</div>
-          </div>
-          <div class="toolbar">
-            <button class="btn" id="btnReset">重置</button>
-            <button class="btn primary" id="btnShare">复制当前参数</button>
-          </div>
+  <div class="container">
+    <p>本计算器用于计算道具 <strong>双鱼壁★7级</strong> 的刷钻效率。默认单个回收价值 <strong>6400 钻石</strong>。</p>
+
+    <div class="grid">
+      <div>
+        <label>总刷怪时间</label>
+        <div class="flex">
+          <input type="number" id="hoursInput" value="2" min="0" step="1"> <span>小时</span>
+          <input type="number" id="minutesInput" value="0" min="0" max="59" step="1"> <span>分钟</span>
         </div>
-
-        <div class="grid" style="margin-top:16px">
-          <div class="field">
-            <label>总刷怪时间</label>
-            <div class="row">
-              <input type="number" id="totalTime" min="0" step="any" value="2" />
-              <select id="timeUnit">
-                <option value="hour">小时</option>
-                <option value="minute">分钟</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field">
-            <label>获得道具数量（个）</label>
-            <input type="number" id="items" min="0" step="1" value="30" />
-          </div>
-
-          <div class="field">
-            <label>单个道具回收价值（钻石）</label>
-            <input type="number" id="itemValue" min="0" step="1" value="6400" />
-            <div class="hint">默认 6400，若游戏改动可自行调整</div>
-          </div>
-
-          <div class="field">
-            <label>预测：每天投入时长（小时）</label>
-            <input type="number" id="hoursPerDay" min="0" step="any" value="24" />
-            <div class="hint">可改成你的实际游戏时长，例如 3、5、8 小时</div>
-          </div>
-        </div>
-
-        <div class="stats">
-          <div class="stat">
-            <div class="t">道具/小时</div>
-            <div class="v" id="itemsPerHour">0</div>
-            <div class="s">= 道具数量 ÷ 总时长(小时)</div>
-          </div>
-          <div class="stat">
-            <div class="t">总盈利（钻石）</div>
-            <div class="v" id="totalProfit">0</div>
-            <div class="s">= 道具数量 × 单价</div>
-          </div>
-          <div class="stat">
-            <div class="t">钻石/小时</div>
-            <div class="v" id="diamondsPerHour">0</div>
-            <div class="s">= 道具/小时 × 单价</div>
-          </div>
-          <div class="stat">
-            <div class="t">预测：每天可刷钻</div>
-            <div class="v" id="predictedPerDay">0</div>
-            <div class="s">= 钻石/小时 × 每天投入时长</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:16px;background:#fafafa">
-          <b>公式速查</b>
-          <ul style="margin:8px 0 0 18px;color:#334155;font-size:14px;line-height:1.6">
-            <li>小时数 = 输入时间 ×（若单位为分钟，则 ÷ 60）</li>
-            <li>道具/小时 = 道具数量 ÷ 小时数</li>
-            <li>总盈利 = 道具数量 × 单个道具回收价值</li>
-            <li>钻石/小时 = 道具/小时 × 单个道具回收价值</li>
-            <li>预测每天可刷钻 = 钻石/小时 × 每天投入时长</li>
-          </ul>
-        </div>
-
-        <div class="footer">提示：输入框变化会自动计算；数值采用本地化格式显示。</div>
       </div>
+
+      <div>
+        <label>获得道具数量（个）</label>
+        <input type="number" id="items" value="30" min="0" step="1">
+      </div>
+
+      <div>
+        <label>单个道具回收价值（钻石）</label>
+        <input type="number" id="itemValue" value="6400" min="0" step="1">
+        <small style="color:#777">默认 6400，可按游戏实际修改。</small>
+      </div>
+
+      <div>
+        <label>预测：每天投入时长（小时）</label>
+        <input type="number" id="hoursPerDay" value="24" min="0" step="any">
+        <small style="color:#777">默认 24 小时，可改为你的实际游戏时长。</small>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:30px;">
+      <div class="card">
+        <div class="title">道具/小时</div>
+        <div class="value" id="itemsPerHour">0</div>
+        <div class="subtitle">= 道具数量 ÷ 总时长(小时)</div>
+      </div>
+
+      <div class="card">
+        <div class="title">总盈利（钻石）</div>
+        <div class="value" id="totalProfit">0</div>
+        <div class="subtitle">= 道具数量 × 单价</div>
+      </div>
+
+      <div class="card">
+        <div class="title">钻石/小时</div>
+        <div class="value" id="diamondsPerHour">0</div>
+        <div class="subtitle">= 道具/小时 × 单价</div>
+      </div>
+
+      <div class="card">
+        <div class="title">预测：每天可刷钻</div>
+        <div class="value" id="predictedPerDay">0</div>
+        <div class="subtitle">= 钻石/小时 × 每日时长</div>
+      </div>
+    </div>
+
+    <div style="margin-top:30px; padding:16px; background:#f9f9f9; border-radius:12px; border:1px solid #eee;">
+      <h2>公式说明</h2>
+      <ul>
+        <li>总时长(小时) = 输入的小时数 + (分钟数 ÷ 60)</li>
+        <li>道具/小时 = 道具数量 ÷ 总时长(小时)</li>
+        <li>总盈利 = 道具数量 × 单个道具回收价值</li>
+        <li>钻石/小时 = 道具/小时 × 单个道具回收价值</li>
+        <li>预测每天可刷钻 = 钻石/小时 × 每天投入时长</li>
+      </ul>
     </div>
   </div>
 
   <script>
-    const $ = (id) => document.getElementById(id);
-    const nf = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+    function fmt(x) { return isFinite(x) ? x.toLocaleString(undefined,{maximumFractionDigits:2}) : "0"; }
 
-    const els = {
-      totalTime: $("totalTime"),
-      timeUnit: $("timeUnit"),
-      items: $("items"),
-      itemValue: $("itemValue"),
-      hoursPerDay: $("hoursPerDay"),
-      itemsPerHour: $("itemsPerHour"),
-      totalProfit: $("totalProfit"),
-      diamondsPerHour: $("diamondsPerHour"),
-      predictedPerDay: $("predictedPerDay"),
-      labelItemValue: $("labelItemValue"),
-      btnReset: $("btnReset"),
-      btnShare: $("btnShare"),
-    };
+    function calculate() {
+      const hoursInput = parseFloat(document.getElementById('hoursInput').value) || 0;
+      const minutesInput = parseFloat(document.getElementById('minutesInput').value) || 0;
+      const items = parseFloat(document.getElementById('items').value) || 0;
+      const itemValue = parseFloat(document.getElementById('itemValue').value) || 0;
+      const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value) || 0;
 
-    function parse(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+      const hours = hoursInput + (minutesInput / 60);
+      const itemsPerHour = hours > 0 ? items / hours : 0;
+      const totalProfit = items * itemValue;
+      const diamondsPerHour = itemsPerHour * itemValue;
+      const predictedPerDay = diamondsPerHour * hoursPerDay;
 
-    function getHours(){
-      const t = parse(els.totalTime.value);
-      return els.timeUnit.value === 'minute' ? t / 60 : t;
+      document.getElementById('itemsPerHour').textContent = fmt(itemsPerHour);
+      document.getElementById('totalProfit').textContent = fmt(totalProfit);
+      document.getElementById('diamondsPerHour').textContent = fmt(diamondsPerHour);
+      document.getElementById('predictedPerDay').textContent = fmt(predictedPerDay);
     }
 
-    function calc(){
-      const hours = getHours();
-      const items = parse(els.items.value);
-      const itemValue = parse(els.itemValue.value);
-      const hpd = parse(els.hoursPerDay.value);
-
-      const iph = hours > 0 ? items / hours : 0; // items per hour
-      const profit = items * itemValue;
-      const dph = iph * itemValue;
-      const perDay = dph * hpd;
-
-      els.itemsPerHour.textContent = nf.format(iph);
-      els.totalProfit.textContent = nf.format(profit);
-      els.diamondsPerHour.textContent = nf.format(dph);
-      els.predictedPerDay.textContent = nf.format(perDay);
-      els.labelItemValue.textContent = nf.format(itemValue);
-    }
-
-    // 恢复 URL 中的参数
-    function fromQuery(){
-      const p = new URLSearchParams(location.search);
-      if(p.has('time')) els.totalTime.value = p.get('time');
-      if(p.has('unit')) els.timeUnit.value = p.get('unit');
-      if(p.has('items')) els.items.value = p.get('items');
-      if(p.has('value')) els.itemValue.value = p.get('value');
-      if(p.has('hpd')) els.hoursPerDay.value = p.get('hpd');
-    }
-
-    function toQuery(){
-      const q = new URLSearchParams({
-        time: els.totalTime.value,
-        unit: els.timeUnit.value,
-        items: els.items.value,
-        value: els.itemValue.value,
-        hpd: els.hoursPerDay.value,
-      });
-      return q.toString();
-    }
-
-    // 事件绑定
-    ["input","change"].forEach(evt => {
-      [els.totalTime, els.timeUnit, els.items, els.itemValue, els.hoursPerDay].forEach(el => el.addEventListener(evt, calc));
-    });
-
-    els.btnReset.addEventListener('click', () => {
-      els.totalTime.value = 2;
-      els.timeUnit.value = 'hour';
-      els.items.value = 30;
-      els.itemValue.value = 6400;
-      els.hoursPerDay.value = 24;
-      calc();
-      history.replaceState(null, '', location.pathname);
-    });
-
-    els.btnShare.addEventListener('click', async () => {
-      const url = location.origin + location.pathname + '?' + toQuery();
-      try {
-        await navigator.clipboard.writeText(url);
-        els.btnShare.textContent = '已复制链接';
-        setTimeout(() => els.btnShare.textContent = '复制当前参数', 1200);
-      } catch (e) {
-        prompt('复制失败，手动全选复制：', url);
-      }
-    });
-
-    fromQuery();
-    calc();
+    document.querySelectorAll('input').forEach(el => el.addEventListener('input', calculate));
+    window.onload = calculate;
   </script>
 </body>
 </html>
