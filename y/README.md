@@ -49,6 +49,7 @@
       { name: "👿Boss击杀", url: "boss.html", version: "v.1.0", date: "2025-07-17" },
       { name: "💴充值", url: "cz.html", version: "v.1.0", date: "2025-07-22" },
       { name: "⏰天界神炉", url: "tjsl.html", version: "v.1.0", date: "2025-07-25 01:26:29" },
+      { name: "💴刷钻计算器", url: "s.html", version: "v.1.0", date: "2025-08-20 17:14:23" },
       { name: "🆕新服消息", url: "new.html", version: "v.1.0", date: "2025-07-18 02:26:34" }
     ];
 
