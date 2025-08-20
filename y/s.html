@@ -7,21 +7,30 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
     .container { max-width: 900px; margin: auto; background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    p { color: #555; }
+    h1 { font-size: clamp(20px, 4vw, 28px); margin-bottom: 10px; }
+    p { color: #555; font-size: clamp(14px, 2vw, 16px); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 16px; margin-top: 20px; }
-    label { font-size: 14px; font-weight: 600; }
-    input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; margin-top: 4px; }
+    label { font-size: 14px; font-weight: 600; display: block; margin-bottom: 6px; }
+    input { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
     .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
     .card .title { font-size: 14px; color: #777; }
-    .card .value { font-size: 22px; font-weight: bold; margin-top: 4px; }
+    .card .value { font-size: clamp(18px, 4vw, 26px); font-weight: bold; margin-top: 4px; word-break: break-word; }
     .card .subtitle { font-size: 12px; color: #999; margin-top: 6px; }
-    ul { margin: 0; padding-left: 20px; }
-    .flex { display: flex; gap: 8px; align-items: center; }
+    ul { margin: 0; padding-left: 20px; font-size: clamp(13px, 2vw, 15px); }
+    .flex { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    span { font-size: 14px; }
+
+    @media (max-width: 480px) {
+      body { padding: 10px; }
+      .container { padding: 16px; }
+      input { font-size: 13px; }
+      .card { padding: 12px; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <h1>刷钻计算器 - 双鱼壁★7级</h1>
     <p>本计算器用于计算道具 <strong>双鱼壁★7级</strong> 的刷钻效率。默认单个回收价值 <strong>6400 钻石</strong>。</p>
 
     <div class="grid">
