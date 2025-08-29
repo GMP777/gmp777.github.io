@@ -46,12 +46,11 @@
       }
     }
 
-    // 简单分配算法：按档位组合，凑够目标钻石
+    // 简单分配算法：按档位组合，凑够目标钻石 (三天内)
     function distributeAccumTarget(target) {
       let days = [];
       let remain = target;
       let day = 1;
-      // 优先用大档位
       for (let opt of rechargeOptions.slice().reverse()) {
         while (remain > 0 && opt.diamonds <= remain && days.length < 3) {
           days.push({ day, option: opt.cost, diamonds: opt.diamonds });
@@ -59,7 +58,6 @@
           day++;
         }
       }
-      // 如果还没凑满，填小档位
       while (remain > 0 && days.length < 3) {
         let opt = rechargeOptions.find(o => o.diamonds >= remain) || rechargeOptions[0];
         days.push({ day, option: opt.cost, diamonds: opt.diamonds });
@@ -94,7 +92,7 @@
 
       let both = {
         name: "累计+连续",
-        cost: accumCost + 200, // 在累计基础上再加四天50元
+        cost: accumCost + 200,
         diamonds: accumDiamonds + ACCUM_REWARD + 70000000,
         efficiency: (accumDiamonds + ACCUM_REWARD + 70000000) / ((accumCost+200) * 10000),
         schedule: [...accumDays,
