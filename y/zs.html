@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>充值最优方案计算器</title>
-    <!-- 载入 footer 样式 -->
+  <!-- 载入 footer 样式 -->
   <link rel="stylesheet" href="/footer.css" />
   <!-- 载入 footer 样式 -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,7 +13,8 @@
   <div class="p-6 max-w-3xl mx-auto">
     <h1 class="text-2xl font-bold mb-4">充值最优方案计算器</h1>
     <div class="flex items-center gap-2 mb-4">
-      <input id="budgetInput" type="number" value="350" class="border rounded p-2 w-32" />
+      <input id="budgetInput" type="number" value="550" class="border rounded p-2 w-32" placeholder="预算 (元)" />
+      <input id="accumTargetInput" type="number" value="100000000" class="border rounded p-2 w-48" placeholder="累计目标钻石 (默认1亿)" />
       <button onclick="calculate()" class="px-4 py-2 bg-blue-500 text-white rounded-lg">计算</button>
     </div>
     <div id="plansContainer" class="grid gap-4"></div>
@@ -45,40 +46,64 @@
       }
     }
 
-    function calculatePlans(budget) {
+    // 简单分配算法：按档位组合，凑够目标钻石
+    function distributeAccumTarget(target) {
+      let days = [];
+      let remain = target;
+      let day = 1;
+      // 优先用大档位
+      for (let opt of rechargeOptions.slice().reverse()) {
+        while (remain > 0 && opt.diamonds <= remain && days.length < 3) {
+          days.push({ day, option: opt.cost, diamonds: opt.diamonds });
+          remain -= opt.diamonds;
+          day++;
+        }
+      }
+      // 如果还没凑满，填小档位
+      while (remain > 0 && days.length < 3) {
+        let opt = rechargeOptions.find(o => o.diamonds >= remain) || rechargeOptions[0];
+        days.push({ day, option: opt.cost, diamonds: opt.diamonds });
+        remain -= opt.diamonds;
+        day++;
+      }
+      return days;
+    }
+
+    function calculatePlans(budget, accumTarget) {
+      const accumDays = distributeAccumTarget(accumTarget);
+      const accumCost = accumDays.reduce((sum, d) => sum + Number(d.option), 0);
+      const accumDiamonds = accumDays.reduce((sum, d) => sum + d.diamonds, 0);
+
       let onlyAcc = {
-        name: "只累计奖励",
-        cost: 350,
-        diamonds: 100000000 + ACCUM_REWARD,
-        efficiency: (100000000 + ACCUM_REWARD) / (350 * 10000),
-        schedule: [ { day: 1, option: "300 + 50", diamonds: 100000000 } ],
-        valid: budget >= 350,
+        name: "只累计奖励 (前三天累计)",
+        cost: accumCost,
+        diamonds: accumDiamonds + ACCUM_REWARD,
+        efficiency: (accumDiamonds + ACCUM_REWARD) / (accumCost * 10000),
+        schedule: accumDays,
+        valid: budget >= accumCost,
       };
 
       let onlyConsec = {
         name: "只连续奖励",
         cost: 350,
         diamonds: 70000000 + 70000000,
-        efficiency: (140000000) / (350 * 10000),
+        efficiency: 140000000 / (350 * 10000),
         schedule: Array.from({ length: 7 }, (_, i) => ({ day: i+1, option: "50", diamonds: 10000000 })),
         valid: budget >= 350,
       };
 
       let both = {
         name: "累计+连续",
-        cost: 550,
-        diamonds: 140000000 + ACCUM_REWARD + 70000000,
-        efficiency: (140000000 + ACCUM_REWARD + 70000000) / (550 * 10000),
-        schedule: [
-          { day: 1, option: "50", diamonds: 10000000 },
-          { day: 2, option: "100", diamonds: 30000000 },
-          { day: 3, option: "200", diamonds: 60000000 },
+        cost: accumCost + 200, // 在累计基础上再加四天50元
+        diamonds: accumDiamonds + ACCUM_REWARD + 70000000,
+        efficiency: (accumDiamonds + ACCUM_REWARD + 70000000) / ((accumCost+200) * 10000),
+        schedule: [...accumDays,
           { day: 4, option: "50", diamonds: 10000000 },
           { day: 5, option: "50", diamonds: 10000000 },
           { day: 6, option: "50", diamonds: 10000000 },
-          { day: 7, option: "50", diamonds: 10000000 },
+          { day: 7, option: "50", diamonds: 10000000 }
         ],
-        valid: budget >= 550,
+        valid: budget >= accumCost+200,
       };
 
       let bestBig = rechargeOptions
@@ -99,7 +124,8 @@
 
     function calculate() {
       const budget = Number(document.getElementById("budgetInput").value);
-      const plans = calculatePlans(budget);
+      const accumTarget = Number(document.getElementById("accumTargetInput").value) || 100000000;
+      const plans = calculatePlans(budget, accumTarget);
       const container = document.getElementById("plansContainer");
       container.innerHTML = "";
 
