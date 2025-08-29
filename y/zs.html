@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>充值最优方案计算器</title>
+    <!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
+  <!-- 载入 footer 样式 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="p-6 max-w-3xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">充值最优方案计算器</h1>
+    <div class="flex items-center gap-2 mb-4">
+      <input id="budgetInput" type="number" value="350" class="border rounded p-2 w-32" />
+      <button onclick="calculate()" class="px-4 py-2 bg-blue-500 text-white rounded-lg">计算</button>
+    </div>
+    <div id="plansContainer" class="grid gap-4"></div>
+  </div>
+
+  <script>
+    const rechargeOptions = [
+      { cost: 10, diamonds: 2000000 },
+      { cost: 20, diamonds: 4000000 },
+      { cost: 30, diamonds: 6000000 },
+      { cost: 50, diamonds: 10000000 },
+      { cost: 100, diamonds: 30000000 },
+      { cost: 200, diamonds: 60000000 },
+      { cost: 300, diamonds: 90000000 },
+      { cost: 500, diamonds: 200000000 },
+      { cost: 1000, diamonds: 500000000 },
+      { cost: 1500, diamonds: 750000000 },
+      { cost: 2000, diamonds: 1200000000 },
+      { cost: 3000, diamonds: 2100000000 },
+    ];
+
+    const ACCUM_REWARD = 145000000;
+
+    function formatDiamonds(num) {
+      if (num >= 100000000) {
+        return (num / 100000000).toFixed(2) + " 亿";
+      } else {
+        return (num / 10000).toFixed(0) + " 万";
+      }
+    }
+
+    function calculatePlans(budget) {
+      let onlyAcc = {
+        name: "只累计奖励",
+        cost: 350,
+        diamonds: 100000000 + ACCUM_REWARD,
+        efficiency: (100000000 + ACCUM_REWARD) / (350 * 10000),
+        schedule: [ { day: 1, option: "300 + 50", diamonds: 100000000 } ],
+        valid: budget >= 350,
+      };
+
+      let onlyConsec = {
+        name: "只连续奖励",
+        cost: 350,
+        diamonds: 70000000 + 70000000,
+        efficiency: (140000000) / (350 * 10000),
+        schedule: Array.from({ length: 7 }, (_, i) => ({ day: i+1, option: "50", diamonds: 10000000 })),
+        valid: budget >= 350,
+      };
+
+      let both = {
+        name: "累计+连续",
+        cost: 550,
+        diamonds: 140000000 + ACCUM_REWARD + 70000000,
+        efficiency: (140000000 + ACCUM_REWARD + 70000000) / (550 * 10000),
+        schedule: [
+          { day: 1, option: "50", diamonds: 10000000 },
+          { day: 2, option: "100", diamonds: 30000000 },
+          { day: 3, option: "200", diamonds: 60000000 },
+          { day: 4, option: "50", diamonds: 10000000 },
+          { day: 5, option: "50", diamonds: 10000000 },
+          { day: 6, option: "50", diamonds: 10000000 },
+          { day: 7, option: "50", diamonds: 10000000 },
+        ],
+        valid: budget >= 550,
+      };
+
+      let bestBig = rechargeOptions
+        .filter(o => o.cost <= budget)
+        .sort((a, b) => b.diamonds / b.cost - a.diamonds / a.cost)[0];
+
+      let bigPlan = bestBig ? {
+        name: `直接买大包(${bestBig.cost}元)`,
+        cost: bestBig.cost,
+        diamonds: bestBig.diamonds,
+        efficiency: bestBig.diamonds / (bestBig.cost * 10000),
+        schedule: [ { day: 1, option: `${bestBig.cost}`, diamonds: bestBig.diamonds } ],
+        valid: true,
+      } : null;
+
+      return [onlyAcc, onlyConsec, both, bigPlan].filter(Boolean);
+    }
+
+    function calculate() {
+      const budget = Number(document.getElementById("budgetInput").value);
+      const plans = calculatePlans(budget);
+      const container = document.getElementById("plansContainer");
+      container.innerHTML = "";
+
+      plans.forEach(plan => {
+        const card = document.createElement("div");
+        card.className = "border rounded-xl p-4 bg-white shadow";
+        card.innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">${plan.name}</h2>
+          ${plan.valid ? `
+            <ul class="mb-2 space-y-1">
+              <li>花费：${plan.cost} 元</li>
+              <li>总钻石：${formatDiamonds(plan.diamonds)}</li>
+              <li>单位成本：${plan.efficiency.toFixed(5)} 元 / 万钻</li>
+            </ul>
+            <div>
+              <p class="font-medium mb-1">逐日购买明细：</p>
+              <ul class="list-disc pl-5 space-y-1 text-sm">
+                ${plan.schedule.map(s => `<li>第${s.day}天：买 ${s.option} 档 → ${formatDiamonds(s.diamonds)}</li>`).join("")}
+              </ul>
+            </div>
+          ` : `<p class='text-gray-500'>预算不足，无法执行该方案</p>`}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.onload = calculate;
+  </script>
+
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+  <!-- footer -->
+</body>
+</html>
