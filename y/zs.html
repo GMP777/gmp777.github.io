@@ -10,14 +10,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
-  <div class="p-6 max-w-3xl mx-auto">
+  <div class="p-6 max-w-4xl mx-auto">
     <h1 class="text-2xl font-bold mb-4">充值最优方案计算器</h1>
-    <div class="flex items-center gap-2 mb-4">
+    <div class="flex flex-wrap items-center gap-2 mb-4">
       <input id="budgetInput" type="number" value="550" class="border rounded p-2 w-32" placeholder="预算 (元)" />
       <input id="accumTargetInput" type="number" value="100000000" class="border rounded p-2 w-48" placeholder="累计目标钻石 (默认1亿)" />
       <button onclick="calculate()" class="px-4 py-2 bg-blue-500 text-white rounded-lg">计算</button>
     </div>
-    <div id="plansContainer" class="grid gap-4"></div>
+    <div id="plansContainer" class="grid gap-4 mb-8"></div>
+    <div id="rankingContainer" class="mt-8"></div>
   </div>
 
   <script>
@@ -46,37 +47,58 @@
       }
     }
 
-    // 简单分配算法：按档位组合，凑够目标钻石 (三天内)
-    function distributeAccumTarget(target) {
-      let days = [];
-      let remain = target;
-      let day = 1;
-      for (let opt of rechargeOptions.slice().reverse()) {
-        while (remain > 0 && opt.diamonds <= remain && days.length < 3) {
-          days.push({ day, option: opt.cost, diamonds: opt.diamonds });
-          remain -= opt.diamonds;
-          day++;
+    function findBestAccumCombo(target){
+      const n = rechargeOptions.length;
+      let best = null;
+
+      for(let i=0;i<n;i++){
+        const a = rechargeOptions[i];
+        check([a]);
+        for(let j=i;j<n;j++){
+          const b = rechargeOptions[j];
+          check([a,b]);
+          for(let k=j;k<n;k++){
+            const c = rechargeOptions[k];
+            check([a,b,c]);
+          }
         }
       }
-      while (remain > 0 && days.length < 3) {
-        let opt = rechargeOptions.find(o => o.diamonds >= remain) || rechargeOptions[0];
-        days.push({ day, option: opt.cost, diamonds: opt.diamonds });
-        remain -= opt.diamonds;
-        day++;
+
+      function check(picks){
+        const totalDiamonds = picks.reduce((s,p)=>s+p.diamonds,0);
+        const totalCost = picks.reduce((s,p)=>s+p.cost,0);
+        if(totalDiamonds < target) return;
+        const over = totalDiamonds - target;
+        const totalWithReward = totalDiamonds + ACCUM_REWARD;
+
+        if(!best 
+          || totalWithReward > best.totalWithReward
+          || (totalWithReward === best.totalWithReward && totalCost < best.cost)
+          || (totalWithReward === best.totalWithReward && totalCost === best.cost && over < best.over)
+          || (totalWithReward === best.totalWithReward && totalCost === best.cost && over === best.over && picks.length < best.picks.length)){
+          best = { cost: totalCost, diamonds: totalDiamonds, picks, over, totalWithReward };
+        }
       }
-      return days;
+
+      if(!best){
+        const top = [rechargeOptions[n-1], rechargeOptions[n-1], rechargeOptions[n-1]];
+        best = { cost: top[0].cost*3, diamonds: top[0].diamonds*3, picks: top, over: top[0].diamonds*3 - target, totalWithReward: top[0].diamonds*3 + ACCUM_REWARD };
+      }
+
+      const days = best.picks.map((p,idx)=>({ day: idx+1, option: p.cost, diamonds: p.diamonds }));
+      return { cost: best.cost, diamonds: best.diamonds, days, totalWithReward: best.totalWithReward };
     }
 
     function calculatePlans(budget, accumTarget) {
-      const accumDays = distributeAccumTarget(accumTarget);
-      const accumCost = accumDays.reduce((sum, d) => sum + Number(d.option), 0);
-      const accumDiamonds = accumDays.reduce((sum, d) => sum + d.diamonds, 0);
+      const acc = findBestAccumCombo(accumTarget);
+      const accumDays = acc.days;
+      const accumCost = acc.cost;
 
       let onlyAcc = {
         name: "只累计奖励 (前三天累计)",
         cost: accumCost,
-        diamonds: accumDiamonds + ACCUM_REWARD,
-        efficiency: (accumDiamonds + ACCUM_REWARD) / (accumCost * 10000),
+        diamonds: acc.totalWithReward,
+        efficiency: acc.totalWithReward / (accumCost * 10000),
         schedule: accumDays,
         valid: budget >= accumCost,
       };
@@ -84,29 +106,30 @@
       let onlyConsec = {
         name: "只连续奖励",
         cost: 350,
-        diamonds: 70000000 + 70000000,
+        diamonds: 140000000,
         efficiency: 140000000 / (350 * 10000),
         schedule: Array.from({ length: 7 }, (_, i) => ({ day: i+1, option: "50", diamonds: 10000000 })),
         valid: budget >= 350,
       };
 
-      let both = {
-        name: "累计+连续",
-        cost: accumCost + 200,
-        diamonds: accumDiamonds + ACCUM_REWARD + 70000000,
-        efficiency: (accumDiamonds + ACCUM_REWARD + 70000000) / ((accumCost+200) * 10000),
-        schedule: [...accumDays,
-          { day: 4, option: "50", diamonds: 10000000 },
-          { day: 5, option: "50", diamonds: 10000000 },
-          { day: 6, option: "50", diamonds: 10000000 },
-          { day: 7, option: "50", diamonds: 10000000 }
-        ],
-        valid: budget >= accumCost+200,
-      };
+      let both = (()=>{
+        const extraDaysNeeded = Math.max(0, 7 - accumDays.length);
+        const extraCost = extraDaysNeeded * 50;
+        const extraList = Array.from({length: extraDaysNeeded}, (_,i)=>({ day: accumDays.length + (i+1), option: "50", diamonds: 10000000 }));
+        const totalWithReward = acc.totalWithReward + 70000000;
+        return {
+          name: "累计+连续",
+          cost: accumCost + extraCost,
+          diamonds: totalWithReward,
+          efficiency: totalWithReward / ((accumCost + extraCost) * 10000),
+          schedule: [...accumDays, ...extraList],
+          valid: budget >= (accumCost + extraCost),
+        };
+      })();
 
       let bestBig = rechargeOptions
         .filter(o => o.cost <= budget)
-        .sort((a, b) => b.diamonds / b.cost - a.diamonds / a.cost)[0];
+        .sort((a, b) => (b.diamonds - a.diamonds) || (a.cost - b.cost))[0];
 
       let bigPlan = bestBig ? {
         name: `直接买大包(${bestBig.cost}元)`,
@@ -148,6 +171,36 @@
         `;
         container.appendChild(card);
       });
+
+      // 排序表
+      const sorted = [...plans].filter(p=>p.valid).sort((a,b)=> b.diamonds - a.diamonds);
+      const rankingContainer = document.getElementById("rankingContainer");
+      if(sorted.length){
+        rankingContainer.innerHTML = `
+          <h2 class="text-xl font-semibold mb-2">方案钻石总量排名</h2>
+          <table class="min-w-full border text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="border px-2 py-1">方案</th>
+                <th class="border px-2 py-1">花费</th>
+                <th class="border px-2 py-1">总钻石</th>
+                <th class="border px-2 py-1">单位成本</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sorted.map(p=>`
+                <tr>
+                  <td class="border px-2 py-1">${p.name}</td>
+                  <td class="border px-2 py-1">${p.cost} 元</td>
+                  <td class="border px-2 py-1">${formatDiamonds(p.diamonds)}</td>
+                  <td class="border px-2 py-1">${p.efficiency.toFixed(5)} 元/万钻</td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        `;
+      } else {
+        rankingContainer.innerHTML = "";
+      }
     }
 
     window.onload = calculate;
