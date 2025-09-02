@@ -66,6 +66,13 @@
         font-size: 0.9rem;
       }
     }
+    .highlight {
+      background-color: #ffeb3b !important;
+    }
+    #timeDisplay {
+      margin: 10px 0;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -74,6 +81,8 @@
     <div><strong>选择游戏区服：</strong></div>
     <div id="combinedButtons" class="btn-group"></div>
   </div>
+
+  <div id="timeDisplay"></div>
 
   <table id="linkTable">
     <thead>
@@ -88,10 +97,18 @@
   </table>
 
 <script>
-  // 游戏和区服数据
+  // 游戏和区服数据（这里写开服时间）
   const gameData = {
-    "115": { name: "悠久传奇", servers: ["119","120"] },
-    "111": { name: "切割神域", servers: ["275] }
+    "115": { 
+      name: "悠久传奇", 
+      servers: ["119"], 
+      openTime: "2025-09-01T00:00:00+08:00" 
+    },
+    "111": { 
+      name: "切割神域", 
+      servers: ["275"], 
+      openTime: "2025-09-02T00:00:00+08:00" 
+    }
   };
 
   // 各平台数据
@@ -108,9 +125,24 @@
 
   const combinedButtons = document.getElementById('combinedButtons');
   const tbody = document.querySelector('#linkTable tbody');
+  const timeDisplay = document.getElementById('timeDisplay');
 
   let selectedGameId = null;
   let selectedServerId = null;
+
+  // 获取北京时间
+  function getBeijingTime() {
+    const now = new Date();
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    return new Date(utc + 8 * 3600000);
+  }
+
+  // 更新时间显示
+  function updateTimeDisplay() {
+    const bjTime = getBeijingTime();
+    timeDisplay.textContent = "北京时间：" + bjTime.toLocaleString('zh-CN', { hour12: false });
+    renderTable(); // 实时刷新表格高亮状态
+  }
 
   function renderCombinedButtons() {
     combinedButtons.innerHTML = '';
@@ -134,6 +166,15 @@
     if (!selectedGameId || !selectedServerId) return;
     tbody.innerHTML = '';
 
+    const bjTime = getBeijingTime();
+    const openTimeStr = gameData[selectedGameId].openTime;
+    let diffDays = null;
+
+    if (openTimeStr) {
+      const openTime = new Date(openTimeStr);
+      diffDays = Math.floor((bjTime - openTime) / (1000 * 60 * 60 * 24)) + 1;
+    }
+
     platforms.forEach(pf => {
       const loginUrl = `${pf.base}/login/${selectedGameId}/${selectedServerId}.html`;
       const homeUrl = `${pf.base}/games/${selectedGameId}.html`;
@@ -145,18 +186,26 @@
         <td><a href="${loginUrl}" target="_blank">${gameData[selectedGameId].name}${selectedServerId}服</a></td>
         <td><a href="${homeUrl}" target="_blank">主页</a></td>
       `;
+
+      // 判断是否为第 3 天
+      if (diffDays === 3) {
+        row.classList.add('highlight');
+      }
+
       tbody.appendChild(row);
     });
   }
 
   function init() {
     renderCombinedButtons();
-    // 默认选中第一个按钮
     const firstGameId = Object.keys(gameData)[0];
     selectedGameId = firstGameId;
     selectedServerId = gameData[firstGameId].servers[0];
     renderTable();
     document.querySelector('#combinedButtons button')?.classList.add('active');
+
+    updateTimeDisplay();
+    setInterval(updateTimeDisplay, 1000);
   }
 
   init();
