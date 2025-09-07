@@ -66,9 +66,6 @@
         font-size: 0.9rem;
       }
     }
-    .highlight {
-      background-color: #ffeb3b !important;
-    }
     #timeDisplay {
       margin: 10px 0;
       font-weight: bold;
@@ -97,30 +94,45 @@
   </table>
 
 <script>
-  // 游戏和区服数据（这里写开服时间）
-  const gameData = {
-    "115": { 
-      name: "悠久传奇", 
-      servers: ["119"], 
-      openTime: "" 
+  // 平台 + 区服 + 开服时间
+  const platformData = [
+    {
+      name: "xayxms",
+      base: "http://gm.xayxms.cn",
+      remark: "xxxx",
+      servers: [
+        { gameId: "115", serverId: "119", openTime: "2025-09-07T00:00:00+08:00" },
+        { gameId: "115", serverId: "120", openTime: "2025-09-08T00:00:00+08:00" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" , openTime: "2025-09-08T00:00:00+08:00" }
+      ]
     },
-    "111": { 
-      name: "切割神域", 
-      servers: ["275","276"], 
-      openTime: "" 
+    {
+      name: "99yn",
+      base: "http://gm.99yn.cn",
+      remark: "qqq0-7",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
+    },
+    {
+      name: "336buy",
+      base: "http://gm.336buy.com",
+      remark: "qqq",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
+    },
+    {
+      name: "395wan",
+      base: "http://game.395wan.com",
+      remark: "qqq,aaa",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
     }
-  };
-
-  // 各平台数据
-  const platforms = [
-    { name: "xayxms", base: "http://gm.xayxms.cn", remark: "xxxx" },
-    { name: "99yn", base: "http://gm.99yn.cn", remark: "qqq0-7" },
-    { name: "336buy", base: "http://gm.336buy.com", remark: "qqq" },
-    { name: "395wan", base: "http://game.395wan.com", remark: "qqq,aaa" },
-    { name: "lovedfm", base: "http://mv.lovedfm.com", remark: "qqq" },
-    { name: "8kyou", base: "http://www.8kyou.com:81", remark: "aaa" },
-    { name: "42uc", base: "http://gm.42uc.com", remark: "无" },
-    { name: "32sf", base: "http://mv.32sf.cn", remark: "无" }
   ];
 
   const combinedButtons = document.getElementById('combinedButtons');
@@ -141,66 +153,77 @@
   function updateTimeDisplay() {
     const bjTime = getBeijingTime();
     timeDisplay.textContent = "北京时间：" + bjTime.toLocaleString('zh-CN', { hour12: false });
-    renderTable(); // 实时刷新表格高亮状态
+    renderTable(); // 实时刷新
   }
 
+  // 渲染区服选择按钮
   function renderCombinedButtons() {
     combinedButtons.innerHTML = '';
-    for (const [gameId, game] of Object.entries(gameData)) {
-      game.servers.forEach(serverId => {
+    const seen = new Set(); // 避免重复按钮
+
+    platformData.forEach(pf => {
+      pf.servers.forEach(sv => {
+        const key = `${sv.gameId}-${sv.serverId}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+
         const btn = document.createElement('button');
-        btn.textContent = `${game.name}${serverId}服`;
+        btn.textContent = `${sv.gameId}${sv.serverId}服`;
         btn.addEventListener('click', () => {
-          selectedGameId = gameId;
-          selectedServerId = serverId;
+          selectedGameId = sv.gameId;
+          selectedServerId = sv.serverId;
           renderTable();
           [...combinedButtons.children].forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
         });
         combinedButtons.appendChild(btn);
       });
-    }
+    });
   }
 
+  // 渲染表格
   function renderTable() {
     if (!selectedGameId || !selectedServerId) return;
     tbody.innerHTML = '';
 
     const bjTime = getBeijingTime();
-    const openTimeStr = gameData[selectedGameId].openTime;
-    let diffDays = null;
 
-    if (openTimeStr) {
-      const openTime = new Date(openTimeStr);
-      diffDays = Math.floor((bjTime - openTime) / (1000 * 60 * 60 * 24)) + 1;
-    }
+    platformData.forEach(pf => {
+      pf.servers.forEach(sv => {
+        if (sv.gameId !== selectedGameId || sv.serverId !== selectedServerId) return;
 
-    platforms.forEach(pf => {
-      const loginUrl = `${pf.base}/login/${selectedGameId}/${selectedServerId}.html`;
-      const homeUrl = `${pf.base}/games/${selectedGameId}.html`;
+        const loginUrl = `${pf.base}/login/${sv.gameId}/${sv.serverId}.html`;
+        const homeUrl = `${pf.base}/games/${sv.gameId}.html`;
 
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${pf.name}</td>
-        <td>${pf.remark}</td>
-        <td><a href="${loginUrl}" target="_blank">${gameData[selectedGameId].name}${selectedServerId}服</a></td>
-        <td><a href="${homeUrl}" target="_blank">主页</a></td>
-      `;
+        let extra = "";
+        if (sv.openTime) {
+          const openTime = new Date(sv.openTime);
+          const openDate = new Date(openTime.getFullYear(), openTime.getMonth(), openTime.getDate());
+          const bjDate = new Date(bjTime.getFullYear(), bjTime.getMonth(), bjTime.getDate());
+          const diffDays = Math.floor((bjDate - openDate) / (1000 * 60 * 60 * 24));
+          if (diffDays >= 2) { // 第3天及以后
+            extra = " 🎉";
+          }
+        }
 
-      // 判断是否为第 3 天
-      if (diffDays === 3) {
-        row.classList.add('highlight');
-      }
-
-      tbody.appendChild(row);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${pf.name}</td>
+          <td>${pf.remark}</td>
+          <td><a href="${loginUrl}" target="_blank">${sv.gameId}${sv.serverId}服${extra}</a></td>
+          <td><a href="${homeUrl}" target="_blank">主页</a></td>
+        `;
+        tbody.appendChild(row);
+      });
     });
   }
 
   function init() {
     renderCombinedButtons();
-    const firstGameId = Object.keys(gameData)[0];
-    selectedGameId = firstGameId;
-    selectedServerId = gameData[firstGameId].servers[0];
+    // 默认选中第一个区服
+    const first = platformData[0].servers[0];
+    selectedGameId = first.gameId;
+    selectedServerId = first.serverId;
     renderTable();
     document.querySelector('#combinedButtons button')?.classList.add('active');
 
