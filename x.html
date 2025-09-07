@@ -86,6 +86,7 @@
       <tr>
         <th>游戏平台</th>
         <th>备注</th>
+        <th>游戏名称</th>
         <th>登录区服链接</th>
         <th>游戏主页</th>
       </tr>
@@ -94,6 +95,12 @@
   </table>
 
 <script>
+  // 游戏ID -> 游戏名映射
+  const gameNames = {
+    "115": "悠久传奇",
+    "111": "切割神域"
+  };
+
   // 平台 + 区服 + 开服时间
   const platformData = [
     {
@@ -101,8 +108,8 @@
       base: "http://gm.xayxms.cn",
       remark: "xxxx",
       servers: [
-        { gameId: "115", serverId: "120", openTime: "2025-09-08T00:00:00+08:00" },
-        { gameId: "111", serverId: "276", openTime: "2025-09-06" , openTime: "2025-09-08T00:00:00+08:00" }
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
       ]
     },
     {
@@ -158,7 +165,7 @@
   // 渲染区服选择按钮
   function renderCombinedButtons() {
     combinedButtons.innerHTML = '';
-    const seen = new Set(); // 避免重复按钮
+    const seen = new Set();
 
     platformData.forEach(pf => {
       pf.servers.forEach(sv => {
@@ -167,7 +174,7 @@
         seen.add(key);
 
         const btn = document.createElement('button');
-        btn.textContent = `${sv.gameId}${sv.serverId}服`;
+        btn.textContent = `${gameNames[sv.gameId]}${sv.serverId}服`;
         btn.addEventListener('click', () => {
           selectedGameId = sv.gameId;
           selectedServerId = sv.serverId;
@@ -209,7 +216,8 @@
         row.innerHTML = `
           <td>${pf.name}</td>
           <td>${pf.remark}</td>
-          <td><a href="${loginUrl}" target="_blank">${sv.gameId}${sv.serverId}服${extra}</a></td>
+          <td>${gameNames[sv.gameId] || sv.gameId}</td>
+          <td><a href="${loginUrl}" target="_blank">${gameNames[sv.gameId]}${sv.serverId}服${extra}</a></td>
           <td><a href="${homeUrl}" target="_blank">主页</a></td>
         `;
         tbody.appendChild(row);
@@ -219,7 +227,6 @@
 
   function init() {
     renderCombinedButtons();
-    // 默认选中第一个区服
     const first = platformData[0].servers[0];
     selectedGameId = first.gameId;
     selectedServerId = first.serverId;
