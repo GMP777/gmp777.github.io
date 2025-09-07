@@ -126,6 +126,12 @@
     return new Date(utc + 8 * 3600000);
   }
 
+  // 将数字转换成圈号
+  function numberToCircle(num) {
+    const circles = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
+    return circles[num - 1] || num;
+  }
+
   // 更新时间显示
   function updateTimeDisplay() {
     const bjTime = getBeijingTime();
@@ -164,6 +170,7 @@
     tbody.innerHTML = '';
 
     const bjTime = getBeijingTime();
+    let index = 1;
 
     platformData.forEach(pf => {
       pf.servers.forEach(sv => {
@@ -178,7 +185,7 @@
           const openDate = new Date(openTime.getFullYear(), openTime.getMonth(), openTime.getDate());
           const bjDate = new Date(bjTime.getFullYear(), bjTime.getMonth(), bjTime.getDate());
           const diffDays = Math.floor((bjDate - openDate) / (1000 * 60 * 60 * 24));
-          if (diffDays >= 2) { // 第3天及以后
+          if (diffDays >= 2) {
             extra = " 🎉";
           }
         }
@@ -187,10 +194,11 @@
         row.innerHTML = `
           <td>${pf.name}</td>
           <td>${pf.remark}</td>
-          <td><a href="${loginUrl}" target="_blank">${gameNames[sv.gameId]}${sv.serverId}服${extra}</a></td>
+          <td><a href="${loginUrl}" target="_blank">${numberToCircle(index)} ${gameNames[sv.gameId]}${sv.serverId}服${extra}</a></td>
           <td><a href="${homeUrl}" target="_blank">主页</a></td>
         `;
         tbody.appendChild(row);
+        index++;
       });
     });
   }
@@ -210,10 +218,10 @@
   init();
 </script>
 
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
+<div class="footer-wrapper">
+  <footer id="footer-container">加载中...</footer>
+</div>
+<script src="/load-footer.js"></script>
 
 </body>
 </html>
