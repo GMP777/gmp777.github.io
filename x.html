@@ -108,8 +108,8 @@
       base: "http://gm.xayxms.cn",
       remark: "xxxx",
       servers: [
-        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
-        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+        { gameId: "115", serverId: "120", openTime: "2025-09-08T00:00:00+08:00" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-08T00:00:00+08:00" }
       ]
     },
     {
@@ -138,6 +138,42 @@
         { gameId: "115", serverId: "120", openTime: "2025-09-07" },
         { gameId: "111", serverId: "276", openTime: "2025-09-06" }
       ]
+    },
+    {
+      name: "lovedfm",
+      base: "http://mv.lovedfm.com",
+      remark: "qqq",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
+    },
+    {
+      name: "8kyou",
+      base: "http://www.8kyou.com:81",
+      remark: "aaa",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
+    },
+    {
+      name: "42uc",
+      base: "http://gm.42uc.com",
+      remark: "无",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
+    },
+    {
+      name: "32sf",
+      base: "http://mv.32sf.cn",
+      remark: "无",
+      servers: [
+        { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+        { gameId: "111", serverId: "276", openTime: "2025-09-06" }
+      ]
     }
   ];
 
@@ -159,7 +195,7 @@
   function updateTimeDisplay() {
     const bjTime = getBeijingTime();
     timeDisplay.textContent = "北京时间：" + bjTime.toLocaleString('zh-CN', { hour12: false });
-    renderTable(); // 实时刷新
+    renderTable();
   }
 
   // 渲染区服选择按钮
