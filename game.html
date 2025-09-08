@@ -78,7 +78,7 @@
       id: '111',
       name: '满V切割神域',
       servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261,262, 263, 264, 265,275,276],
-      lords: [262, 263, 264, 265,275,276], // 👈 城主区服
+      lords: [262, 263, 264, 265,275,276],
       type: 'xayxms'
     },
     {
@@ -87,7 +87,7 @@
       type: 'xayxms',
       canHang: [105,112,113,114,115,116,119,120],
       cannotHang: [86,87,93,95,101,102,104,106,107,108,109,110,111,117,118],
-      lords: [112,113,115,116,119,120] // 👑 城主区服
+      lords: [112,113,115,116,119,120]
     },
     {
       id: '137',
@@ -99,14 +99,20 @@
       id: '962-115',
       name: '962yx',
       type: '962yx',
-      mainAccount: [115,116], // 主号
-      altAccount: [115,116,119,120] // 小号
+      mainAccount: [115,116],
+      altAccount: [115,116,119,120]
     },
     {
       id: 'ydcs',
       name: '炎黃大陸',
       servers: [543, 544, 545, 547, 548, 551],
       type: '1100yx'
+    },
+    {
+      id: '88-7',
+      name: '屠神',
+      type: '88lhzs',
+      servers: [25, 26, 30] // ✅ 屠神实际区服
     }
   ];
 
@@ -120,6 +126,7 @@
       case '137': return 'http://gm.xayxms.cn/games/137.html';
       case '962-115': return 'http://gm.962yx.com/games/115.html';
       case 'ydcs': return 'http://www.1100yx.com/game_list_8.html';
+      case '88-7': return 'http://www.88lhzs.cn/game/7/';
       default: return '#';
     }
   }
@@ -149,16 +156,16 @@
           a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
         } else if (game.type === '962yx') {
           a.href = `http://gm.962yx.com/login/115/${server}.html`;
+        } else if (game.type === '88lhzs') {
+          a.href = `http://www.88lhzs.cn/Game/gameto.php?gid=7&sid=${server}`;
         } else {
           a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
         }
 
         a.target = '_blank';
-
         let label = `${server}区`;
         a.textContent = label;
 
-        // 如果是城主区服，加特殊 class
         if (game.lords && game.lords.includes(server)) {
           a.classList.add('lord-btn');
         }
@@ -180,14 +187,17 @@
         item.className = 'grid-item';
 
         const a = document.createElement('a');
-        a.href = game.type === '1100yx'
-          ? `http://www.1100yx.com/Game_Login_8_${server}.html`
-          : game.type === '962yx'
-            ? `http://gm.962yx.com/login/115/${server}.html`
-            : `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+        if (game.type === '1100yx') {
+          a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
+        } else if (game.type === '962yx') {
+          a.href = `http://gm.962yx.com/login/115/${server}.html`;
+        } else if (game.type === '88lhzs') {
+          a.href = `http://www.88lhzs.cn/Game/gameto.php?gid=7&sid=${server}`;
+        } else {
+          a.href = `http://gm.xayxms.cn/login/${game.id}/${server}.html`;
+        }
 
         a.target = '_blank';
-
         let label = `${server}区`;
         a.textContent = label;
 
@@ -224,6 +234,7 @@
       btn.classList.add('active');
       games.forEach(g => document.getElementById('table-' + g.id).classList.add('hidden'));
       document.getElementById('table-' + game.id).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     tabsContainer.appendChild(btn);
 
