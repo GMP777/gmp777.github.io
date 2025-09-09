@@ -186,8 +186,11 @@
           const openDate = new Date(openTime.getFullYear(), openTime.getMonth(), openTime.getDate());
           const bjDate = new Date(bjTime.getFullYear(), bjTime.getMonth(), bjTime.getDate());
           const diffDays = Math.floor((bjDate - openDate) / (1000 * 60 * 60 * 24));
-          if (diffDays >= 2) {
+
+          if (diffDays === 2) {
             extra = " 🎉";
+          } else if (diffDays >= 3) {
+            extra = " 🔚";
           }
         }
 
