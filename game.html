@@ -101,6 +101,7 @@
       type: '962yx',
       mainAccount: [115,116],
       altAccount: [115,116,119,120]
+      freAccount: [112,118]
     },
     {
       id: 'ydcs',
@@ -178,6 +179,7 @@
     if (game.mainAccount || game.altAccount) {
       renderSection('👑 主号', game.mainAccount);
       renderSection('🌀 小号', game.altAccount);
+      renderSection('🥥 代玩', game.freAccount);
     } else if (game.canHang || game.cannotHang) {
       renderSection('✅ 刷', game.canHang);
       renderSection('⛔ 签到', game.cannotHang);
