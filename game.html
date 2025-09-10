@@ -100,7 +100,8 @@
       name: '962yx',
       type: '962yx',
       mainAccount: [115,116],
-      altAccount: [115,116,119,120]
+      altAccount: [115,116,119,120],
+      daiwan: [112,118] // ✅ 新增代玩
     },
     {
       id: 'ydcs',
@@ -175,9 +176,10 @@
       });
     }
 
-    if (game.mainAccount || game.altAccount) {
-      renderSection('👑 主号', game.mainAccount);
-      renderSection('🌀 小号', game.altAccount);
+    if (game.mainAccount || game.altAccount || game.daiwan) {
+      if (game.mainAccount) renderSection('👑 主号', game.mainAccount);
+      if (game.altAccount) renderSection('🌀 小号', game.altAccount);
+      if (game.daiwan) renderSection('🎯 代玩', game.daiwan); // ✅ 渲染代玩
     } else if (game.canHang || game.cannotHang) {
       renderSection('✅ 刷', game.canHang);
       renderSection('⛔ 签到', game.cannotHang);
