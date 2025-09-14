@@ -3,9 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>侠客强化计算器</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
   <script>
     const costTable = [
       6,6,6,7,8,8,9,10,11,12,
@@ -19,6 +16,11 @@
     function calculate() {
       const current = parseInt(document.getElementById("currentLevel").value);
       const target = parseInt(document.getElementById("targetLevel").value);
+
+      if (isNaN(current) || isNaN(target) || current < 0 || current > 59 || target < 0 || target > 59) {
+        alert("请输入有效的等级 (0-59)");
+        return;
+      }
       if (target <= current) {
         alert("目标等级必须大于当前等级");
         return;
@@ -39,34 +41,16 @@
 </head>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
   <h2>侠客强化计算器</h2>
-  <label>当前等级：</label>
-  <select id="currentLevel">
-    <script>
-      for (let i = 0; i <= 59; i++) {
-        document.write(`<option value="${i}">${i}</option>`);
-      }
-    </script>
-  </select>
+  <label>当前等级 (0-59)：</label>
+  <input type="number" id="currentLevel" min="0" max="59" value="0">
   <br><br>
 
-  <label>目标等级：</label>
-  <select id="targetLevel">
-    <script>
-      for (let i = 1; i <= 59; i++) {
-        document.write(`<option value="${i}">${i}</option>`);
-      }
-    </script>
-  </select>
+  <label>目标等级 (0-59)：</label>
+  <input type="number" id="targetLevel" min="0" max="59" value="1">
   <br><br>
 
   <button onclick="calculate()">计算</button>
 
   <div id="result" style="margin-top:20px; font-size:16px;"></div>
-    <!-- Footer -->
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
