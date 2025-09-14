@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>侠客强化计算器</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
   <script>
     const costTable = [
       6,6,6,7,8,8,9,10,11,12,
@@ -52,5 +55,11 @@
   <button onclick="calculate()">计算</button>
 
   <div id="result" style="margin-top:20px; font-size:16px;"></div>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
 </body>
 </html>
