@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>侠客强化计算器</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <script>
+    const costTable = [
+      6,6,6,7,8,8,9,10,11,12,
+      13,14,16,17,19,21,23,25,27,30,
+      33,36,40,44,48,53,58,64,70,77,
+      85,93,102,113,124,136,150,165,181,199,
+      219,241,265,291,320,352,387,426,468,515,
+      567,623,685,754,829,912,1003,1104,1214,1335
+    ];
+
+    function calculate() {
+      const current = parseInt(document.getElementById("currentLevel").value);
+      const target = parseInt(document.getElementById("targetLevel").value);
+      if (target <= current) {
+        alert("目标等级必须大于当前等级");
+        return;
+      }
+
+      let totalStones = 0;
+      for (let i = current; i < target; i++) {
+        totalStones += costTable[i];
+      }
+
+      const diamondCost = totalStones * 200;
+      document.getElementById("result").innerHTML =
+        `从 <b>${current}</b> 级强化到 <b>${target}</b> 级<br>` +
+        `需要 <b>${totalStones}</b> 个聚力神石<br>` +
+        `总计 <b>${diamondCost}</b> 钻石`;
+    }
+  </script>
+</head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+  <h2>侠客强化计算器</h2>
+  <label>当前等级：</label>
+  <select id="currentLevel">
+    <script>
+      for (let i = 0; i <= 59; i++) {
+        document.write(`<option value="${i}">${i}</option>`);
+      }
+    </script>
+  </select>
+  <br><br>
+
+  <label>目标等级：</label>
+  <select id="targetLevel">
+    <script>
+      for (let i = 1; i <= 59; i++) {
+        document.write(`<option value="${i}">${i}</option>`);
+      }
+    </script>
+  </select>
+  <br><br>
+
+  <button onclick="calculate()">计算</button>
+
+  <div id="result" style="margin-top:20px; font-size:16px;"></div>
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
