@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>侠客强化计算器</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
   <script>
+    // 每级消耗表：从 n 级强化到 n+1 级所需聚力神石
     const costTable = [
       6,6,6,7,8,8,9,10,11,12,
       13,14,16,17,19,21,23,25,27,30,
@@ -17,11 +15,11 @@
     ];
 
     function calculate() {
-      const current = parseInt(document.getElementById("currentLevel").value);
-      const target = parseInt(document.getElementById("targetLevel").value);
+      const current = parseInt(document.getElementById("currentLevel").value, 10);
+      const target = parseInt(document.getElementById("targetLevel").value, 10);
 
-      if (isNaN(current) || isNaN(target) || current < 0 || current > 59 || target < 0 || target > 59) {
-        alert("请输入有效的等级 (0-59)");
+      if (isNaN(current) || isNaN(target) || current < 0 || current > 60 || target < 0 || target > 60) {
+        alert("请输入有效的等级 (0-60)");
         return;
       }
       if (target <= current) {
@@ -31,6 +29,10 @@
 
       let totalStones = 0;
       for (let i = current; i < target; i++) {
+        if (typeof costTable[i] === 'undefined') {
+          alert("缺少等级 " + i + " 的消耗数据。请提供后再计算。");
+          return;
+        }
         totalStones += costTable[i];
       }
 
@@ -38,28 +40,29 @@
       document.getElementById("result").innerHTML =
         `从 <b>${current}</b> 级强化到 <b>${target}</b> 级<br>` +
         `需要 <b>${totalStones}</b> 个聚力神石<br>` +
-        `总计 <b>${diamondCost}</b> 钻石`;
+        `总计 <b>${diamondCost}</b> 钻石（单价 200 钻）`;
     }
   </script>
+  <style>
+    body{font-family:Arial,sans-serif;padding:20px}
+    input[type=number]{width:90px;padding:4px}
+    button{padding:6px 12px;border-radius:6px;cursor:pointer}
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; padding: 20px;">
+<body>
   <h2>侠客强化计算器</h2>
-  <label>当前等级 (0-59)：</label>
-  <input type="number" id="currentLevel" min="0" max="59" value="0">
+  <p>等级范围：0–60（表格提供了 0→60 的所有消耗数据）。</p>
+
+  <label>当前等级 (0-60)：</label>
+  <input type="number" id="currentLevel" min="0" max="60" value="0">
   <br><br>
 
-  <label>目标等级 (0-59)：</label>
-  <input type="number" id="targetLevel" min="0" max="59" value="1">
+  <label>目标等级 (0-60)：</label>
+  <input type="number" id="targetLevel" min="0" max="60" value="60">
   <br><br>
 
   <button onclick="calculate()">计算</button>
 
-  <div id="result" style="margin-top:20px; font-size:16px;"></div>
-  <!-- Footer -->
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
-<!-- footer -->
+  <div id="result" style="margin-top:20px;font-size:16px;"></div>
 </body>
 </html>
