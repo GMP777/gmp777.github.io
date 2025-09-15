@@ -4,8 +4,34 @@
   <meta charset="UTF-8">
   <title>侠客强化计算器</title>
   <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
+  <style>
+    body{font-family:Arial,sans-serif;padding:20px}
+    input[type=number]{width:90px;padding:4px}
+    button{padding:6px 12px;border-radius:6px;cursor:pointer;margin-left:4px}
+
+    /* toast 样式 */
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+    .toast {
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin-top: 10px;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
   <script>
     // 每级消耗表：从 n 级强化到 n+1 级所需聚力神石
     const costTable = [
@@ -16,6 +42,24 @@
       219,241,265,291,320,352,387,426,468,515,
       567,623,685,754,829,912,1003,1104,1214,1335
     ];
+
+    // toast 方法
+    function showToast(message, duration = 2000) {
+      const container = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      // 动画显示
+      setTimeout(() => toast.classList.add("show"), 50);
+
+      // 自动移除
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => container.removeChild(toast), 300);
+      }, duration);
+    }
 
     function formatNumber(num) {
       if (num >= 100000000) {
@@ -35,18 +79,18 @@
       const target = parseInt(document.getElementById("targetLevel").value, 10);
 
       if (isNaN(current) || isNaN(target) || current < 0 || current > 60 || target < 0 || target > 60) {
-        alert("请输入有效的等级 (0-60)");
+        showToast("请输入有效的等级 (0-60)");
         return;
       }
       if (target <= current) {
-        alert("目标等级必须大于当前等级");
+        showToast("目标等级必须大于当前等级");
         return;
       }
 
       let totalStones = 0;
       for (let i = current; i < target; i++) {
         if (typeof costTable[i] === 'undefined') {
-          alert("缺少等级 " + i + " 的消耗数据。请提供后再计算。");
+          showToast("缺少等级 " + i + " 的消耗数据");
           return;
         }
         totalStones += costTable[i];
@@ -57,23 +101,18 @@
 
       document.getElementById("result").innerHTML =
         `从 <b>${current}</b> 级强化到 <b>${target}</b> 级<br>` +
-        `需要 <b id=\"stoneCount\">${totalStones}</b> 个聚力神石 ` +
-        `<button onclick=\"copyStones()\">复制数量</button><br>` +
+        `需要 <b id="stoneCount">${totalStones}</b> 个聚力神石 ` +
+        `<button onclick="copyStones()">复制数量</button><br>` +
         `总计 <b>${formattedDiamond}</b> 钻石（单价 200 钻/个）`;
     }
 
     function copyStones() {
       const text = document.getElementById("stoneCount").innerText;
       navigator.clipboard.writeText(text).then(() => {
-        alert("已复制聚力神石数量: " + text);
+        showToast("已复制聚力神石数量: " + text);
       });
     }
   </script>
-  <style>
-    body{font-family:Arial,sans-serif;padding:20px}
-    input[type=number]{width:90px;padding:4px}
-    button{padding:6px 12px;border-radius:6px;cursor:pointer;margin-left:4px}
-  </style>
 </head>
 <body>
   <h2>侠客强化计算器</h2>
@@ -90,11 +129,14 @@
   <button onclick="calculate()">计算</button>
 
   <div id="result" style="margin-top:20px;font-size:16px;"></div>
-    <!-- Footer -->
+
+  <!-- Toast 容器 -->
+  <div id="toast-container"></div>
+
+  <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
