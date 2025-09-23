@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>侠客强化计算器</title>
-  <!-- 载入 footer 样式 -->
   <link rel="stylesheet" href="/footer.css" />
   <style>
     body{font-family:Arial,sans-serif;padding:20px}
@@ -33,7 +32,7 @@
     }
   </style>
   <script>
-    // 每级消耗表：从 n 级强化到 n+1 级所需聚力神石
+    // 每级消耗表：从 n 级 → n+1 级
     const costTable = [
       6,6,6,7,8,8,9,10,11,12,
       13,14,16,17,19,21,23,25,27,30,
@@ -43,7 +42,6 @@
       567,623,685,754,829,912,1003,1104,1214,1335
     ];
 
-    // toast 方法
     function showToast(message, duration = 2000) {
       const container = document.getElementById("toast-container");
       const toast = document.createElement("div");
@@ -51,10 +49,7 @@
       toast.textContent = message;
       container.appendChild(toast);
 
-      // 动画显示
       setTimeout(() => toast.classList.add("show"), 50);
-
-      // 自动移除
       setTimeout(() => {
         toast.classList.remove("show");
         setTimeout(() => container.removeChild(toast), 300);
@@ -78,8 +73,9 @@
       const current = parseInt(document.getElementById("currentLevel").value, 10);
       const target = parseInt(document.getElementById("targetLevel").value, 10);
 
-      if (isNaN(current) || isNaN(target) || current < 0 || current > 60 || target < 0 || target > 60) {
-        showToast("请输入有效的等级 (0-60)");
+      // 新规则：current 0–59，target 1–60
+      if (isNaN(current) || isNaN(target) || current < 0 || current > 59 || target < 1 || target > 60) {
+        showToast("请输入有效的等级：当前 0–59，目标 1–60");
         return;
       }
       if (target <= current) {
@@ -116,14 +112,14 @@
 </head>
 <body>
   <h2>侠客强化计算器</h2>
-  <p>等级范围：0–60（表格提供了 0→60 的所有消耗数据）。</p>
+  <p>当前等级范围：0–59（0 级开始，最后升到 60）；<br>目标等级范围：1–60。</p>
 
-  <label>当前等级 (0-60)：</label>
-  <input type="number" id="currentLevel" min="0" max="60" value="0">
+  <label>当前等级：</label>
+  <input type="number" id="currentLevel" min="0" max="59" value="0">
   <br><br>
 
-  <label>目标等级 (0-60)：</label>
-  <input type="number" id="targetLevel" min="0" max="60" value="60">
+  <label>目标等级：</label>
+  <input type="number" id="targetLevel" min="1" max="60" value="60">
   <br><br>
 
   <button onclick="calculate()">计算</button>
