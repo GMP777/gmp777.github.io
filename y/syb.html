@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双鱼壁合成计算器</title>
+    <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f4f6f9; margin: 0; }
+        h2 { text-align: center; }
+        .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        label { display: block; margin: 10px 0 5px; font-size: 16px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        button { margin-top: 15px; width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; }
+        button:hover { background: #45a049; }
+        .clear-btn { background: #f44336; }
+        .clear-btn:hover { background: #e53935; }
+        .result { margin-top: 20px; padding: 15px; background: #eef; border-radius: 6px; white-space: pre-line; font-size: 16px; overflow-x: auto; }
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            label, input, button, .result { font-size: 14px; }
+            button { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>双鱼壁合成计算器</h2>
+        <form id="calcForm" onsubmit="return false;">
+            <label for="lvl9">9级双鱼壁数量:</label>
+            <input type="number" id="lvl9" min="0" value="0">
+
+            <label for="lvl10">10级双鱼壁数量:</label>
+            <input type="number" id="lvl10" min="0" value="0">
+
+            <label for="lvl11">11级双鱼壁数量:</label>
+            <input type="number" id="lvl11" min="0" value="0">
+
+            <label for="lvl12">12级双鱼壁数量:</label>
+            <input type="number" id="lvl12" min="0" value="0">
+
+            <label for="lvl13">13级双鱼壁数量:</label>
+            <input type="number" id="lvl13" min="0" value="0">
+
+            <label for="lvl14">14级双鱼壁数量:</label>
+            <input type="number" id="lvl14" min="0" value="0">
+
+            <label for="lvl15">15级双鱼壁数量:</label>
+            <input type="number" id="lvl15" min="0" value="0">
+
+            <button type="button" onclick="calculate()">开始合成</button>
+            <button type="button" class="clear-btn" onclick="clearForm()">清空输入</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            let walls = {};
+            for (let i = 9; i <= 15; i++) {
+                walls[i] = parseInt(document.getElementById('lvl' + i).value) || 0;
+            }
+
+            let log = "合成过程:\n";
+
+            for (let lvl = 9; lvl <= 15; lvl++) {
+                if (!walls[lvl]) continue;
+                while (walls[lvl] >= 2) {
+                    let pairs = Math.floor(walls[lvl] / 2);
+                    walls[lvl] -= pairs * 2;
+                    walls[lvl + 1] = (walls[lvl + 1] || 0) + pairs;
+                    log += `${pairs * 2} 个 ${lvl}级 → ${pairs} 个 ${lvl+1}级\n`;
+                }
+            }
+
+            log += "\n最终结果:\n";
+            for (let i = 9; i <= 16; i++) {
+                if (walls[i] && walls[i] > 0) {
+                    log += `${i}级: ${walls[i]} 个\n`;
+                }
+            }
+
+            document.getElementById('result').innerText = log;
+        }
+
+        function clearForm() {
+            for (let i = 9; i <= 15; i++) {
+                document.getElementById('lvl' + i).value = 0;
+            }
+            document.getElementById('result').innerText = "";
+        }
+    </script>
+      <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
