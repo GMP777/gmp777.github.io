@@ -99,7 +99,7 @@
       font-weight: 600;
     }
 
-    input[type="number"], input[type="text"] {
+    input[type="text"] {
       width: 80px;
       border: 1px solid var(--border);
       border-radius: 4px;
@@ -132,12 +132,19 @@
       background: #f9fafb;
     }
 
-    /* ✅ 独立保存区域 */
+    /* ✅ 保存区域 */
     .save-area {
       text-align: right;
       padding-top: 10px;
       border-top: 1px solid var(--border);
       margin-top: 10px;
+    }
+
+    /* ✅ 抽卡次数勾选框 */
+    .gacha-options {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
     }
 
     #toast {
@@ -169,28 +176,22 @@
   <div id="toast"></div>
 
   <script>
-    // ✅ 账号 & 角色
     const roles = [
-      { account: "打工1号", role: "剑圣一号" },
-      { account: "打工2号", role: "灵狐二号" },
-      { account: "打工3号", role: "鬼面三号" },
-      { account: "打工4号", role: "鬼面三号" },
-      { account: "打工01号", role: "鬼面三号" },
-      { account: "打工02号", role: "鬼面三号" },
-      { account: "打工03号", role: "鬼面三号" },
-      { account: "打工04号", role: "鬼面三号" }
+      { account: "AccountA", role: "剑圣一号" },
+      { account: "AccountB", role: "灵狐二号" },
+      { account: "AccountC", role: "鬼面三号" }
     ];
 
-    // ✅ 装备
     const equipsLeft = ["武器","头盔","手臂","左戒","腰带"];
     const equipsRight = ["衣服","项链","镯子","右戒","鞋子"];
 
-    // ✅ 任务
     const tasks = [
       "赏金猎人","降魔道人","试炼道人",
       "封神法器1/4","封神法器2/4","封神法器3/4","封神法器4/4",
       "每日充值50万钻石","每日充值100万钻石"
     ];
+
+    const gachaOptions = [1000, 2000, 3000];
 
     const list = document.getElementById("list");
     const toast = document.getElementById("toast");
@@ -202,7 +203,6 @@
       setTimeout(() => toast.style.opacity = "0", 1500);
     }
 
-    // ✅ 渲染卡片
     roles.forEach(r => {
       const card = document.createElement("div");
       card.className = "card";
@@ -217,10 +217,15 @@
       const saved = cache[saveKey] || {};
 
       content.innerHTML = `
-        <table>
-          <tr><th colspan="2">基本信息</th></tr>
-          <tr><td>抽卡次数</td><td><input type="number" id="gacha_${saveKey}" value="${saved.gacha || ''}"></td></tr>
-        </table>
+        <h3>抽卡次数</h3>
+        <div class="gacha-options">
+          ${gachaOptions.map(val => `
+            <label>
+              <input type="radio" name="gacha_${saveKey}" value="${val}" ${saved.gacha==val ? 'checked' : ''}>
+              ${val}次
+            </label>
+          `).join("")}
+        </div>
 
         <h3>装备等级</h3>
         <div class="equip-grid">
@@ -256,7 +261,8 @@
       });
 
       content.querySelector(`#save_${saveKey}`).addEventListener("click", () => {
-        const obj = { gacha: document.getElementById(`gacha_${saveKey}`).value };
+        const gachaEl = document.querySelector(`input[name="gacha_${saveKey}"]:checked`);
+        const obj = { gacha: gachaEl ? parseInt(gachaEl.value) : null };
         [...equipsLeft, ...equipsRight].forEach(eq => obj[eq] = document.getElementById(`${eq}_${saveKey}`).value);
         tasks.forEach(t => obj[t] = document.getElementById(`task_${t}_${saveKey}`).checked);
         cache[saveKey] = obj;
@@ -269,7 +275,6 @@
       list.appendChild(card);
     });
 
-    // ✅ 导出 Markdown
     document.getElementById("exportMd").addEventListener("click", () => {
       cache = JSON.parse(localStorage.getItem("role-data") || "{}");
       let md = "# 角色任务记录\n\n";
@@ -288,12 +293,11 @@
       showToast("Markdown 已复制到剪贴板 📋");
     });
 
-    // ✅ 清除所有数据（无需刷新）
     document.getElementById("clearAll").addEventListener("click", () => {
       localStorage.removeItem("role-data");
       cache = {};
-      // 清空界面内容
-      document.querySelectorAll("input[type='text'], input[type='number']").forEach(i => i.value = "");
+      document.querySelectorAll("input[type='text']").forEach(i => i.value = "");
+      document.querySelectorAll("input[type='radio']").forEach(r => r.checked = false);
       document.querySelectorAll("input[type='checkbox']").forEach(c => c.checked = false);
       showToast("所有数据已清除 🗑️");
     });
