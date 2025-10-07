@@ -10,7 +10,7 @@
 
 # JS
 
-在 </body> 前加入这两行
+在 body前加入这两行
 
 ```html
   <!-- Footer -->
