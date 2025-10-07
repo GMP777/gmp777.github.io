@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>角色任务填写表</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --text: #1e293b;
+    }
+
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      padding: 20px;
+      color: var(--text);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: var(--primary-hover); }
+    .danger { background: var(--danger); }
+    .danger:hover { background: var(--danger-hover); }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      padding: 14px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+    }
+    .header:hover { background: #f1f5f9; }
+
+    .content {
+      display: none;
+      padding: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+    }
+
+    input[type="number"], input[type="text"] {
+      width: 80px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 6px;
+    }
+
+    /* ✅ 装备双列布局 */
+    .equip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* ✅ 任务多列布局 */
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .task-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      background: #f9fafb;
+    }
+
+    /* ✅ 独立保存区域 */
+    .save-area {
+      text-align: right;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      margin-top: 10px;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      font-size: 15px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 角色任务填写表</h1>
+
+  <div class="toolbar">
+    <button id="exportMd">📋 导出为 Markdown</button>
+    <button id="clearAll" class="danger">🗑️ 清除所有内容</button>
+  </div>
+
+  <div id="list"></div>
+  <div id="toast"></div>
+
+  <script>
+    // ✅ 账号 & 角色
+    const roles = [
+      { account: "打工1号", role: "剑圣一号" },
+      { account: "打工2号", role: "灵狐二号" },
+      { account: "打工3号", role: "鬼面三号" },
+      { account: "打工4号", role: "鬼面三号" },
+      { account: "打工01号", role: "鬼面三号" },
+      { account: "打工02号", role: "鬼面三号" },
+      { account: "打工03号", role: "鬼面三号" },
+      { account: "打工04号", role: "鬼面三号" }
+    ];
+
+    // ✅ 装备
+    const equipsLeft = ["武器","头盔","手臂","左戒","腰带"];
+    const equipsRight = ["衣服","项链","镯子","右戒","鞋子"];
+
+    // ✅ 任务
+    const tasks = [
+      "赏金猎人","降魔道人","试炼道人",
+      "封神法器1/4","封神法器2/4","封神法器3/4","封神法器4/4",
+      "每日充值50万钻石","每日充值100万钻石"
+    ];
+
+    const list = document.getElementById("list");
+    const toast = document.getElementById("toast");
+    let cache = JSON.parse(localStorage.getItem("role-data") || "{}");
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.style.opacity = "1";
+      setTimeout(() => toast.style.opacity = "0", 1500);
+    }
+
+    // ✅ 渲染卡片
+    roles.forEach(r => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "header";
+      header.innerHTML = `<span>${r.role}（${r.account}）</span> <span>▼</span>`;
+
+      const content = document.createElement("div");
+      content.className = "content";
+      const saveKey = `${r.account}_${r.role}`;
+      const saved = cache[saveKey] || {};
+
+      content.innerHTML = `
+        <table>
+          <tr><th colspan="2">基本信息</th></tr>
+          <tr><td>抽卡次数</td><td><input type="number" id="gacha_${saveKey}" value="${saved.gacha || ''}"></td></tr>
+        </table>
+
+        <h3>装备等级</h3>
+        <div class="equip-grid">
+          <table>
+            ${equipsLeft.map(eq => `
+              <tr><td>${eq}</td><td><input type="text" id="${eq}_${saveKey}" value="${saved[eq] || ''}"></td></tr>
+            `).join("")}
+          </table>
+          <table>
+            ${equipsRight.map(eq => `
+              <tr><td>${eq}</td><td><input type="text" id="${eq}_${saveKey}" value="${saved[eq] || ''}"></td></tr>
+            `).join("")}
+          </table>
+        </div>
+
+        <h3>任务完成</h3>
+        <div class="task-grid">
+          ${tasks.map(t => `
+            <div class="task-item">
+              <label>${t}</label>
+              <input type="checkbox" id="task_${t}_${saveKey}" ${saved[t] ? 'checked' : ''}>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="save-area">
+          <button id="save_${saveKey}">💾 保存</button>
+        </div>
+      `;
+
+      header.addEventListener("click", () => {
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      });
+
+      content.querySelector(`#save_${saveKey}`).addEventListener("click", () => {
+        const obj = { gacha: document.getElementById(`gacha_${saveKey}`).value };
+        [...equipsLeft, ...equipsRight].forEach(eq => obj[eq] = document.getElementById(`${eq}_${saveKey}`).value);
+        tasks.forEach(t => obj[t] = document.getElementById(`task_${t}_${saveKey}`).checked);
+        cache[saveKey] = obj;
+        localStorage.setItem("role-data", JSON.stringify(cache));
+        showToast(`${r.role} 已保存 ✅`);
+      });
+
+      card.appendChild(header);
+      card.appendChild(content);
+      list.appendChild(card);
+    });
+
+    // ✅ 导出 Markdown
+    document.getElementById("exportMd").addEventListener("click", () => {
+      cache = JSON.parse(localStorage.getItem("role-data") || "{}");
+      let md = "# 角色任务记录\n\n";
+      for (const key in cache) {
+        const [account, role] = key.split("_");
+        const d = cache[key];
+        md += `## ${role}（${account}）\n`;
+        md += `- 抽卡次数：${d.gacha || 0}\n\n`;
+        md += `### 装备等级\n`;
+        [...equipsLeft, ...equipsRight].forEach(eq => md += `- ${eq}：${d[eq] || ''}\n`);
+        md += `\n### 任务完成\n`;
+        tasks.forEach(t => md += `- ${t}：${d[t] ? "✅" : "❌"}\n`);
+        md += "\n---\n\n";
+      }
+      navigator.clipboard.writeText(md);
+      showToast("Markdown 已复制到剪贴板 📋");
+    });
+
+    // ✅ 清除所有数据（无需刷新）
+    document.getElementById("clearAll").addEventListener("click", () => {
+      localStorage.removeItem("role-data");
+      cache = {};
+      // 清空界面内容
+      document.querySelectorAll("input[type='text'], input[type='number']").forEach(i => i.value = "");
+      document.querySelectorAll("input[type='checkbox']").forEach(c => c.checked = false);
+      showToast("所有数据已清除 🗑️");
+    });
+  </script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
