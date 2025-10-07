@@ -44,7 +44,6 @@
         <th>区服</th>
         <th>开服时间</th>
         <th>第42天 (天界神炉开启)</th>
-        <th>第43天 (天界神炉开启)</th>
       </tr>
     </thead>
     <tbody id="tableBody">
@@ -97,14 +96,12 @@
 
     serverData.forEach(item => {
       const day42 = calcDayAfter(item.开服时间, 41);
-      const day43 = calcDayAfter(item.开服时间, 42);
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${item.区服}</td>
         <td>${item.开服时间}</td>
         <td>${day42}</td>
-        <td>${day43}</td>
       `;
       tbody.appendChild(tr);
     });
