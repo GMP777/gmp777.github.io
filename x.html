@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🎮</title>
+  <title>🎮 区服链接表</title>
   <link rel="stylesheet" href="/footer.css" />
   <style>
     body {
@@ -49,22 +49,15 @@
     th {
       background-color: #f0f0f0;
     }
+    tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
     a {
       color: #337ab7;
       text-decoration: none;
     }
     a:hover {
       text-decoration: underline;
-    }
-    @media (max-width: 600px) {
-      table, th, td {
-        font-size: 0.85rem;
-        padding: 8px 4px;
-      }
-      .btn-group button {
-        padding: 6px 10px;
-        font-size: 0.9rem;
-      }
     }
     #timeDisplay {
       margin: 10px 0;
@@ -100,17 +93,54 @@
     "111": "切割神域"
   };
 
-  // 平台 + 区服 + 开服时间
+  // 平台数据
   const platformData = [
-    { name: "336buy", base: "http://gm.336buy.com", remark: "qqq", servers: [ { gameId: "115", serverId: "1", openTime: "2025-10-07" }, { gameId: "115", serverId: "2", openTime: "2025-10-08" }, { gameId: "115", serverId: "120", openTime: "2025-09-07" }, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "395wan", base: "http://game.395wan.com", remark: "qqq", servers: [ { gameId: "115", serverId: "1", openTime: "2025-10-07" }, { gameId: "115", serverId: "2", openTime: "2025-10-08" }, { gameId: "115", serverId: "120", openTime: "2025-09-07" }, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "lovedfm", base: "http://mv.lovedfm.com", remark: "qqq", servers: [ { gameId: "115", serverId: "1", openTime: "2025-10-07" }, { gameId: "115", serverId: "2", openTime: "2025-10-08" }, { gameId: "115", serverId: "120", openTime: "2025-09-07" }, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "99yn", base: "http://gm.99yn.cn", remark: "qqq", servers: [ { gameId: "115", serverId: "1", openTime: "2025-10-07" }, { gameId: "115", serverId: "2", openTime: "2025-10-08" }, { gameId: "115", serverId: "120", openTime: "2025-09-07" }, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "32sf", base: "http://mv.32sf.cn", remark: "q0-1", servers: [ { gameId: "115", serverId: "1", openTime: "2025-10-07" }, { gameId: "115", serverId: "2", openTime: "2025-10-08" }, { gameId: "115", serverId: "120"}, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "395wan", base: "http://game.395wan.com", remark: "aaa", servers: [ { gameId: "115", serverId: "120", openTime: "2025-09-08" }, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "42uc", base: "http://gm.42uc.com", remark: "a0-2", servers: [ { gameId: "115", serverId: "120"}, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "8kyou", base: "http://www.8kyou.com:81", remark: "a1-9", servers: [ { gameId: "115", serverId: "120", openTime: "2025-09-08" }, { gameId: "111", serverId: "277", openTime: "2025-09-10" } ] },
-    { name: "xayxms", base: "http://gm.yx4f.com:81", remark: "xxxx", servers: [ { gameId: "115", serverId: "120"}, { gameId: "111", serverId: "277"}]}
+    { name: "336buy", base: "http://gm.336buy.com", remark: "qqq", servers: [
+      { gameId: "115", serverId: "1", openTime: "2025-10-07" },
+      { gameId: "115", serverId: "2", openTime: "2025-10-08" },
+      { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "395wan", base: "http://game.395wan.com", remark: "qqq", servers: [
+      { gameId: "115", serverId: "1", openTime: "2025-10-07" },
+      { gameId: "115", serverId: "2", openTime: "2025-10-08" },
+      { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "lovedfm", base: "http://mv.lovedfm.com", remark: "qqq", servers: [
+      { gameId: "115", serverId: "1", openTime: "2025-10-07" },
+      { gameId: "115", serverId: "2", openTime: "2025-10-08" },
+      { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "99yn", base: "http://gm.99yn.cn", remark: "qqq", servers: [
+      { gameId: "115", serverId: "1", openTime: "2025-10-07" },
+      { gameId: "115", serverId: "2", openTime: "2025-10-08" },
+      { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "32sf", base: "http://mv.32sf.cn", remark: "q0-1", servers: [
+      { gameId: "115", serverId: "1", openTime: "2025-10-07" },
+      { gameId: "115", serverId: "2", openTime: "2025-10-08" },
+      { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "395wan", base: "http://game.395wan.com", remark: "aaa", servers: [
+      { gameId: "115", serverId: "120", openTime: "2025-09-08" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "42uc", base: "http://gm.42uc.com", remark: "a0-2", servers: [
+      { gameId: "115", serverId: "120", openTime: "2025-09-07" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "8kyou", base: "http://www.8kyou.com:81", remark: "a1-9", servers: [
+      { gameId: "115", serverId: "120", openTime: "2025-09-08" },
+      { gameId: "111", serverId: "277", openTime: "2025-09-10" }
+    ]},
+    { name: "xayxms", base: "http://gm.yx4f.com:81", remark: "xxxx", servers: [
+      { gameId: "115", serverId: "120" },
+      { gameId: "111", serverId: "277" }
+    ]}
   ];
 
   const combinedButtons = document.getElementById('combinedButtons');
@@ -120,27 +150,26 @@
   let selectedGameId = null;
   let selectedServerId = null;
 
-  // 获取北京时间
   function getBeijingTime() {
     const now = new Date();
     const utc = now.getTime() + now.getTimezoneOffset() * 60000;
     return new Date(utc + 8 * 3600000);
   }
 
-  // 将数字转换成圈号
   function numberToCircle(num) {
     const circles = ["①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩"];
     return circles[num - 1] || num;
   }
 
-  // 更新时间显示
   function updateTimeDisplay() {
     const bjTime = getBeijingTime();
-    timeDisplay.textContent = "北京时间：" + bjTime.toLocaleString('zh-CN', { hour12: false });
+    timeDisplay.textContent = "北京时间：" + bjTime.toLocaleString('zh-CN', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    });
     renderTable();
   }
 
-  // 渲染区服选择按钮
   function renderCombinedButtons() {
     combinedButtons.innerHTML = '';
     const seen = new Set();
@@ -165,7 +194,6 @@
     });
   }
 
-  // 渲染表格
   function renderTable() {
     if (!selectedGameId || !selectedServerId) return;
     tbody.innerHTML = '';
@@ -173,9 +201,25 @@
     const bjTime = getBeijingTime();
     let index = 1;
 
-    platformData.forEach(pf => {
+    // ✅ 按 remark 首字母排序
+    const sortedPlatforms = [...platformData].sort((a, b) => {
+      const ra = (a.remark || '').trim().charAt(0).toLowerCase();
+      const rb = (b.remark || '').trim().charAt(0).toLowerCase();
+      if (ra < rb) return -1;
+      if (ra > rb) return 1;
+      return 0;
+    });
+
+    sortedPlatforms.forEach(pf => {
       pf.servers.forEach(sv => {
         if (sv.gameId !== selectedGameId || sv.serverId !== selectedServerId) return;
+
+        let remarkType = "";
+        if (pf.remark) {
+          const firstChar = pf.remark.trim().charAt(0).toLowerCase();
+          if (firstChar === "q") remarkType = " (Q类)";
+          else if (firstChar === "a") remarkType = " (A类)";
+        }
 
         const loginUrl = `${pf.base}/login/${sv.gameId}/${sv.serverId}.html`;
         const homeUrl = `${pf.base}/games/${sv.gameId}.html`;
@@ -187,16 +231,15 @@
           const bjDate = new Date(bjTime.getFullYear(), bjTime.getMonth(), bjTime.getDate());
           const diffDays = Math.floor((bjDate - openDate) / (1000 * 60 * 60 * 24));
 
-          if (diffDays === 2) {
-            extra = " 🎉";
-          } else if (diffDays >= 3) {
-            extra = " 🔚";
-          }
+          if (diffDays < 0) extra = " ⏳ 未开服";
+          else if (diffDays === 0) extra = " 🚀 今日开服";
+          else if (diffDays === 1) extra = " 🎉 昨日开服";
+          else if (diffDays >= 2) extra = " 🔚 已过期";
         }
 
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${pf.name}</td>
+          <td>${pf.name}${remarkType}</td>
           <td>${pf.remark}</td>
           <td><a href="${loginUrl}" target="_blank">${numberToCircle(index)} ${gameNames[sv.gameId]}${sv.serverId}服${extra}</a></td>
           <td><a href="${homeUrl}" target="_blank">主页</a></td>
