@@ -3,9 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>角色任务填写表</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+  <link rel="stylesheet" href="/footer.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -92,18 +90,12 @@
       border: 1px solid var(--border);
       padding: 8px;
       text-align: left;
+      vertical-align: top;
     }
 
     th {
       background: #f8fafc;
       font-weight: 600;
-    }
-
-    input[type="text"] {
-      width: 80px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 4px 6px;
     }
 
     /* ✅ 装备双列布局 */
@@ -147,6 +139,14 @@
       margin-bottom: 16px;
     }
 
+    /* ✅ 等级单选框区域 */
+    .level-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      font-size: 14px;
+    }
+
     #toast {
       position: fixed;
       bottom: 20px;
@@ -176,7 +176,6 @@
   <div id="toast"></div>
 
   <script>
-    // ✅ 账号 & 角色
     const roles = [
       { account: "打工1号", role: "剑圣一号" },
       { account: "打工2号", role: "灵狐二号" },
@@ -190,14 +189,13 @@
 
     const equipsLeft = ["武器","头盔","手臂","左戒","腰带"];
     const equipsRight = ["衣服","项链","镯子","右戒","鞋子"];
-
     const tasks = [
       "赏金猎人","降魔道人","试炼道人",
       "封神法器1/4","封神法器2/4","封神法器3/4","封神法器4/4",
       "每日充值50万钻石","每日充值100万钻石"
     ];
-
     const gachaOptions = [1000, 2000, 3000];
+    const levels = Array.from({length: 19}, (_,i) => i + 42); // 42~60
 
     const list = document.getElementById("list");
     const toast = document.getElementById("toast");
@@ -222,6 +220,25 @@
       const saveKey = `${r.account}_${r.role}`;
       const saved = cache[saveKey] || {};
 
+      const createEquipTable = (arr) => `
+        <table>
+          ${arr.map(eq => `
+            <tr>
+              <td>${eq}</td>
+              <td>
+                <div class="level-options">
+                  ${levels.map(lv => `
+                    <label>
+                      <input type="radio" name="${eq}_${saveKey}" value="${lv}" ${saved[eq]==lv ? 'checked' : ''}>${lv}
+                    </label>
+                  `).join("")}
+                </div>
+              </td>
+            </tr>
+          `).join("")}
+        </table>
+      `;
+
       content.innerHTML = `
         <h3>抽卡次数</h3>
         <div class="gacha-options">
@@ -235,16 +252,8 @@
 
         <h3>装备等级</h3>
         <div class="equip-grid">
-          <table>
-            ${equipsLeft.map(eq => `
-              <tr><td>${eq}</td><td><input type="text" id="${eq}_${saveKey}" value="${saved[eq] || ''}"></td></tr>
-            `).join("")}
-          </table>
-          <table>
-            ${equipsRight.map(eq => `
-              <tr><td>${eq}</td><td><input type="text" id="${eq}_${saveKey}" value="${saved[eq] || ''}"></td></tr>
-            `).join("")}
-          </table>
+          ${createEquipTable(equipsLeft)}
+          ${createEquipTable(equipsRight)}
         </div>
 
         <h3>任务完成</h3>
@@ -269,7 +278,10 @@
       content.querySelector(`#save_${saveKey}`).addEventListener("click", () => {
         const gachaEl = document.querySelector(`input[name="gacha_${saveKey}"]:checked`);
         const obj = { gacha: gachaEl ? parseInt(gachaEl.value) : null };
-        [...equipsLeft, ...equipsRight].forEach(eq => obj[eq] = document.getElementById(`${eq}_${saveKey}`).value);
+        [...equipsLeft, ...equipsRight].forEach(eq => {
+          const selected = document.querySelector(`input[name="${eq}_${saveKey}"]:checked`);
+          obj[eq] = selected ? parseInt(selected.value) : '';
+        });
         tasks.forEach(t => obj[t] = document.getElementById(`task_${t}_${saveKey}`).checked);
         cache[saveKey] = obj;
         localStorage.setItem("role-data", JSON.stringify(cache));
@@ -302,17 +314,15 @@
     document.getElementById("clearAll").addEventListener("click", () => {
       localStorage.removeItem("role-data");
       cache = {};
-      document.querySelectorAll("input[type='text']").forEach(i => i.value = "");
       document.querySelectorAll("input[type='radio']").forEach(r => r.checked = false);
       document.querySelectorAll("input[type='checkbox']").forEach(c => c.checked = false);
       showToast("所有数据已清除 🗑️");
     });
   </script>
-  <!-- Footer -->
+
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
   <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
