@@ -77,8 +77,8 @@
     {
       id: '111',
       name: '满V切割神域',
-      servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261,262, 263, 264, 265,275,276,277],
-      lords: [262, 263, 264, 265,275,276],
+      servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261, 262, 263, 264, 265, 275, 276, 277],
+      lords: [262, 263, 264, 265, 275, 276],
       type: 'xayxms'
     },
     {
@@ -101,7 +101,7 @@
       type: '962yx',
       mainAccount: [115,116],
       altAccount: [115,116,119,120,123],
-      daiwan: [112,118,123] // ✅ 新增代玩
+      daiwan: [112,118,123]
     },
     {
       id: 'ydcs',
@@ -113,7 +113,27 @@
       id: '88-7',
       name: '屠神',
       type: '8syx',
-      servers: [25, 26, 30] // ✅ 屠神实际区服
+      servers: [25, 26, 30]
+    },
+    {
+      id: 'swcq',
+      name: '圣王传奇',
+      type: '9awan',
+      servers: [
+        { show: 2085, real: 97947 },
+        { show: 2090, real: 98470 },
+        { show: 2091, real: 98471 },
+        { show: 2092, real: 98472 },
+        { show: 2093, real: 98473 },
+        { show: 2094, real: 98474 },
+        { show: 2095, real: 98475 },
+        { show: 2096, real: 98476 },
+        { show: 2097, real: 98477 },
+        { show: 2098, real: 98478 },
+        { show: 2099, real: 98479 }
+      ],
+      homepage9awan: 'http://www.9awan.com/home/server/283',
+      homepage3uyy: 'https://88.3uyy.com/home/server/283'
     }
   ];
 
@@ -128,6 +148,7 @@
       case '962-115': return 'http://gm.962yx.com/games/115.html';
       case 'ydcs': return 'http://www.1100yx.com/game_list_8.html';
       case '88-7': return 'http://www.8syx.com/game/7/';
+      case 'swcq': return 'http://www.9awan.com/home/server/283';
       default: return '#';
     }
   }
@@ -140,7 +161,6 @@
 
     function renderSection(title, serverList) {
       if (!serverList || serverList.length === 0) return;
-
       const titleDiv = document.createElement('div');
       titleDiv.textContent = title;
       titleDiv.style.gridColumn = '1 / -1';
@@ -148,81 +168,92 @@
       titleDiv.style.margin = '10px 0 5px';
       container.appendChild(titleDiv);
 
-      serverList.forEach(server => {
-        const item = document.createElement('div');
-        item.className = 'grid-item';
+      serverList.forEach(server => renderServer(server));
+    }
 
-        const a = document.createElement('a');
-        if (game.type === '1100yx') {
-          a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
-        } else if (game.type === '962yx') {
-          a.href = `http://gm.962yx.com/login/115/${server}.html`;
-        } else if (game.type === '8syx') {
-          a.href = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${server}`;
-        } else {
-          a.href = `http://gm.yx4f.com:81/login/${game.id}/${server}.html`;
-        }
+    function renderServer(server) {
+      const item = document.createElement('div');
+      item.className = 'grid-item';
 
-        a.target = '_blank';
-        let label = `${server}区`;
-        a.textContent = label;
+      const a = document.createElement('a');
+      let label, realId;
+      if (typeof server === 'object') {
+        label = `${server.show}区`;
+        realId = server.real;
+      } else {
+        label = `${server}区`;
+        realId = server;
+      }
 
-        if (game.lords && game.lords.includes(server)) {
-          a.classList.add('lord-btn');
-        }
+      if (game.type === '1100yx') {
+        a.href = `http://www.1100yx.com/Game_Login_8_${realId}.html`;
+      } else if (game.type === '962yx') {
+        a.href = `http://gm.962yx.com/login/115/${realId}.html`;
+      } else if (game.type === '8syx') {
+        a.href = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${realId}`;
+      } else if (game.type === '9awan') {
+        a.href = `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${realId}`;
+      } else {
+        a.href = `http://gm.yx4f.com:81/login/${game.id}/${realId}.html`;
+      }
 
-        item.appendChild(a);
-        container.appendChild(item);
-      });
+      a.target = '_blank';
+      a.textContent = label;
+
+      if (game.lords && game.lords.includes(realId)) {
+        a.classList.add('lord-btn');
+      }
+
+      item.appendChild(a);
+      container.appendChild(item);
     }
 
     if (game.mainAccount || game.altAccount || game.daiwan) {
       if (game.mainAccount) renderSection('👑 主号', game.mainAccount);
       if (game.altAccount) renderSection('🌀 小号', game.altAccount);
-      if (game.daiwan) renderSection('🎯 代玩', game.daiwan); // ✅ 渲染代玩
+      if (game.daiwan) renderSection('🎯 代玩', game.daiwan);
     } else if (game.canHang || game.cannotHang) {
       renderSection('✅ 刷', game.canHang);
       renderSection('⛔ 签到', game.cannotHang);
     } else {
-      game.servers.forEach(server => {
-        const item = document.createElement('div');
-        item.className = 'grid-item';
-
-        const a = document.createElement('a');
-        if (game.type === '1100yx') {
-          a.href = `http://www.1100yx.com/Game_Login_8_${server}.html`;
-        } else if (game.type === '962yx') {
-          a.href = `http://gm.962yx.com/login/115/${server}.html`;
-        } else if (game.type === '8syx') {
-          a.href = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${server}`;
-        } else {
-          a.href = `http://gm.yx4f.com:81/login/${game.id}/${server}.html`;
-        }
-
-        a.target = '_blank';
-        let label = `${server}区`;
-        a.textContent = label;
-
-        if (game.lords && game.lords.includes(server)) {
-          a.classList.add('lord-btn');
-        }
-
-        item.appendChild(a);
-        container.appendChild(item);
-      });
+      game.servers.forEach(server => renderServer(server));
     }
 
-    const homeItem = document.createElement('div');
-    homeItem.className = 'grid-item';
-
-    const homeLink = document.createElement('a');
-    homeLink.href = getGameHomepageURL(game.id);
-    homeLink.target = '_blank';
-    homeLink.style.fontWeight = 'bold';
-    homeLink.textContent = '游戏主页';
-
-    homeItem.appendChild(homeLink);
-    container.appendChild(homeItem);
+    // 添加主页链接
+    if (game.homepage9awan || game.homepage3uyy) {
+      if (game.homepage9awan) {
+        const homeItem = document.createElement('div');
+        homeItem.className = 'grid-item';
+        const homeLink = document.createElement('a');
+        homeLink.href = game.homepage9awan;
+        homeLink.target = '_blank';
+        homeLink.style.fontWeight = 'bold';
+        homeLink.textContent = '9a玩主页';
+        homeItem.appendChild(homeLink);
+        container.appendChild(homeItem);
+      }
+      if (game.homepage3uyy) {
+        const homeItem = document.createElement('div');
+        homeItem.className = 'grid-item';
+        const homeLink = document.createElement('a');
+        homeLink.href = game.homepage3uyy;
+        homeLink.target = '_blank';
+        homeLink.style.fontWeight = 'bold';
+        homeLink.textContent = '3U主页';
+        homeItem.appendChild(homeLink);
+        container.appendChild(homeItem);
+      }
+    } else {
+      const homeItem = document.createElement('div');
+      homeItem.className = 'grid-item';
+      const homeLink = document.createElement('a');
+      homeLink.href = getGameHomepageURL(game.id);
+      homeLink.target = '_blank';
+      homeLink.style.fontWeight = 'bold';
+      homeLink.textContent = '游戏主页';
+      homeItem.appendChild(homeLink);
+      container.appendChild(homeItem);
+    }
 
     return container;
   }
@@ -239,7 +270,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     tabsContainer.appendChild(btn);
-
     tablesContainer.appendChild(createGrid(game));
   });
 
