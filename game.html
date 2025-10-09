@@ -32,26 +32,29 @@
     }
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 10px;
       justify-items: center;
       margin-bottom: 30px;
     }
+    .grid-item {
+      text-align: center;
+    }
     .grid-item a {
-      display: inline-block;
-      padding: 8px 12px;
+      display: block;
+      padding: 6px 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
       color: #007bff;
       text-decoration: none;
       white-space: nowrap;
       transition: 0.2s;
+      font-size: 0.9em;
     }
     .grid-item a:hover {
-      text-decoration: underline;
+      background: #007bff;
+      color: #fff;
     }
-
-    /* 👑 城主按钮样式 */
     .grid-item a.lord-btn {
       border-color: #ff9800;
       background: #fff7e6;
@@ -61,9 +64,7 @@
     .grid-item a.lord-btn:hover {
       background: #ff9800;
       color: #fff;
-      text-decoration: none;
     }
-
     .hidden { display: none; }
   </style>
 </head>
@@ -167,7 +168,6 @@
       titleDiv.style.fontWeight = 'bold';
       titleDiv.style.margin = '10px 0 5px';
       container.appendChild(titleDiv);
-
       serverList.forEach(server => renderServer(server));
     }
 
@@ -175,7 +175,7 @@
       const item = document.createElement('div');
       item.className = 'grid-item';
 
-      const a = document.createElement('a');
+      // 支持数字或对象格式
       let label, realId;
       if (typeof server === 'object') {
         label = `${server.show}区`;
@@ -185,26 +185,38 @@
         realId = server;
       }
 
-      if (game.type === '1100yx') {
-        a.href = `http://www.1100yx.com/Game_Login_8_${realId}.html`;
-      } else if (game.type === '962yx') {
-        a.href = `http://gm.962yx.com/login/115/${realId}.html`;
-      } else if (game.type === '8syx') {
-        a.href = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${realId}`;
-      } else if (game.type === '9awan') {
-        a.href = `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${realId}`;
+      // 圣王传奇：两个平台按钮
+      if (game.type === '9awan') {
+        const a9a = document.createElement('a');
+        a9a.href = `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${realId}`;
+        a9a.textContent = label + ' (9a)';
+        a9a.target = '_blank';
+        item.appendChild(a9a);
+
+        const a3u = document.createElement('a');
+        a3u.href = `https://88.3uyy.com/game.php?action=play&game_id=283&server_id=${realId}`;
+        a3u.textContent = label + ' (3U)';
+        a3u.target = '_blank';
+        item.appendChild(a3u);
       } else {
-        a.href = `http://gm.yx4f.com:81/login/${game.id}/${realId}.html`;
+        const a = document.createElement('a');
+        if (game.type === '1100yx') {
+          a.href = `http://www.1100yx.com/Game_Login_8_${realId}.html`;
+        } else if (game.type === '962yx') {
+          a.href = `http://gm.962yx.com/login/115/${realId}.html`;
+        } else if (game.type === '8syx') {
+          a.href = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${realId}`;
+        } else {
+          a.href = `http://gm.yx4f.com:81/login/${game.id}/${realId}.html`;
+        }
+        a.textContent = label;
+        a.target = '_blank';
+        if (game.lords && game.lords.includes(realId)) {
+          a.classList.add('lord-btn');
+        }
+        item.appendChild(a);
       }
 
-      a.target = '_blank';
-      a.textContent = label;
-
-      if (game.lords && game.lords.includes(realId)) {
-        a.classList.add('lord-btn');
-      }
-
-      item.appendChild(a);
       container.appendChild(item);
     }
 
