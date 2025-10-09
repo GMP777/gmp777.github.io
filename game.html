@@ -30,18 +30,32 @@
       background: #007bff;
       color: white;
     }
+
     .grid-container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
       justify-items: center;
       margin-bottom: 30px;
     }
+
     .grid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
       text-align: center;
     }
+
+    .swcq-item {
+      flex-direction: row;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
     .grid-item a {
-      display: block;
+      display: inline-block;
       padding: 6px 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -55,6 +69,7 @@
       background: #007bff;
       color: #fff;
     }
+
     .grid-item a.lord-btn {
       border-color: #ff9800;
       background: #fff7e6;
@@ -65,7 +80,9 @@
       background: #ff9800;
       color: #fff;
     }
+
     .hidden { display: none; }
+
   </style>
 </head>
 <body>
@@ -78,8 +95,8 @@
     {
       id: '111',
       name: '满V切割神域',
-      servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261, 262, 263, 264, 265, 275, 276, 277],
-      lords: [262, 263, 264, 265, 275, 276],
+      servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261,262, 263, 264, 265,275,276,277],
+      lords: [262, 263, 264, 265,275,276],
       type: 'xayxms'
     },
     {
@@ -175,7 +192,6 @@
       const item = document.createElement('div');
       item.className = 'grid-item';
 
-      // 支持数字或对象格式
       let label, realId;
       if (typeof server === 'object') {
         label = `${server.show}区`;
@@ -185,17 +201,19 @@
         realId = server;
       }
 
-      // 圣王传奇：两个平台按钮
+      // 圣王传奇：两个平台按钮同一行
       if (game.type === '9awan') {
+        item.classList.add('swcq-item');
+
         const a9a = document.createElement('a');
         a9a.href = `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${realId}`;
-        a9a.textContent = label + ' (9a)';
+        a9a.textContent = label + '·9a';
         a9a.target = '_blank';
         item.appendChild(a9a);
 
         const a3u = document.createElement('a');
         a3u.href = `https://88.3uyy.com/game.php?action=play&game_id=283&server_id=${realId}`;
-        a3u.textContent = label + ' (3U)';
+        a3u.textContent = '3U';
         a3u.target = '_blank';
         item.appendChild(a3u);
       } else {
