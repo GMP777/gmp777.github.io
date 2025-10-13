@@ -14,6 +14,7 @@
 |典狱长刷新预测|[v.1.0](https://gmp777.github.io/boss.html)`2025-07-27 13:15:23`|
 |小号记录|[v.2.0](https://gmp777.github.io/day.html)`2025-07-28 02:43:54`|
 |小号抽卡|[v.3.0](https://gmp777.github.io/x.html)`2025-08-07 05:18:46`|
+|圣王传奇区服|<https://gmp777.github.io/sw.html>`2025-10-14 04:56:20`|
 
   <!-- Footer -->
   <div class="footer-wrapper">
