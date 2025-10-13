@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>圣王传奇 - 点击复制链接</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#06b6d4;
+      --radius:12px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: Inter, Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
+      background:linear-gradient(180deg,#071025 0%, #0b1a2a 100%); color: #e6eef8; min-height:100vh; padding:20px;
+    }
+    .wrap{max-width:900px; margin:0 auto}
+    header{text-align:center; margin-bottom:24px}
+    header h1{font-size:22px; margin:0 0 6px 0}
+    header p{margin:0; color:var(--muted); font-size:14px}
+
+    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:var(--radius); padding:18px; cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset, 0 6px 18px rgba(2,6,23,0.6);
+      text-align:center;
+    }
+    .card:hover{box-shadow:0 8px 26px rgba(6,182,212,0.25)}
+    .card:active{transform:translateY(1px)}
+    .title{font-weight:700; font-size:18px; color:#fff; margin-bottom:8px}
+    .link{font-size:12px; color:var(--muted); word-break:break-all}
+
+    .toast{
+      position:fixed; left:50%; transform:translateX(-50%); bottom:28px; background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#022; padding:10px 16px; border-radius:999px; box-shadow:0 6px 24px rgba(6,22,34,0.6); font-weight:600; display:none; z-index:999;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>圣王传奇服务器列表</h1>
+      <p>点击任意卡片即可复制对应服务器的链接</p>
+    </header>
+
+    <div class="grid" id="cardContainer"></div>
+  </div>
+
+  <div id="toast" class="toast">已复制链接到剪贴板</div>
+
+  <script>
+    // JSON 管理所有服务器数据
+    const servers = [
+      { id: 2094, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98474' },
+      { id: 2095, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98475' },
+      { id: 2096, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98476' },
+      { id: 2097, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98477' },
+      { id: 2098, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98478' },
+      { id: 2099, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98479' },
+      { id: 2100, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98480' },
+      { id: 2101, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98481' },
+      { id: 2102, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98482' },
+      { id: 2103, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98483' },
+      { id: 2104, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98484' },
+      { id: 2105, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98485' },
+      { id: 2106, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98486' }
+    ];
+
+    const container = document.getElementById('cardContainer');
+    const toast = document.getElementById('toast');
+
+    // 渲染所有卡片
+    function renderCards() {
+      container.innerHTML = '';
+      servers.forEach(server => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.tabIndex = 0;
+        card.innerHTML = `
+          <div class="title">圣王传奇${server.id}</div>
+          <div class="link">${server.url}</div>
+        `;
+        card.addEventListener('click', () => copyText(server.url));
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            copyText(server.url);
+          }
+        });
+        container.appendChild(card);
+      });
+    }
+
+    function copyText(text){
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+      } else fallbackCopy(text);
+    }
+
+    function fallbackCopy(text){
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try{document.execCommand('copy'); showToast();}catch(e){}
+      ta.remove();
+    }
+
+    function showToast(){
+      toast.style.display='block'; toast.style.opacity='1';
+      setTimeout(()=>{
+        toast.style.transition='opacity 300ms ease'; toast.style.opacity='0';
+        setTimeout(()=>toast.style.display='none',300);
+      },1000);
+    }
+
+    renderCards();
+  </script>
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
