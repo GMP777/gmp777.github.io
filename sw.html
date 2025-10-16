@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>圣王传奇 - 点击复制链接</title>
+  <title>圣王传奇</title>
   <link rel="stylesheet" href="/footer.css" />
   <style>
     :root{
@@ -31,7 +31,11 @@
     }
     .card:hover{box-shadow:0 8px 26px rgba(6,182,212,0.25)}
     .card:active{transform:translateY(1px)}
-    .title{font-weight:700; font-size:18px; color:#fff; margin-bottom:6px}
+    .title{
+      font-weight:700; font-size:18px; color:#fff; margin-bottom:6px;
+      display:flex; justify-content:center; align-items:center; gap:6px;
+    }
+    .new-tag{font-size:16px; color:var(--accent);}
     .info{font-size:13px; color:var(--muted)}
 
     .toast{
@@ -56,7 +60,7 @@
   <div id="toast" class="toast">已复制链接到剪贴板</div>
 
   <script>
-    // === 服务器数据（新增 openDate 开服时间） ===
+    // === 服务器数据 ===
     const servers = [
       { id: 2094, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98474', openDate: '2025-10-09' },
       { id: 2095, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98475', openDate: '2025-10-10' },
@@ -70,7 +74,9 @@
       { id: 2103, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98483', openDate: '2025-10-18' },
       { id: 2104, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98484', openDate: '2025-10-19' },
       { id: 2105, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98485', openDate: '2025-10-20' },
-      { id: 2106, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98486', openDate: '2025-10-21' }
+      { id: 2106, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98486', openDate: '2025-10-21' },
+      { id: 2107, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98487', openDate: '2025-10-22' },
+      { id: 2108, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98488', openDate: '2025-10-23' }
     ];
 
     const container = document.getElementById('cardContainer');
@@ -85,20 +91,20 @@
         const openDate = new Date(server.openDate);
         const diffDays = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
         let infoText = '';
+        let newTag = '';
 
         if (diffDays < 0) {
           infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
         } else if (diffDays < 7) {
           infoText = `开服第 ${diffDays + 1} 天`;
-        } else {
-          infoText = ''; // 超过7天不显示
+          if (diffDays === 0) newTag = '<span class="new-tag">🆕</span>';
         }
 
         const card = document.createElement('div');
         card.className = 'card';
         card.tabIndex = 0;
         card.innerHTML = `
-          <div class="title">圣王传奇${server.id}服</div>
+          <div class="title">圣王传奇${server.id}服 ${newTag}</div>
           <div class="info">${infoText}</div>
         `;
         card.addEventListener('click', () => copyText(server.url));
@@ -112,7 +118,7 @@
       });
     }
 
-    // === 复制到剪贴板 ===
+    // === 复制功能 ===
     function copyText(text){
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
