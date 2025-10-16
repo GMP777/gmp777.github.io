@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>圣王传奇</title>
+  <title>圣王传奇 - 点击复制链接</title>
   <link rel="stylesheet" href="/footer.css" />
   <style>
     :root{
@@ -33,9 +33,16 @@
     .card:active{transform:translateY(1px)}
     .title{
       font-weight:700; font-size:18px; color:#fff; margin-bottom:6px;
-      display:flex; justify-content:center; align-items:center; gap:6px;
+      display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:6px;
     }
-    .new-tag{font-size:16px; color:var(--accent);}
+    .badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; border-radius:999px;
+      padding:2px 6px; box-shadow:0 1px 3px rgba(0,0,0,0.3);
+    }
+    .badge-new{background:#06b6d4; color:#022;}
+    .badge-guild{background:#facc15; color:#222;}
+    .badge-diamond{background:#38bdf8; color:#022;}
     .info{font-size:13px; color:var(--muted)}
 
     .toast{
@@ -86,25 +93,30 @@
     function renderCards() {
       container.innerHTML = '';
       const now = new Date();
+      const todayWeekday = now.getDay(); // 0=周日, 3=周三, 6=周六
 
       servers.forEach(server => {
         const openDate = new Date(server.openDate);
         const diffDays = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
         let infoText = '';
-        let newTag = '';
+        let icons = '';
 
         if (diffDays < 0) {
           infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
         } else if (diffDays < 7) {
           infoText = `开服第 ${diffDays + 1} 天`;
-          if (diffDays === 0) newTag = '<span class="new-tag">🆕</span>';
+          if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
+          if (diffDays === 2) icons += `<span class="badge badge-guild">👑 公会战</span>`;
+          if (diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
+            icons += `<span class="badge badge-diamond">💎 战日</span>`;
+          }
         }
 
         const card = document.createElement('div');
         card.className = 'card';
         card.tabIndex = 0;
         card.innerHTML = `
-          <div class="title">圣王传奇${server.id}服 ${newTag}</div>
+          <div class="title">圣王传奇${server.id}服 ${icons}</div>
           <div class="info">${infoText}</div>
         `;
         card.addEventListener('click', () => copyText(server.url));
