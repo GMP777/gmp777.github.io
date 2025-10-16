@@ -43,6 +43,7 @@
     .badge-new{background:#06b6d4; color:#022;}
     .badge-guild{background:#facc15; color:#222;}
     .badge-diamond{background:#38bdf8; color:#022;}
+    .badge-old{background:#64748b; color:#fff;}
     .info{font-size:13px; color:var(--muted)}
 
     .toast{
@@ -110,6 +111,9 @@
           if (diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
             icons += `<span class="badge badge-diamond">💎 战日</span>`;
           }
+        } else {
+          infoText = `⌛️ 待合服`;
+          icons += `<span class="badge badge-old">⌛️ 待合服</span>`;
         }
 
         const card = document.createElement('div');
