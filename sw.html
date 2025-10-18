@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>圣王传奇 - 点击复制链接</title>
-  <link rel="stylesheet" href="/footer.css" />
   <style>
     :root{
       --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#06b6d4;
@@ -44,6 +43,7 @@
     .badge-guild{background:#facc15; color:#222;}
     .badge-diamond{background:#38bdf8; color:#022;}
     .badge-old{background:#64748b; color:#fff;}
+    .badge-merge{background:#ef4444; color:#fff;} /* 合服徽章 */
     .info{font-size:13px; color:var(--muted)}
 
     .toast{
@@ -59,7 +59,7 @@
   <div class="wrap">
     <header>
       <h1>圣王传奇服务器列表</h1>
-      <p>点击任意卡片即可复制对应服务器的链接</p>
+      <p>点击任意卡片即可复制对应服务器的链接（时间基于北京时间 UTC+8）</p>
     </header>
 
     <div class="grid" id="cardContainer"></div>
@@ -68,8 +68,11 @@
   <div id="toast" class="toast">已复制链接到剪贴板</div>
 
   <script>
-    // === 服务器数据 ===
+    // === 服务器数据（包含 2091 - 2108）===
     const servers = [
+      { id: 2091, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98471', openDate: '2025-10-06' },
+      { id: 2092, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98472', openDate: '2025-10-07' },
+      { id: 2093, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98473', openDate: '2025-10-08' },
       { id: 2094, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98474', openDate: '2025-10-09' },
       { id: 2095, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98475', openDate: '2025-10-10' },
       { id: 2096, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98476', openDate: '2025-10-11' },
@@ -87,33 +90,82 @@
       { id: 2108, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98488', openDate: '2025-10-23' }
     ];
 
+    // === 合服范围：仅 2091 - 2097，且合服从“今天（北京时间）0点”开始计算 ===
+    const mergedRange = { from: 2091, to: 2097 };
+
     const container = document.getElementById('cardContainer');
     const toast = document.getElementById('toast');
+
+    // 获取当前北京时间（Date 对象）
+    function getBeijingNow() {
+      const now = new Date();
+      const beijingOffset = 8 * 60; // 分钟数
+      const localOffset = now.getTimezoneOffset(); // 本地与 UTC 的分钟差
+      const diffMin = beijingOffset + localOffset;
+      return new Date(now.getTime() + diffMin * 60 * 1000);
+    }
+
+    // 获取“今日（北京时间）00:00”的 Date 对象
+    function getBeijingStartOfToday() {
+      const now = getBeijingNow();
+      const year = now.getFullYear();
+      const month = now.getMonth(); // 0-based
+      const date = now.getDate();
+      // 使用构造器并指定为本地时间等价于该时区的午夜，但为保险起见，使用 ISO 带时区形式
+      // 构造 yyyy-mm-ddT00:00:00+08:00
+      const y = year.toString().padStart(4,'0');
+      const m = (month + 1).toString().padStart(2,'0');
+      const d = date.toString().padStart(2,'0');
+      return new Date(`${y}-${m}-${d}T00:00:00+08:00`);
+    }
 
     // === 渲染卡片 ===
     function renderCards() {
       container.innerHTML = '';
-      const now = new Date();
+
+      const now = getBeijingNow();
       const todayWeekday = now.getDay(); // 0=周日, 3=周三, 6=周六
+      const mergeStart = getBeijingStartOfToday(); // 合服从今天北京0点开始
 
       servers.forEach(server => {
-        const openDate = new Date(server.openDate);
+        const openDate = new Date(server.openDate + "T00:00:00+08:00"); // 明确开服为北京时间 0 点
         const diffDays = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
         let infoText = '';
         let icons = '';
 
         if (diffDays < 0) {
+          // 未开服
           infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
-        } else if (diffDays < 7) {
-          infoText = `开服第 ${diffDays + 1} 天`;
-          if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
-          if (diffDays === 2) icons += `<span class="badge badge-guild">👑 公会战</span>`;
+        } else {
+          // 已经开服：主信息保留“开服第 N 天”（若超过7天则显示为“开服共 N 天”）
+          if (diffDays < 7) {
+            infoText = `开服第 ${diffDays + 1} 天`;
+          } else {
+            infoText = `开服共 ${diffDays + 1} 天`;
+          }
+
+          // 常见徽章：新服 / 战日
+          if (diffDays === 0) {
+            icons += `<span class="badge badge-new">🆕 新服</span>`;
+          }
+
           if (diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
             icons += `<span class="badge badge-diamond">💎 战日</span>`;
           }
-        } else {
-          infoText = `⌛️ 待合服`;
-          icons += `<span class="badge badge-old">⌛️ 待合服</span>`;
+
+          // 公会战徽章逻辑调整：
+          // - 如果该服在合服范围（2091-2097），用“合服第 X 天”替代公会战徽章；
+          // - 否则若 diffDays === 2 则显示公会战徽章。
+          if (server.id >= mergedRange.from && server.id <= mergedRange.to) {
+            const mergeDiffDays = Math.floor((now - mergeStart) / (1000 * 60 * 60 * 24));
+            // 合服第几天，从 1 开始
+            const mergeDayNum = mergeDiffDays >= 0 ? mergeDiffDays + 1 : 0;
+            icons += `<span class="badge badge-merge">⚔️ 合服第 ${mergeDayNum} 天</span>`;
+          } else {
+            if (diffDays === 2) {
+              icons += `<span class="badge badge-guild">👑 公会战</span>`;
+            }
+          }
         }
 
         const card = document.createElement('div');
@@ -165,6 +217,7 @@
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
-  <script src="/load-footer.js"></script>
+  <!-- 若需要加载公共 footer，请保留下面的脚本引用 -->
+  <!-- <script src="/load-footer.js"></script> -->
 </body>
 </html>
