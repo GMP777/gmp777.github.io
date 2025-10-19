@@ -98,17 +98,24 @@
   <div id="toast" class="toast">已复制链接到剪贴板</div>
 
   <script>
-    // === 服务器数据 自动生成 2091~2111 ===
+    // === 服务器数据 自动生成 2091~2111（修正：按北京时间格式化日期，避免 UTC 偏移） ===
     const servers = [];
-    let baseServerId = 98471;
-    let baseServerNum = 2091;
-    let baseDate = new Date("2025-10-06T00:00:00+08:00");
+    const baseServerId = 98471;
+    const baseServerNum = 2091;
+    // baseDate 表示“北京时间 2025-10-06 00:00:00”
+    const baseDate = new Date("2025-10-06T00:00:00+08:00");
+
+    // helper：把一个时间戳格式化为北京时间的 YYYY-MM-DD 字符串
+    function formatDateBeijingYYYYMMDD(ms) {
+      // 使用 toLocaleDateString 指定时区为 Asia/Shanghai，en-CA 返回 YYYY-MM-DD 格式
+      return new Date(ms).toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });
+    }
 
     for (let i = 0; i <= 20; i++) { // 2091 ~ 2111 共21个
       const serverNum = baseServerNum + i;
       const serverId = baseServerId + i;
-      const openDate = new Date(baseDate.getTime() + i * 86400000);
-      const openDateStr = openDate.toISOString().slice(0, 10);
+      const ms = baseDate.getTime() + i * 24 * 60 * 60 * 1000;
+      const openDateStr = formatDateBeijingYYYYMMDD(ms); // 正确的北京时间日期字符串
       servers.push({
         id: serverNum,
         url: `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${serverId}`,
@@ -117,7 +124,7 @@
     }
 
     const mergedRange = { from: 2091, to: 2097 };
-    const mergeStart = new Date("2025-10-18T00:00:00+08:00"); // 固定合服开始日期（第1天）
+    const mergeStart = new Date("2025-10-18T00:00:00+08:00"); // 合服开始（第1天）
 
     const container = document.getElementById('cardContainer');
     const toast = document.getElementById('toast');
@@ -127,7 +134,6 @@
 
     // === 获取北京时间（精确） ===
     function getBeijingNow() {
-      // 以本机时间得到 UTC 毫秒数，然后加上 +8 小时
       const now = new Date();
       const utcMs = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
       const beijingMs = utcMs + 8 * 60 * 60 * 1000;
@@ -140,14 +146,13 @@
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, '0');
       const d = String(now.getDate()).padStart(2, '0');
-      // 解析带 +08:00 的时间字符串，得到该时区的零点对应的绝对时间
       return new Date(`${y}-${m}-${d}T00:00:00+08:00`);
     }
 
-    // === 渲染卡片 ===
+    // === 渲染卡片（以北京时间零点为基准计算天数） ===
     function renderCards() {
       container.innerHTML = '';
-      const beijingTodayStart = getBeijingStartOfToday(); // 北京时间当日零点
+      const beijingTodayStart = getBeijingStartOfToday();
       const now = getBeijingNow();
       const todayWeekday = now.getDay(); // 0=周日,1=周一,...
 
@@ -276,15 +281,11 @@
       const nextRefreshMs = todayBeijingStart.getTime() + 24 * 60 * 60 * 1000 + 1 * 60 * 1000;
       const msUntilNext = nextRefreshMs - nowBeijing.getTime();
 
-      // 若 msUntilNext 为负（理论上不应），直接在 1 秒后触发一次
       const initialDelay = msUntilNext > 0 ? msUntilNext : 1000;
 
       setTimeout(() => {
         renderCards();
-        // 之后每 12 小时再自动刷新一次（保持页面不会长期失效）
         setInterval(renderCards, 12 * 60 * 60 * 1000);
-        // 同时也安排每天 00:01 的定时（为了更准确，可保持当前 setInterval 也行）
-        // 这里不再重复安排 next day's setTimeout（简单处理）
       }, initialDelay);
     }
 
