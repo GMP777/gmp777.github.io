@@ -98,7 +98,7 @@
   <div id="toast" class="toast">已复制链接到剪贴板</div>
 
   <script>
-    // === 服务器数据 ===
+    // === 服务器数据 自动生成 2091~2111 ===
     const servers = [];
     let baseServerId = 98471;
     let baseServerNum = 2091;
@@ -117,7 +117,7 @@
     }
 
     const mergedRange = { from: 2091, to: 2097 };
-    const mergeStart = new Date("2025-10-18T00:00:00+08:00"); // ✅ 固定合服开始日期（第1天）
+    const mergeStart = new Date("2025-10-18T00:00:00+08:00"); // 固定合服开始日期（第1天）
 
     const container = document.getElementById('cardContainer');
     const toast = document.getElementById('toast');
@@ -125,43 +125,64 @@
 
     let currentMode = 'copy'; // 默认复制模式
 
-    // === 获取北京时间 ===
+    // === 获取北京时间（精确） ===
     function getBeijingNow() {
+      // 以本机时间得到 UTC 毫秒数，然后加上 +8 小时
       const now = new Date();
-      const beijingOffset = 8 * 60;
-      const localOffset = now.getTimezoneOffset();
-      const diff = beijingOffset + localOffset;
-      return new Date(now.getTime() + diff * 60 * 1000);
+      const utcMs = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
+      const beijingMs = utcMs + 8 * 60 * 60 * 1000;
+      return new Date(beijingMs);
+    }
+
+    // 返回北京时间当天 00:00:00 的 Date（用于按北京时间的“日”来计算）
+    function getBeijingStartOfToday() {
+      const now = getBeijingNow();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      // 解析带 +08:00 的时间字符串，得到该时区的零点对应的绝对时间
+      return new Date(`${y}-${m}-${d}T00:00:00+08:00`);
     }
 
     // === 渲染卡片 ===
     function renderCards() {
       container.innerHTML = '';
+      const beijingTodayStart = getBeijingStartOfToday(); // 北京时间当日零点
       const now = getBeijingNow();
-      const todayWeekday = now.getDay();
+      const todayWeekday = now.getDay(); // 0=周日,1=周一,...
+
+      const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
       servers.forEach(server => {
-        const openDate = new Date(server.openDate + "T00:00:00+08:00");
-        const diffDays = Math.floor((now - openDate) / (1000 * 60 * 60 * 24));
+        // 服务器开服日的北京零点时间
+        const openDateStart = new Date(server.openDate + "T00:00:00+08:00");
+        // 用「北京零点」作基准天数差：保证在北京时间 00:00 切换
+        const diffDays = Math.floor((beijingTodayStart.getTime() - openDateStart.getTime()) / MS_PER_DAY);
+
         let infoText = '';
         let icons = '';
 
         if (diffDays < 0) {
+          // 还没开服：倒计时按天计算（开服日为第1天）
           infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
         } else if (diffDays < 7) {
+          // 开服第 N 天（开服当天 diffDays==0 -> 第1天）
           infoText = `开服第 ${diffDays + 1} 天`;
         } else {
           infoText = `开服共 ${diffDays + 1} 天`;
         }
 
+        // 新服：严格当天开服（以北京零点为准）
         if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
 
+        // 战日逻辑（非合服区）
         if (!(server.id >= mergedRange.from && server.id <= mergedRange.to) && diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
           icons += `<span class="badge badge-diamond">💎 战日</span>`;
         }
 
+        // 合服区处理（用固定 mergeStart 与北京零点基准计算合服第几天）
         if (server.id >= mergedRange.from && server.id <= mergedRange.to) {
-          const mergeDiffDays = Math.floor((now - mergeStart) / (1000 * 60 * 60 * 24));
+          const mergeDiffDays = Math.floor((beijingTodayStart.getTime() - mergeStart.getTime()) / MS_PER_DAY);
           const mergeDay = mergeDiffDays >= 0 ? mergeDiffDays + 1 : 0;
           icons += `<span class="badge badge-merge">⚔️ 合服第 ${mergeDay} 天</span>`;
           if (mergeDay === 3) icons += `<span class="badge badge-guild">👑 公会战</span>`;
@@ -172,6 +193,7 @@
         const card = document.createElement('div');
         card.className = 'card';
         card.tabIndex = 0;
+        card.setAttribute('aria-label', `圣王传奇${server.id}服，${infoText}`);
         card.innerHTML = `
           <div class="title">圣王传奇${server.id}服 ${icons}</div>
           <div class="info">${infoText}</div>
@@ -248,17 +270,25 @@
 
     // === 每天北京时间00:01自动更新，并每12小时再更新一次 ===
     function scheduleDailyRefresh() {
-      const now = getBeijingNow();
-      const nextRefresh = new Date(now);
-      nextRefresh.setHours(24, 1, 0, 0);
-      const msUntilNext = nextRefresh - now;
+      const nowBeijing = getBeijingNow();
+      const todayBeijingStart = getBeijingStartOfToday();
+      // 下一个北京时间 00:01 的时间戳 = 今天北京零点 + 24小时 + 1分钟
+      const nextRefreshMs = todayBeijingStart.getTime() + 24 * 60 * 60 * 1000 + 1 * 60 * 1000;
+      const msUntilNext = nextRefreshMs - nowBeijing.getTime();
+
+      // 若 msUntilNext 为负（理论上不应），直接在 1 秒后触发一次
+      const initialDelay = msUntilNext > 0 ? msUntilNext : 1000;
 
       setTimeout(() => {
         renderCards();
+        // 之后每 12 小时再自动刷新一次（保持页面不会长期失效）
         setInterval(renderCards, 12 * 60 * 60 * 1000);
-      }, msUntilNext);
+        // 同时也安排每天 00:01 的定时（为了更准确，可保持当前 setInterval 也行）
+        // 这里不再重复安排 next day's setTimeout（简单处理）
+      }, initialDelay);
     }
 
+    // 首次渲染
     renderCards();
     scheduleDailyRefresh();
   </script>
