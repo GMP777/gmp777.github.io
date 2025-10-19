@@ -21,6 +21,30 @@
     header h1{font-size:22px; margin:0 0 6px 0}
     header p{margin:0; color:var(--muted); font-size:14px}
 
+    .mode-buttons {
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+    .mode-btn {
+      background:rgba(255,255,255,0.08);
+      color:#e6eef8;
+      border:none;
+      border-radius:999px;
+      padding:8px 16px;
+      cursor:pointer;
+      font-weight:600;
+      transition:background .15s ease, transform .1s ease;
+    }
+    .mode-btn:hover {background:rgba(255,255,255,0.12);}
+    .mode-btn:active {transform:scale(0.98);}
+    .mode-btn.active {
+      background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#022;
+    }
+
     .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px}
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
@@ -43,7 +67,6 @@
     .badge-new{background:#06b6d4; color:#022;}
     .badge-guild{background:#facc15; color:#222;}
     .badge-diamond{background:#38bdf8; color:#022;}
-    .badge-old{background:#64748b; color:#fff;}
     .badge-merge{background:linear-gradient(90deg,#ef4444,#dc2626); color:#fff;}
     .info{font-size:13px; color:var(--muted)}
 
@@ -60,8 +83,14 @@
   <div class="wrap">
     <header>
       <h1>圣王传奇服务器列表</h1>
-      <p>点击任意卡片即可复制对应服务器的链接</p>
+      <p>点击卡片操作方式可切换：复制链接 / 新窗口打开</p>
     </header>
+
+    <div class="mode-buttons">
+      <button id="copyMode" class="mode-btn active">📋 点击复制链接</button>
+      <button id="openMode" class="mode-btn">🌐 新窗口打开链接</button>
+      <button id="refreshBtn" class="mode-btn">🔄 强制刷新状态</button>
+    </div>
 
     <div class="grid" id="cardContainer"></div>
   </div>
@@ -70,46 +99,39 @@
 
   <script>
     // === 服务器数据 ===
-    const servers = [
-      { id: 2091, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98471', openDate: '2025-10-06' },
-      { id: 2092, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98472', openDate: '2025-10-07' },
-      { id: 2093, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98473', openDate: '2025-10-08' },
-      { id: 2094, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98474', openDate: '2025-10-09' },
-      { id: 2095, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98475', openDate: '2025-10-10' },
-      { id: 2096, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98476', openDate: '2025-10-11' },
-      { id: 2097, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98477', openDate: '2025-10-12' },
-      { id: 2098, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98478', openDate: '2025-10-13' },
-      { id: 2099, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98479', openDate: '2025-10-14' },
-      { id: 2100, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98480', openDate: '2025-10-15' },
-      { id: 2101, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98481', openDate: '2025-10-16' },
-      { id: 2102, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98482', openDate: '2025-10-17' },
-      { id: 2103, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98483', openDate: '2025-10-18' },
-      { id: 2104, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98484', openDate: '2025-10-19' },
-      { id: 2105, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98485', openDate: '2025-10-20' },
-      { id: 2106, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98486', openDate: '2025-10-21' },
-      { id: 2107, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98487', openDate: '2025-10-22' },
-      { id: 2108, url: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=98488', openDate: '2025-10-23' }
-    ];
+    const servers = [];
+    let baseServerId = 98471;
+    let baseServerNum = 2091;
+    let baseDate = new Date("2025-10-06T00:00:00+08:00");
+
+    for (let i = 0; i <= 20; i++) { // 2091 ~ 2111 共21个
+      const serverNum = baseServerNum + i;
+      const serverId = baseServerId + i;
+      const openDate = new Date(baseDate.getTime() + i * 86400000);
+      const openDateStr = openDate.toISOString().slice(0, 10);
+      servers.push({
+        id: serverNum,
+        url: `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${serverId}`,
+        openDate: openDateStr
+      });
+    }
 
     const mergedRange = { from: 2091, to: 2097 };
+    const mergeStart = new Date("2025-10-18T00:00:00+08:00"); // ✅ 固定合服开始日期（第1天）
 
     const container = document.getElementById('cardContainer');
     const toast = document.getElementById('toast');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    let currentMode = 'copy'; // 默认复制模式
 
     // === 获取北京时间 ===
     function getBeijingNow() {
       const now = new Date();
-      const beijingOffset = 8 * 60; // UTC+8
+      const beijingOffset = 8 * 60;
       const localOffset = now.getTimezoneOffset();
       const diff = beijingOffset + localOffset;
       return new Date(now.getTime() + diff * 60 * 1000);
-    }
-    function getBeijingStartOfToday() {
-      const now = getBeijingNow();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      return new Date(`${y}-${m}-${d}T00:00:00+08:00`);
     }
 
     // === 渲染卡片 ===
@@ -117,7 +139,6 @@
       container.innerHTML = '';
       const now = getBeijingNow();
       const todayWeekday = now.getDay();
-      const mergeStart = getBeijingStartOfToday(); // 合服从今天起
 
       servers.forEach(server => {
         const openDate = new Date(server.openDate + "T00:00:00+08:00");
@@ -125,7 +146,6 @@
         let infoText = '';
         let icons = '';
 
-        // 主信息
         if (diffDays < 0) {
           infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
         } else if (diffDays < 7) {
@@ -134,15 +154,12 @@
           infoText = `开服共 ${diffDays + 1} 天`;
         }
 
-        // 新服徽章
         if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
 
-        // 战日徽章（非合服区）
         if (!(server.id >= mergedRange.from && server.id <= mergedRange.to) && diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
           icons += `<span class="badge badge-diamond">💎 战日</span>`;
         }
 
-        // 合服 / 公会战徽章
         if (server.id >= mergedRange.from && server.id <= mergedRange.to) {
           const mergeDiffDays = Math.floor((now - mergeStart) / (1000 * 60 * 60 * 24));
           const mergeDay = mergeDiffDays >= 0 ? mergeDiffDays + 1 : 0;
@@ -152,7 +169,6 @@
           if (diffDays === 2) icons += `<span class="badge badge-guild">👑 公会战</span>`;
         }
 
-        // 卡片生成
         const card = document.createElement('div');
         card.className = 'card';
         card.tabIndex = 0;
@@ -160,21 +176,55 @@
           <div class="title">圣王传奇${server.id}服 ${icons}</div>
           <div class="info">${infoText}</div>
         `;
-        card.addEventListener('click', () => copyText(server.url));
+
+        card.addEventListener('click', () => handleCardClick(server.url));
         card.addEventListener('keydown', e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            copyText(server.url);
+            handleCardClick(server.url);
           }
         });
+
         container.appendChild(card);
       });
     }
 
+    // === 点击行为 ===
+    function handleCardClick(url) {
+      if (currentMode === 'copy') {
+        copyText(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    }
+
+    // === 模式切换 ===
+    const copyBtn = document.getElementById('copyMode');
+    const openBtn = document.getElementById('openMode');
+    copyBtn.addEventListener('click', () => switchMode('copy'));
+    openBtn.addEventListener('click', () => switchMode('open'));
+
+    function switchMode(mode) {
+      currentMode = mode;
+      if (mode === 'copy') {
+        copyBtn.classList.add('active');
+        openBtn.classList.remove('active');
+      } else {
+        openBtn.classList.add('active');
+        copyBtn.classList.remove('active');
+      }
+    }
+
+    // === 强制刷新 ===
+    refreshBtn.addEventListener('click', () => {
+      renderCards();
+      showToastMessage("已手动刷新状态");
+    });
+
     // === 复制功能 ===
     function copyText(text){
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text));
+        navigator.clipboard.writeText(text).then(() => showToastMessage("已复制链接到剪贴板")).catch(() => fallbackCopy(text));
       } else fallbackCopy(text);
     }
     function fallbackCopy(text){
@@ -182,12 +232,13 @@
       ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
       document.body.appendChild(ta);
       ta.focus(); ta.select();
-      try{document.execCommand('copy'); showToast();}catch(e){}
+      try{document.execCommand('copy'); showToastMessage("已复制链接到剪贴板");}catch(e){}
       ta.remove();
     }
 
     // === 提示气泡 ===
-    function showToast(){
+    function showToastMessage(msg){
+      toast.textContent = msg;
       toast.style.display='block'; toast.style.opacity='1';
       setTimeout(()=>{
         toast.style.transition='opacity 300ms ease'; toast.style.opacity='0';
@@ -199,12 +250,12 @@
     function scheduleDailyRefresh() {
       const now = getBeijingNow();
       const nextRefresh = new Date(now);
-      nextRefresh.setHours(24, 1, 0, 0); // 明天北京时间00:01
+      nextRefresh.setHours(24, 1, 0, 0);
       const msUntilNext = nextRefresh - now;
 
       setTimeout(() => {
         renderCards();
-        setInterval(renderCards, 12 * 60 * 60 * 1000); // 之后每12小时更新一次
+        setInterval(renderCards, 12 * 60 * 60 * 1000);
       }, msUntilNext);
     }
 
