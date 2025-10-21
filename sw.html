@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>圣王传奇 - 点击复制链接</title>
+  <title>圣王传奇 - 点击复制或打开链接</title>
   <link rel="stylesheet" href="/footer.css" />
   <style>
     :root{
@@ -83,12 +83,13 @@
   <div class="wrap">
     <header>
       <h1>圣王传奇服务器列表</h1>
-      <p>点击卡片操作方式可切换：复制链接 / 新窗口打开</p>
+      <p>可切换操作模式与网站域名</p>
     </header>
 
     <div class="mode-buttons">
       <button id="copyMode" class="mode-btn active">📋 点击复制链接</button>
       <button id="openMode" class="mode-btn">🌐 新窗口打开链接</button>
+      <button id="switchSite" class="mode-btn">🕹️ 当前网站：9awan</button>
       <button id="refreshBtn" class="mode-btn">🔄 强制刷新状态</button>
     </div>
 
@@ -98,41 +99,42 @@
   <div id="toast" class="toast">已复制链接到剪贴板</div>
 
   <script>
-    // === 服务器数据 自动生成 2091~2111（修正：按北京时间格式化日期，避免 UTC 偏移） ===
+    // === 设置基础域名切换 ===
+    let currentDomain = "www.9awan.com"; // 默认域名
+    const siteBtn = document.getElementById("switchSite");
+
+    // === 服务器数据自动生成 2091~2111 ===
     const servers = [];
     const baseServerId = 98471;
     const baseServerNum = 2091;
-    // baseDate 表示“北京时间 2025-10-06 00:00:00”
     const baseDate = new Date("2025-10-06T00:00:00+08:00");
 
-    // helper：把一个时间戳格式化为北京时间的 YYYY-MM-DD 字符串
     function formatDateBeijingYYYYMMDD(ms) {
-      // 使用 toLocaleDateString 指定时区为 Asia/Shanghai，en-CA 返回 YYYY-MM-DD 格式
-      return new Date(ms).toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });
+      return new Date(ms).toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });
     }
 
-    for (let i = 0; i <= 20; i++) { // 2091 ~ 2111 共21个
+    for (let i = 0; i <= 20; i++) { // 2091~2111 共21个
       const serverNum = baseServerNum + i;
       const serverId = baseServerId + i;
       const ms = baseDate.getTime() + i * 24 * 60 * 60 * 1000;
-      const openDateStr = formatDateBeijingYYYYMMDD(ms); // 正确的北京时间日期字符串
+      const openDateStr = formatDateBeijingYYYYMMDD(ms);
       servers.push({
         id: serverNum,
-        url: `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${serverId}`,
+        server_id: serverId,
         openDate: openDateStr
       });
     }
 
     const mergedRange = { from: 2091, to: 2097 };
-    const mergeStart = new Date("2025-10-18T00:00:00+08:00"); // 合服开始（第1天）
+    const mergeStart = new Date("2025-10-18T00:00:00+08:00");
 
-    const container = document.getElementById('cardContainer');
-    const toast = document.getElementById('toast');
-    const refreshBtn = document.getElementById('refreshBtn');
+    const container = document.getElementById("cardContainer");
+    const toast = document.getElementById("toast");
+    const refreshBtn = document.getElementById("refreshBtn");
 
-    let currentMode = 'copy'; // 默认复制模式
+    let currentMode = "copy"; // 默认复制模式
 
-    // === 获取北京时间（精确） ===
+    // === 获取北京时间 ===
     function getBeijingNow() {
       const now = new Date();
       const utcMs = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
@@ -140,54 +142,45 @@
       return new Date(beijingMs);
     }
 
-    // 返回北京时间当天 00:00:00 的 Date（用于按北京时间的“日”来计算）
     function getBeijingStartOfToday() {
       const now = getBeijingNow();
       const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
       return new Date(`${y}-${m}-${d}T00:00:00+08:00`);
     }
 
-    // === 渲染卡片（以北京时间零点为基准计算天数） ===
+    // === 渲染卡片 ===
     function renderCards() {
-      container.innerHTML = '';
+      container.innerHTML = "";
       const beijingTodayStart = getBeijingStartOfToday();
       const now = getBeijingNow();
-      const todayWeekday = now.getDay(); // 0=周日,1=周一,...
-
+      const todayWeekday = now.getDay();
       const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
       servers.forEach(server => {
-        // 服务器开服日的北京零点时间
+        const url = `http://${currentDomain}/game.php?action=play&game_id=283&server_id=${server.server_id}`;
         const openDateStart = new Date(server.openDate + "T00:00:00+08:00");
-        // 用「北京零点」作基准天数差：保证在北京时间 00:00 切换
-        const diffDays = Math.floor((beijingTodayStart.getTime() - openDateStart.getTime()) / MS_PER_DAY);
+        const diffDays = Math.floor((beijingTodayStart - openDateStart) / MS_PER_DAY);
 
-        let infoText = '';
-        let icons = '';
+        let infoText = "";
+        let icons = "";
 
         if (diffDays < 0) {
-          // 还没开服：倒计时按天计算（开服日为第1天）
           infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
         } else if (diffDays < 7) {
-          // 开服第 N 天（开服当天 diffDays==0 -> 第1天）
           infoText = `开服第 ${diffDays + 1} 天`;
         } else {
           infoText = `开服共 ${diffDays + 1} 天`;
         }
 
-        // 新服：严格当天开服（以北京零点为准）
         if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
-
-        // 战日逻辑（非合服区）
         if (!(server.id >= mergedRange.from && server.id <= mergedRange.to) && diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
           icons += `<span class="badge badge-diamond">💎 战日</span>`;
         }
 
-        // 合服区处理（用固定 mergeStart 与北京零点基准计算合服第几天）
         if (server.id >= mergedRange.from && server.id <= mergedRange.to) {
-          const mergeDiffDays = Math.floor((beijingTodayStart.getTime() - mergeStart.getTime()) / MS_PER_DAY);
+          const mergeDiffDays = Math.floor((beijingTodayStart - mergeStart) / MS_PER_DAY);
           const mergeDay = mergeDiffDays >= 0 ? mergeDiffDays + 1 : 0;
           icons += `<span class="badge badge-merge">⚔️ 合服第 ${mergeDay} 天</span>`;
           if (mergeDay === 3) icons += `<span class="badge badge-guild">👑 公会战</span>`;
@@ -195,55 +188,66 @@
           if (diffDays === 2) icons += `<span class="badge badge-guild">👑 公会战</span>`;
         }
 
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.tabIndex = 0;
-        card.setAttribute('aria-label', `圣王传奇${server.id}服，${infoText}`);
+        const card = document.createElement("div");
+        card.className = "card";
         card.innerHTML = `
           <div class="title">圣王传奇${server.id}服 ${icons}</div>
           <div class="info">${infoText}</div>
         `;
-
-        card.addEventListener('click', () => handleCardClick(server.url));
-        card.addEventListener('keydown', e => {
-          if (e.key === 'Enter' || e.key === ' ') {
+        card.addEventListener("click", () => handleCardClick(url));
+        card.addEventListener("keydown", e => {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            handleCardClick(server.url);
+            handleCardClick(url);
           }
         });
-
         container.appendChild(card);
       });
     }
 
     // === 点击行为 ===
     function handleCardClick(url) {
-      if (currentMode === 'copy') {
+      if (currentMode === "copy") {
         copyText(url);
       } else {
-        window.open(url, '_blank');
+        window.open(url, "_blank");
       }
     }
 
-    // === 模式切换 ===
-    const copyBtn = document.getElementById('copyMode');
-    const openBtn = document.getElementById('openMode');
-    copyBtn.addEventListener('click', () => switchMode('copy'));
-    openBtn.addEventListener('click', () => switchMode('open'));
+    // === 模式按钮 ===
+    const copyBtn = document.getElementById("copyMode");
+    const openBtn = document.getElementById("openMode");
+
+    copyBtn.addEventListener("click", () => switchMode("copy"));
+    openBtn.addEventListener("click", () => switchMode("open"));
+    siteBtn.addEventListener("click", toggleSite);
 
     function switchMode(mode) {
       currentMode = mode;
-      if (mode === 'copy') {
-        copyBtn.classList.add('active');
-        openBtn.classList.remove('active');
+      if (mode === "copy") {
+        copyBtn.classList.add("active");
+        openBtn.classList.remove("active");
       } else {
-        openBtn.classList.add('active');
-        copyBtn.classList.remove('active');
+        openBtn.classList.add("active");
+        copyBtn.classList.remove("active");
       }
     }
 
+    // === 切换网站 ===
+    function toggleSite() {
+      if (currentDomain === "www.9awan.com") {
+        currentDomain = "88.3uyy.com";
+        siteBtn.textContent = "🕹️ 当前网站：3uyy";
+      } else {
+        currentDomain = "www.9awan.com";
+        siteBtn.textContent = "🕹️ 当前网站：9awan";
+      }
+      renderCards();
+      showToastMessage("已切换到 " + currentDomain);
+    }
+
     // === 强制刷新 ===
-    refreshBtn.addEventListener('click', () => {
+    refreshBtn.addEventListener("click", () => {
       renderCards();
       showToastMessage("已手动刷新状态");
     });
@@ -255,11 +259,11 @@
       } else fallbackCopy(text);
     }
     function fallbackCopy(text){
-      const ta = document.createElement('textarea');
-      ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position="fixed"; ta.style.left="-9999px";
       document.body.appendChild(ta);
       ta.focus(); ta.select();
-      try{document.execCommand('copy'); showToastMessage("已复制链接到剪贴板");}catch(e){}
+      try{document.execCommand("copy"); showToastMessage("已复制链接到剪贴板");}catch(e){}
       ta.remove();
     }
 
@@ -273,23 +277,19 @@
       },1000);
     }
 
-    // === 每天北京时间00:01自动更新，并每12小时再更新一次 ===
+    // === 定时刷新 ===
     function scheduleDailyRefresh() {
       const nowBeijing = getBeijingNow();
       const todayBeijingStart = getBeijingStartOfToday();
-      // 下一个北京时间 00:01 的时间戳 = 今天北京零点 + 24小时 + 1分钟
       const nextRefreshMs = todayBeijingStart.getTime() + 24 * 60 * 60 * 1000 + 1 * 60 * 1000;
       const msUntilNext = nextRefreshMs - nowBeijing.getTime();
-
       const initialDelay = msUntilNext > 0 ? msUntilNext : 1000;
-
       setTimeout(() => {
         renderCards();
         setInterval(renderCards, 12 * 60 * 60 * 1000);
       }, initialDelay);
     }
 
-    // 首次渲染
     renderCards();
     scheduleDailyRefresh();
   </script>
