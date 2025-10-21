@@ -1,302 +1,324 @@
-<!doctype html>
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="zh">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>圣王传奇 - 点击复制或打开链接</title>
+  <meta charset="UTF-8" />
   <link rel="stylesheet" href="/footer.css" />
+  <title>🎮</title>
   <style>
-    :root{
-      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#06b6d4;
-      --radius:12px;
+    body { font-family: Arial; max-width: 700px; margin: 30px auto; padding: 20px; }
+    h2 { text-align: center; }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family: Inter, Roboto, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
-      background:linear-gradient(180deg,#071025 0%, #0b1a2a 100%);
-      color:#e6eef8; min-height:100vh; padding:20px;
+    .tab-btn, .top-extra-btn {
+      cursor: pointer;
+      border: 1px solid #007bff;
+      background: white;
+      color: #007bff;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 1em;
+      transition: 0.3s;
     }
-    .wrap{max-width:900px; margin:0 auto}
-    header{text-align:center; margin-bottom:24px}
-    header h1{font-size:22px; margin:0 0 6px 0}
-    header p{margin:0; color:var(--muted); font-size:14px}
-
-    .mode-buttons {
-      display:flex;
-      justify-content:center;
-      gap:10px;
-      margin-bottom:16px;
-      flex-wrap:wrap;
-    }
-    .mode-btn {
-      background:rgba(255,255,255,0.08);
-      color:#e6eef8;
-      border:none;
-      border-radius:999px;
-      padding:8px 16px;
-      cursor:pointer;
-      font-weight:600;
-      transition:background .15s ease, transform .1s ease;
-    }
-    .mode-btn:hover {background:rgba(255,255,255,0.12);}
-    .mode-btn:active {transform:scale(0.98);}
-    .mode-btn.active {
-      background:linear-gradient(90deg,var(--accent),#7dd3fc);
-      color:#022;
+    .tab-btn.active, .tab-btn:hover,
+    .top-extra-btn:hover {
+      background: #007bff;
+      color: white;
     }
 
-    .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius); padding:18px; cursor:pointer;
-      transition:transform .12s ease, box-shadow .12s ease;
-      box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset, 0 6px 18px rgba(2,6,23,0.6);
-      text-align:center;
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      justify-items: center;
+      margin-bottom: 30px;
     }
-    .card:hover{box-shadow:0 8px 26px rgba(6,182,212,0.25)}
-    .card:active{transform:translateY(1px)}
-    .title{
-      font-weight:700; font-size:18px; color:#fff; margin-bottom:6px;
-      display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:6px;
-    }
-    .badge{
-      display:inline-flex; align-items:center; justify-content:center;
-      font-size:12px; font-weight:700; border-radius:999px;
-      padding:2px 6px; box-shadow:0 1px 3px rgba(0,0,0,0.3);
-    }
-    .badge-new{background:#06b6d4; color:#022;}
-    .badge-guild{background:#facc15; color:#222;}
-    .badge-diamond{background:#38bdf8; color:#022;}
-    .badge-merge{background:linear-gradient(90deg,#ef4444,#dc2626); color:#fff;}
-    .info{font-size:13px; color:var(--muted)}
 
-    .toast{
-      position:fixed; left:50%; transform:translateX(-50%);
-      bottom:28px; background:linear-gradient(90deg,var(--accent),#7dd3fc);
-      color:#022; padding:10px 16px; border-radius:999px;
-      box-shadow:0 6px 24px rgba(6,22,34,0.6); font-weight:600;
-      display:none; z-index:999;
+    .grid-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
     }
+
+    .swcq-item {
+      flex-direction: row;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .grid-item a {
+      display: inline-block;
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      color: #007bff;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: 0.2s;
+      font-size: 0.9em;
+    }
+    .grid-item a:hover {
+      background: #007bff;
+      color: #fff;
+    }
+
+    .grid-item a.lord-btn {
+      border-color: #ff9800;
+      background: #fff7e6;
+      color: #e65100;
+      font-weight: bold;
+    }
+    .grid-item a.lord-btn:hover {
+      background: #ff9800;
+      color: #fff;
+    }
+
+    .hidden { display: none; }
+
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <h1>圣王传奇服务器列表</h1>
-      <p>可切换操作模式与网站域名</p>
-    </header>
 
-    <div class="mode-buttons">
-      <button id="copyMode" class="mode-btn active">📋 点击复制链接</button>
-      <button id="openMode" class="mode-btn">🌐 新窗口打开链接</button>
-      <button id="switchSite" class="mode-btn">🕹️ 当前网站：9awan</button>
-      <button id="refreshBtn" class="mode-btn">🔄 强制刷新状态</button>
-    </div>
+<div class="tabs" id="tabs"></div>
+<div id="tables"></div>
 
-    <div class="grid" id="cardContainer"></div>
-  </div>
+<script>
+  const games = [
+    {
+      id: '111',
+      name: '满V切割神域',
+      servers: [235, 236, 237, 248, 249, 250, 251, 252, 253, 254, 259, 260, 261,262, 263, 264, 265,275,276,277],
+      lords: [262, 263, 264, 265,275,276],
+      type: 'xayxms'
+    },
+    {
+      id: '115',
+      name: '满V悠久传奇',
+      type: 'xayxms',
+      canHang: [105,112,113,114,115,116,119,120],
+      cannotHang: [86,87,93,95,101,102,104,106,107,108,109,110,111,117,118,121,122,123],
+      lords: [115,116,119,120]
+    },
+    {
+      id: '137',
+      name: 'GM赤焰无双',
+      servers: [1, 2, 3, 4,5,6,7,8,9,10,11,12],
+      type: 'xayxms'
+    },
+    {
+      id: '962-115',
+      name: '962yx',
+      type: '962yx',
+      mainAccount: [115,116],
+      altAccount: [115,116,119,120,123],
+      daiwan: [112,118,123]
+    },
+    {
+      id: 'ydcs',
+      name: '炎黃大陸',
+      servers: [543, 544, 545, 547, 548, 551],
+      type: '1100yx'
+    },
+    {
+      id: '88-7',
+      name: '屠神',
+      type: '8syx',
+      servers: [25, 26, 30,31]
+    },
+    {
+      id: 'swcq',
+      name: '圣王传奇',
+      type: '9awan',
+      servers: [
+        { show: 2085, real: 97947 },
+        { show: 2090, real: 98470 },
+        { show: 2091, real: 98471 },
+        { show: 2092, real: 98472 },
+        { show: 2093, real: 98473 },
+        { show: 2094, real: 98474 },
+        { show: 2095, real: 98475 },
+        { show: 2096, real: 98476 },
+        { show: 2097, real: 98477 },
+        { show: 2098, real: 98478 },
+        { show: 2099, real: 98479 }
+      ],
+      homepage9awan: 'http://www.9awan.com/home/server/283',
+      homepage3uyy: 'http://88.3uyy.com/home/server/283'
+    }
+  ];
 
-  <div id="toast" class="toast">已复制链接到剪贴板</div>
+  const tabsContainer = document.getElementById('tabs');
+  const tablesContainer = document.getElementById('tables');
 
-  <script>
-    // === 设置基础域名切换 ===
-    let currentDomain = "www.9awan.com"; // 默认域名
-    const siteBtn = document.getElementById("switchSite");
+  function getGameHomepageURL(gameId) {
+    switch (gameId) {
+      case '111': return 'http://gm.yx4f.com:81/games/111.html';
+      case '115': return 'http://gm.yx4f.com:81/games/115.html';
+      case '137': return 'http://gm.yx4f.com:81/games/137.html';
+      case '962-115': return 'http://gm.962yx.com/games/115.html';
+      case 'ydcs': return 'http://www.1100yx.com/game_list_8.html';
+      case '88-7': return 'http://www.8syx.com/game/7/';
+      case 'swcq': return 'http://www.9awan.com/home/server/283';
+      default: return '#';
+    }
+  }
 
-    // === 服务器数据自动生成 2091~2111 ===
-    const servers = [];
-    const baseServerId = 98471;
-    const baseServerNum = 2091;
-    const baseDate = new Date("2025-10-06T00:00:00+08:00");
+  function createGrid(game) {
+    const container = document.createElement('div');
+    container.id = 'table-' + game.id;
+    container.className = 'grid-container';
+    if (game !== games[0]) container.classList.add('hidden');
 
-    function formatDateBeijingYYYYMMDD(ms) {
-      return new Date(ms).toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });
+    function renderSection(title, serverList) {
+      if (!serverList || serverList.length === 0) return;
+      const titleDiv = document.createElement('div');
+      titleDiv.textContent = title;
+      titleDiv.style.gridColumn = '1 / -1';
+      titleDiv.style.fontWeight = 'bold';
+      titleDiv.style.margin = '10px 0 5px';
+      container.appendChild(titleDiv);
+      serverList.forEach(server => renderServer(server));
     }
 
-    for (let i = 0; i <= 20; i++) { // 2091~2111 共21个
-      const serverNum = baseServerNum + i;
-      const serverId = baseServerId + i;
-      const ms = baseDate.getTime() + i * 24 * 60 * 60 * 1000;
-      const openDateStr = formatDateBeijingYYYYMMDD(ms);
-      servers.push({
-        id: serverNum,
-        server_id: serverId,
-        openDate: openDateStr
-      });
-    }
+    function renderServer(server) {
+      const item = document.createElement('div');
+      item.className = 'grid-item';
 
-    const mergedRange = { from: 2091, to: 2097 };
-    const mergeStart = new Date("2025-10-18T00:00:00+08:00");
+      let label, realId;
+      if (typeof server === 'object') {
+        label = `${server.show}区`;
+        realId = server.real;
+      } else {
+        label = `${server}区`;
+        realId = server;
+      }
 
-    const container = document.getElementById("cardContainer");
-    const toast = document.getElementById("toast");
-    const refreshBtn = document.getElementById("refreshBtn");
+      // 圣王传奇：两个平台按钮同一行
+      if (game.type === '9awan') {
+        item.classList.add('swcq-item');
 
-    let currentMode = "copy"; // 默认复制模式
+        const a9a = document.createElement('a');
+        a9a.href = `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${realId}`;
+        a9a.textContent = label + '·9a';
+        a9a.target = '_blank';
+        item.appendChild(a9a);
 
-    // === 获取北京时间 ===
-    function getBeijingNow() {
-      const now = new Date();
-      const utcMs = now.getTime() + now.getTimezoneOffset() * 60 * 1000;
-      const beijingMs = utcMs + 8 * 60 * 60 * 1000;
-      return new Date(beijingMs);
-    }
-
-    function getBeijingStartOfToday() {
-      const now = getBeijingNow();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, "0");
-      const d = String(now.getDate()).padStart(2, "0");
-      return new Date(`${y}-${m}-${d}T00:00:00+08:00`);
-    }
-
-    // === 渲染卡片 ===
-    function renderCards() {
-      container.innerHTML = "";
-      const beijingTodayStart = getBeijingStartOfToday();
-      const now = getBeijingNow();
-      const todayWeekday = now.getDay();
-      const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
-      servers.forEach(server => {
-        const url = `http://${currentDomain}/game.php?action=play&game_id=283&server_id=${server.server_id}`;
-        const openDateStart = new Date(server.openDate + "T00:00:00+08:00");
-        const diffDays = Math.floor((beijingTodayStart - openDateStart) / MS_PER_DAY);
-
-        let infoText = "";
-        let icons = "";
-
-        if (diffDays < 0) {
-          infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
-        } else if (diffDays < 7) {
-          infoText = `开服第 ${diffDays + 1} 天`;
+        const a3u = document.createElement('a');
+        a3u.href = `http://88.3uyy.com/game.php?action=play&game_id=283&server_id=${realId}`;
+        a3u.textContent = '3U';
+        a3u.target = '_blank';
+        item.appendChild(a3u);
+      } else {
+        const a = document.createElement('a');
+        if (game.type === '1100yx') {
+          a.href = `http://www.1100yx.com/Game_Login_8_${realId}.html`;
+        } else if (game.type === '962yx') {
+          a.href = `http://gm.962yx.com/login/115/${realId}.html`;
+        } else if (game.type === '8syx') {
+          a.href = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${realId}`;
         } else {
-          infoText = `开服共 ${diffDays + 1} 天`;
+          a.href = `http://gm.yx4f.com:81/login/${game.id}/${realId}.html`;
         }
-
-        if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
-        if (!(server.id >= mergedRange.from && server.id <= mergedRange.to) && diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
-          icons += `<span class="badge badge-diamond">💎 战日</span>`;
+        a.textContent = label;
+        a.target = '_blank';
+        if (game.lords && game.lords.includes(realId)) {
+          a.classList.add('lord-btn');
         }
-
-        if (server.id >= mergedRange.from && server.id <= mergedRange.to) {
-          const mergeDiffDays = Math.floor((beijingTodayStart - mergeStart) / MS_PER_DAY);
-          const mergeDay = mergeDiffDays >= 0 ? mergeDiffDays + 1 : 0;
-          icons += `<span class="badge badge-merge">⚔️ 合服第 ${mergeDay} 天</span>`;
-          if (mergeDay === 3) icons += `<span class="badge badge-guild">👑 公会战</span>`;
-        } else {
-          if (diffDays === 2) icons += `<span class="badge badge-guild">👑 公会战</span>`;
-        }
-
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <div class="title">圣王传奇${server.id}服 ${icons}</div>
-          <div class="info">${infoText}</div>
-        `;
-        card.addEventListener("click", () => handleCardClick(url));
-        card.addEventListener("keydown", e => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleCardClick(url);
-          }
-        });
-        container.appendChild(card);
-      });
-    }
-
-    // === 点击行为 ===
-    function handleCardClick(url) {
-      if (currentMode === "copy") {
-        copyText(url);
-      } else {
-        window.open(url, "_blank");
+        item.appendChild(a);
       }
+
+      container.appendChild(item);
     }
 
-    // === 模式按钮 ===
-    const copyBtn = document.getElementById("copyMode");
-    const openBtn = document.getElementById("openMode");
+    if (game.mainAccount || game.altAccount || game.daiwan) {
+      if (game.mainAccount) renderSection('👑 主号', game.mainAccount);
+      if (game.altAccount) renderSection('🌀 小号', game.altAccount);
+      if (game.daiwan) renderSection('🎯 代玩', game.daiwan);
+    } else if (game.canHang || game.cannotHang) {
+      renderSection('✅ 刷', game.canHang);
+      renderSection('⛔ 签到', game.cannotHang);
+    } else {
+      game.servers.forEach(server => renderServer(server));
+    }
 
-    copyBtn.addEventListener("click", () => switchMode("copy"));
-    openBtn.addEventListener("click", () => switchMode("open"));
-    siteBtn.addEventListener("click", toggleSite);
-
-    function switchMode(mode) {
-      currentMode = mode;
-      if (mode === "copy") {
-        copyBtn.classList.add("active");
-        openBtn.classList.remove("active");
-      } else {
-        openBtn.classList.add("active");
-        copyBtn.classList.remove("active");
+    // 添加主页链接
+    if (game.homepage9awan || game.homepage3uyy) {
+      if (game.homepage9awan) {
+        const homeItem = document.createElement('div');
+        homeItem.className = 'grid-item';
+        const homeLink = document.createElement('a');
+        homeLink.href = game.homepage9awan;
+        homeLink.target = '_blank';
+        homeLink.style.fontWeight = 'bold';
+        homeLink.textContent = '9a玩主页';
+        homeItem.appendChild(homeLink);
+        container.appendChild(homeItem);
       }
-    }
-
-    // === 切换网站 ===
-    function toggleSite() {
-      if (currentDomain === "www.9awan.com") {
-        currentDomain = "88.3uyy.com";
-        siteBtn.textContent = "🕹️ 当前网站：3uyy";
-      } else {
-        currentDomain = "www.9awan.com";
-        siteBtn.textContent = "🕹️ 当前网站：9awan";
+      if (game.homepage3uyy) {
+        const homeItem = document.createElement('div');
+        homeItem.className = 'grid-item';
+        const homeLink = document.createElement('a');
+        homeLink.href = game.homepage3uyy;
+        homeLink.target = '_blank';
+        homeLink.style.fontWeight = 'bold';
+        homeLink.textContent = '3U主页';
+        homeItem.appendChild(homeLink);
+        container.appendChild(homeItem);
       }
-      renderCards();
-      showToastMessage("已切换到 " + currentDomain);
+    } else {
+      const homeItem = document.createElement('div');
+      homeItem.className = 'grid-item';
+      const homeLink = document.createElement('a');
+      homeLink.href = getGameHomepageURL(game.id);
+      homeLink.target = '_blank';
+      homeLink.style.fontWeight = 'bold';
+      homeLink.textContent = '游戏主页';
+      homeItem.appendChild(homeLink);
+      container.appendChild(homeItem);
     }
 
-    // === 强制刷新 ===
-    refreshBtn.addEventListener("click", () => {
-      renderCards();
-      showToastMessage("已手动刷新状态");
-    });
+    return container;
+  }
 
-    // === 复制功能 ===
-    function copyText(text){
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => showToastMessage("已复制链接到剪贴板")).catch(() => fallbackCopy(text));
-      } else fallbackCopy(text);
-    }
-    function fallbackCopy(text){
-      const ta = document.createElement("textarea");
-      ta.value = text; ta.style.position="fixed"; ta.style.left="-9999px";
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      try{document.execCommand("copy"); showToastMessage("已复制链接到剪贴板");}catch(e){}
-      ta.remove();
-    }
+  games.forEach((game, idx) => {
+    const btn = document.createElement('button');
+    btn.textContent = game.name;
+    btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      games.forEach(g => document.getElementById('table-' + g.id).classList.add('hidden'));
+      document.getElementById('table-' + game.id).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    tabsContainer.appendChild(btn);
+    tablesContainer.appendChild(createGrid(game));
+  });
 
-    // === 提示气泡 ===
-    function showToastMessage(msg){
-      toast.textContent = msg;
-      toast.style.display='block'; toast.style.opacity='1';
-      setTimeout(()=>{
-        toast.style.transition='opacity 300ms ease'; toast.style.opacity='0';
-        setTimeout(()=>toast.style.display='none',300);
-      },1000);
-    }
+  function createTopButton(html, title, url) {
+    const btn = document.createElement('button');
+    btn.innerHTML = html;
+    btn.title = title;
+    btn.className = 'top-extra-btn';
+    btn.onclick = () => window.open(url, '_self');
+    return btn;
+  }
 
-    // === 定时刷新 ===
-    function scheduleDailyRefresh() {
-      const nowBeijing = getBeijingNow();
-      const todayBeijingStart = getBeijingStartOfToday();
-      const nextRefreshMs = todayBeijingStart.getTime() + 24 * 60 * 60 * 1000 + 1 * 60 * 1000;
-      const msUntilNext = nextRefreshMs - nowBeijing.getTime();
-      const initialDelay = msUntilNext > 0 ? msUntilNext : 1000;
-      setTimeout(() => {
-        renderCards();
-        setInterval(renderCards, 12 * 60 * 60 * 1000);
-      }, initialDelay);
-    }
+  const btnNewGame = createTopButton('🆕', '新游戏区服', 'https://gmp777.github.io/all.html');
+  tabsContainer.appendChild(btnNewGame);
+</script>
 
-    renderCards();
-    scheduleDailyRefresh();
-  </script>
-
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
+<div class="footer-wrapper">
+  <footer id="footer-container">加载中...</footer>
+</div>
+<script src="/load-footer.js"></script>
 </body>
 </html>
