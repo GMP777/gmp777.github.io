@@ -58,17 +58,25 @@
     .title{
       font-weight:700; font-size:18px; color:#fff; margin-bottom:6px;
       display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:6px;
+      line-height:1.4; word-break:keep-all; text-align:center;
     }
     .badge{
       display:inline-flex; align-items:center; justify-content:center;
       font-size:12px; font-weight:700; border-radius:999px;
-      padding:2px 6px; box-shadow:0 1px 3px rgba(0,0,0,0.3);
+      padding:2px 8px; min-height:20px; line-height:1;
+      white-space:nowrap; vertical-align:middle;
+      box-shadow:0 1px 3px rgba(0,0,0,0.3);
     }
     .badge-new{background:#06b6d4; color:#022;}
     .badge-guild{background:#facc15; color:#222;}
     .badge-diamond{background:#38bdf8; color:#022;}
     .badge-merge{background:linear-gradient(90deg,#ef4444,#dc2626); color:#fff;}
     .info{font-size:13px; color:var(--muted)}
+
+    @media (max-width:480px){
+      .title{font-size:16px;}
+      .badge{font-size:11px; padding:2px 6px;}
+    }
 
     .toast{
       position:fixed; left:50%; transform:translateX(-50%);
@@ -100,10 +108,10 @@
 
   <script>
     // === 设置基础域名切换 ===
-    let currentDomain = "www.9awan.com"; // 默认域名
+    let currentDomain = "www.9awan.com";
     const siteBtn = document.getElementById("switchSite");
 
-    // === 服务器数据自动生成 2091~2111 ===
+    // === 服务器数据自动生成 ===
     const servers = [];
     const baseServerId = 98471;
     const baseServerNum = 2091;
@@ -113,7 +121,7 @@
       return new Date(ms).toLocaleDateString("en-CA", { timeZone: "Asia/Shanghai" });
     }
 
-    for (let i = 0; i <= 20; i++) { // 2091~2111 共21个
+    for (let i = 0; i <= 20; i++) {
       const serverNum = baseServerNum + i;
       const serverId = baseServerId + i;
       const ms = baseDate.getTime() + i * 24 * 60 * 60 * 1000;
@@ -125,14 +133,16 @@
       });
     }
 
-    const mergedRange = { from: 2091, to: 2097 };
-    const mergeStart = new Date("2025-10-18T00:00:00+08:00");
+    // === 合服记录 ===
+    const mergeGroups = [
+      { from: 2091, to: 2097, start: new Date("2025-10-18T00:00:00+08:00") },
+      { from: 2098, to: 2104, start: new Date("2025-10-25T00:00:00+08:00") }
+    ];
 
     const container = document.getElementById("cardContainer");
     const toast = document.getElementById("toast");
     const refreshBtn = document.getElementById("refreshBtn");
-
-    let currentMode = "copy"; // 默认复制模式
+    let currentMode = "copy";
 
     // === 获取北京时间 ===
     function getBeijingNow() {
@@ -166,26 +176,30 @@
         let infoText = "";
         let icons = "";
 
-        if (diffDays < 0) {
-          infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
-        } else if (diffDays < 7) {
-          infoText = `开服第 ${diffDays + 1} 天`;
-        } else {
-          infoText = `开服共 ${diffDays + 1} 天`;
-        }
+        if (diffDays < 0) infoText = `开服倒计时 ${Math.abs(diffDays)} 天`;
+        else if (diffDays < 7) infoText = `开服第 ${diffDays + 1} 天`;
+        else infoText = `开服共 ${diffDays + 1} 天`;
 
         if (diffDays === 0) icons += `<span class="badge badge-new">🆕 新服</span>`;
-        if (!(server.id >= mergedRange.from && server.id <= mergedRange.to) && diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
-          icons += `<span class="badge badge-diamond">💎 战日</span>`;
-        }
 
-        if (server.id >= mergedRange.from && server.id <= mergedRange.to) {
-          const mergeDiffDays = Math.floor((beijingTodayStart - mergeStart) / MS_PER_DAY);
+        // === 合服逻辑 ===
+        const mergeInfo = mergeGroups.find(g => server.id >= g.from && server.id <= g.to);
+        if (mergeInfo) {
+          const mergeDiffDays = Math.floor((beijingTodayStart - mergeInfo.start) / MS_PER_DAY);
           const mergeDay = mergeDiffDays >= 0 ? mergeDiffDays + 1 : 0;
           icons += `<span class="badge badge-merge">⚔️ 合服第 ${mergeDay} 天</span>`;
+
           if (mergeDay === 3) icons += `<span class="badge badge-guild">👑 公会战</span>`;
+          if (mergeDay >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
+            icons += `<span class="badge badge-diamond">💎 战日</span>`;
+          }
+
         } else {
+          // === 普通服逻辑 ===
           if (diffDays === 2) icons += `<span class="badge badge-guild">👑 公会战</span>`;
+          if (diffDays >= 3 && (todayWeekday === 3 || todayWeekday === 6)) {
+            icons += `<span class="badge badge-diamond">💎 战日</span>`;
+          }
         }
 
         const card = document.createElement("div");
@@ -195,42 +209,27 @@
           <div class="info">${infoText}</div>
         `;
         card.addEventListener("click", () => handleCardClick(url));
-        card.addEventListener("keydown", e => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleCardClick(url);
-          }
-        });
         container.appendChild(card);
       });
     }
 
     // === 点击行为 ===
     function handleCardClick(url) {
-      if (currentMode === "copy") {
-        copyText(url);
-      } else {
-        window.open(url, "_blank");
-      }
+      if (currentMode === "copy") copyText(url);
+      else window.open(url, "_blank");
     }
 
     // === 模式按钮 ===
     const copyBtn = document.getElementById("copyMode");
     const openBtn = document.getElementById("openMode");
-
     copyBtn.addEventListener("click", () => switchMode("copy"));
     openBtn.addEventListener("click", () => switchMode("open"));
     siteBtn.addEventListener("click", toggleSite);
 
     function switchMode(mode) {
       currentMode = mode;
-      if (mode === "copy") {
-        copyBtn.classList.add("active");
-        openBtn.classList.remove("active");
-      } else {
-        openBtn.classList.add("active");
-        copyBtn.classList.remove("active");
-      }
+      copyBtn.classList.toggle("active", mode === "copy");
+      openBtn.classList.toggle("active", mode === "open");
     }
 
     // === 切换网站 ===
@@ -255,7 +254,8 @@
     // === 复制功能 ===
     function copyText(text){
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(() => showToastMessage("已复制链接到剪贴板")).catch(() => fallbackCopy(text));
+        navigator.clipboard.writeText(text).then(() => showToastMessage("已复制链接到剪贴板"))
+        .catch(() => fallbackCopy(text));
       } else fallbackCopy(text);
     }
     function fallbackCopy(text){
