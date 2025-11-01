@@ -49,8 +49,7 @@ h2 { text-align:center; margin-bottom:12px; }
 <div id="toast"></div>
 
 <script>
-// ---------- 配置 ----------
-let clickMode = "copy"; // 默认复制模式
+let clickMode = "copy";
 let currentSite = "9awan";
 
 const swcqMergeRanges = [
@@ -60,9 +59,8 @@ const swcqMergeRanges = [
 
 const games = [
   {id:"swcq", name:"圣王传奇", type:"swcq", servers:[2091,2092,2093,2094,2095,2096,2097,2098,2099,2100,2101,2102,2103,2104,2105,2106,2107,2108,2109,2110,2111,2112,2113,2114,2115,2116]},
-  {id:"111", name:"满V切割神域", servers:[235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277], homepage:"http://gm.yx4f.com:81/games/111.html"},
-  {id:"115", name:"满V悠久传奇", servers:[105,112,113,114,115,116,117,118,119,120,121,122,123], homepage:"http://gm.yx4f.com:81/games/115.html"},
-  {id:"137", name:"GM赤焰无双", servers:[1,2,3,4,5,6,7,8,9,10,11,12], homepage:"http://gm.yx4f.com:81/games/137.html"}
+  {id:"xayxms", name:"悠久传奇", servers:[105,112,113,114,115,116,117,118,119,120,121,122,123], homepage1:"http://gm.yx4f.com:81/games/115.html", homepage2:"http://gm.962yx.com/games/115.html"},
+  {id:"tmss", name:"屠神", servers:[25,26,30,31], homepage:"http://www.8syx.com/game/7/"}
 ];
 
 // ---------- 工具 ----------
@@ -76,21 +74,20 @@ function showToast(msg){
 
 function getBeijingNow(){ const now=new Date(); return new Date(now.getTime()+8*60*60*1000+now.getTimezoneOffset()*60*1000); }
 
-// ---------- 渲染 ----------
-const tabs = document.getElementById("tabs");
-const tables = document.getElementById("tables");
-
 function getMergeInfo(serverId){
   for(const r of swcqMergeRanges) if(serverId>=r.from&&serverId<=r.to) return r;
   return null;
 }
+
+// ---------- 渲染 ----------
+const tabs = document.getElementById("tabs");
+const tables = document.getElementById("tables");
 
 function renderSWCQ(){
   const grid = document.createElement("div");
   grid.className="grid-container";
   grid.id="table-swcq";
 
-  // 开服表卡片
   const card = document.createElement("div"); card.className="grid-item";
   const a = document.createElement("a");
   a.textContent="📅 开服表";
@@ -109,16 +106,12 @@ function renderSWCQ(){
       if(clickMode==="open") window.open(url,"_blank");
       else {navigator.clipboard.writeText(url); showToast("已复制链接");}
     };
-
     item.appendChild(link);
 
-    // 合服天数
     if(diffDays>0){ 
       const b = document.createElement("div"); b.className="badge badge-day"; b.textContent=`合服第 ${diffDays} 天`; item.appendChild(b);
     }
-
-    // 特殊徽章
-    if(diffDays===3) { const b=document.createElement("div"); b.className="badge badge-event"; b.textContent="👑 城主战"; item.appendChild(b);}
+    if(diffDays===3){ const b=document.createElement("div"); b.className="badge badge-event"; b.textContent="👑 城主战"; item.appendChild(b);}
     const weekday = today.getDay(); if(diffDays>3&&(weekday===3||weekday===6)){ const b=document.createElement("div"); b.className="badge badge-event"; b.textContent="🏰 公会战日"; item.appendChild(b);}
     grid.appendChild(item);
   }
@@ -127,13 +120,19 @@ function renderSWCQ(){
 
 function renderOtherGame(game){
   const grid=document.createElement("div"); grid.className="grid-container"; grid.id="table-"+game.id;
-  grid.style.display="none"; // 初始隐藏
+  grid.style.display="none";
 
-  // 游戏主页卡片
-  if(game.homepage){
-    const homeCard=document.createElement("div"); homeCard.className="grid-item";
-    const homeLink=document.createElement("a"); homeLink.textContent="🏠 游戏主页"; homeLink.href=game.homepage; homeLink.target="_blank";
-    homeCard.appendChild(homeLink); grid.appendChild(homeCard);
+  // 游戏主页或不同平台标识
+  if(game.homepage1 && game.homepage2){
+    const h1=document.createElement("div"); h1.className="grid-item";
+    const a1=document.createElement("a"); a1.textContent="🏠 悠久传奇"; a1.href=game.homepage1; a1.target="_blank"; h1.appendChild(a1);
+    grid.appendChild(h1);
+    const h2=document.createElement("div"); h2.className="grid-item";
+    const a2=document.createElement("a"); a2.textContent="🏠 962yx"; a2.href=game.homepage2; a2.target="_blank"; h2.appendChild(a2);
+    grid.appendChild(h2);
+  } else if(game.homepage){
+    const h=document.createElement("div"); h.className="grid-item";
+    const a=document.createElement("a"); a.textContent="🏠 游戏主页"; a.href=game.homepage; a.target="_blank"; h.appendChild(a); grid.appendChild(h);
   }
 
   for(const s of game.servers){
@@ -145,7 +144,7 @@ function renderOtherGame(game){
   return grid;
 }
 
-// ---------- 生成标签页和表格 ----------
+// ---------- 标签页 ----------
 games.forEach((g,i)=>{
   const btn=document.createElement("button"); btn.className="tab-btn"+(i===0?" active":""); btn.textContent=g.name;
   btn.onclick=()=>{
