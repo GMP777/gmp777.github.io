@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
-<title>圣王传奇 & 游戏列表</title>
+<title>游戏区服列表</title>
   <!-- 载入 footer 样式 -->
 <link rel="stylesheet" href="/footer.css" />
 <!-- 载入 footer 样式 -->
@@ -50,7 +50,7 @@ h2 { text-align:center; margin-bottom:12px; }
 
 <script>
 // ---------- 配置 ----------
-let clickMode = "open";
+let clickMode = "copy"; // 默认复制模式
 let currentSite = "9awan";
 
 const swcqMergeRanges = [
@@ -60,9 +60,9 @@ const swcqMergeRanges = [
 
 const games = [
   {id:"swcq", name:"圣王传奇", type:"swcq", servers:[2091,2092,2093,2094,2095,2096,2097,2098,2099,2100,2101,2102,2103,2104,2105,2106,2107,2108,2109,2110,2111,2112,2113,2114,2115,2116]},
-  {id:"111", name:"满V切割神域", servers:[235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277]},
-  {id:"115", name:"满V悠久传奇", servers:[105,112,113,114,115,116,117,118,119,120,121,122,123]},
-  {id:"137", name:"GM赤焰无双", servers:[1,2,3,4,5,6,7,8,9,10,11,12]}
+  {id:"111", name:"满V切割神域", servers:[235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277], homepage:"http://gm.yx4f.com:81/games/111.html"},
+  {id:"115", name:"满V悠久传奇", servers:[105,112,113,114,115,116,117,118,119,120,121,122,123], homepage:"http://gm.yx4f.com:81/games/115.html"},
+  {id:"137", name:"GM赤焰无双", servers:[1,2,3,4,5,6,7,8,9,10,11,12], homepage:"http://gm.yx4f.com:81/games/137.html"}
 ];
 
 // ---------- 工具 ----------
@@ -128,6 +128,14 @@ function renderSWCQ(){
 function renderOtherGame(game){
   const grid=document.createElement("div"); grid.className="grid-container"; grid.id="table-"+game.id;
   grid.style.display="none"; // 初始隐藏
+
+  // 游戏主页卡片
+  if(game.homepage){
+    const homeCard=document.createElement("div"); homeCard.className="grid-item";
+    const homeLink=document.createElement("a"); homeLink.textContent="🏠 游戏主页"; homeLink.href=game.homepage; homeLink.target="_blank";
+    homeCard.appendChild(homeLink); grid.appendChild(homeCard);
+  }
+
   for(const s of game.servers){
     const item=document.createElement("div"); item.className="grid-item";
     const a=document.createElement("a"); a.textContent=`${s}区`;
@@ -143,9 +151,7 @@ games.forEach((g,i)=>{
   btn.onclick=()=>{
     document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    // 先隐藏所有表格
     document.querySelectorAll(".grid-container").forEach(gc=>gc.style.display="none");
-    // 显示当前表格
     const table = document.getElementById("table-"+g.id);
     table.style.display="grid";
   };
@@ -155,9 +161,9 @@ games.forEach((g,i)=>{
 });
 
 // ---------- 控制按钮 ----------
-document.getElementById("copyModeBtn").onclick=()=>{ clickMode="copy"; showToast("复制模式"); };
-document.getElementById("openModeBtn").onclick=()=>{ clickMode="open"; showToast("打开模式"); };
-document.getElementById("switchSiteBtn").onclick=()=>{
+document.getElementById("copyModeBtn").onclick = ()=>{ clickMode="copy"; showToast("复制模式"); };
+document.getElementById("openModeBtn").onclick = ()=>{ clickMode="open"; showToast("打开模式"); };
+document.getElementById("switchSiteBtn").onclick = ()=>{
   currentSite=currentSite==="9awan"?"3uyy":"9awan";
   document.getElementById("switchSiteBtn").textContent=`🌐 当前：${currentSite}`;
   document.getElementById("table-swcq").replaceWith(renderSWCQ());
