@@ -13,277 +13,198 @@
   }
   body{
     background:linear-gradient(180deg,var(--bg),#0b1a2a);
-    color:#e6eef8; font-family: "Microsoft Yahei", Arial, sans-serif;
+    color:#e6eef8; font-family:"Microsoft YaHei",Arial,sans-serif;
     margin:0; padding:18px;
   }
   .wrap{ max-width:1000px; margin:0 auto; }
   h1{ text-align:center; margin:6px 0 10px; font-size:20px; }
   #time{ text-align:center; color:var(--muted); margin-bottom:10px; font-size:14px; }
 
-  /* 全局控制按钮（复制/打开） */
   .controls{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:10px; }
-  .control-btn{
-    background:rgba(255,255,255,0.06); color:#e6eef8;
-    border:1px solid rgba(255,255,255,0.04);
-    padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700;
-  }
+  .control-btn{ background:rgba(255,255,255,0.06); color:#e6eef8; border:1px solid rgba(255,255,255,0.04); padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
   .control-btn.active{ background:linear-gradient(90deg,var(--accent),#7dd3fc); color:#022; border:none; }
 
-  /* 标签 */
   .tabs{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
   .tab{ padding:6px 12px; border-radius:8px; cursor:pointer; background:transparent; border:1px solid rgba(255,255,255,0.04); color:var(--muted); font-weight:700; }
   .tab.active{ background:linear-gradient(90deg,var(--accent),#7dd3fc); color:#022; border-color:transparent; }
 
-  /* 网格与卡片 */
   .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
-  .card{ background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:12px; text-align:center; box-shadow:0 6px 18px rgba(2,6,23,0.6); }
-  .card .title{ font-weight:800; font-size:16px; margin-bottom:8px; color:#fff; }
-  .info{ color:var(--muted); font-size:13px; }
+  .card{ background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01)); padding:12px; border-radius:12px; text-align:center; box-shadow:0 6px 18px rgba(2,6,23,0.6); }
+
+  .title{ font-weight:800; font-size:16px; margin-bottom:8px; color:#fff; }
+
+  .srv{
+    display:inline-block; width:100%; text-align:center;
+    padding:8px 6px; border-radius:8px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.04);
+    cursor:pointer; font-weight:700; color:#e6eef8; text-decoration:none; font-size:14px;
+  }
+  .srv:hover{ background:var(--accent); color:#022; border-color:transparent; }
+  .srv:active{ transform:translateY(1px); }
 
   .badges{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-top:8px; }
   .badge{ padding:4px 8px; border-radius:999px; font-weight:700; font-size:13px; color:#022; background:var(--accent); }
   .badge-day{ background:linear-gradient(90deg,#60a5fa,#06b6d4); color:#022; }
   .badge-event{ background:linear-gradient(90deg,#f59e0b,#f97316); color:#111; }
 
-  /* 小型按钮：用于站点切换与游戏主页（比原来小） */
-  .small-btn{
-    display:inline-block; padding:6px 8px; font-size:13px; border-radius:8px;
-    background:rgba(255,255,255,0.04); color:#e6eef8; border:1px solid rgba(255,255,255,0.04);
-    cursor:pointer; text-decoration:none;
-  }
-  .small-btn:hover{ background:var(--accent); color:#022; border-color:transparent; }
-
-  /* 服务器按钮（格子） */
-  .srv-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(80px,1fr)); gap:8px; margin-top:10px; }
-  .srv{
-    padding:8px 6px; border-radius:8px; background:rgba(255,255,255,0.02);
-    cursor:pointer; border:1px solid rgba(255,255,255,0.03); font-weight:700; color:#e6eef8;
-    text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font-size:14px;
-  }
-  .srv:active{ transform:translateY(1px); }
-
   #toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:28px; background:linear-gradient(90deg,var(--accent),#7dd3fc); color:#022; padding:10px 16px; border-radius:999px; box-shadow:0 6px 24px rgba(6,22,34,0.6); font-weight:700; display:none; z-index:999; }
 
   footer{ text-align:center; color:var(--muted); margin-top:16px; font-size:13px; }
 
-  /* 更小的屏幕微调 */
   @media (max-width:520px){
     .grid{ grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
     .srv{ font-size:13px; padding:6px 4px; }
-    .small-btn{ padding:5px 6px; font-size:12px; }
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>🎮 游戏区服导航（按钮微调版）</h1>
-    <div id="time">北京时间加载中…</div>
+<div class="wrap">
+  <div id="time">北京时间加载中…</div>
 
-    <div class="controls">
-      <button id="btnCopy" class="control-btn active">📋 复制模式（全站）</button>
-      <button id="btnOpen" class="control-btn">🔗 打开模式（全站）</button>
-    </div>
-
-    <div class="tabs" id="tabs"></div>
-
-    <div id="content"></div>
-
-    <div id="toast"></div>
-
-    <footer>已就绪</footer>
+  <div class="controls">
+    <button id="btnCopy" class="control-btn active">📋 复制模式（全站）</button>
+    <button id="btnOpen" class="control-btn">🔗 打开模式（全站）</button>
   </div>
 
-<script>
-/* ======= 全局设置 ======= */
-let clickMode = 'copy'; // 全站通用，默认复制
-let currentSWCQ = '9awan'; // 圣王传奇站点（9awan / 3uyy）
-let currentYJ = 'yx4f';    // 悠久传奇站点（yx4f / 962yx）
+  <div class="tabs" id="tabs"></div>
+  <div id="content"></div>
+  <div id="toast"></div>
+  <footer>已就绪</footer>
+</div>
 
-const MS_DAY = 24*60*60*1000;
-const showToast = (msg)=>{
-  const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; t.style.opacity='1';
-  setTimeout(()=>{ t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.style.display='none',300); },1400);
+<script>
+let clickMode='copy';
+let currentSWCQ='9awan';
+let currentYJ='yx4f';
+
+const MS_DAY=86400000;
+const showToast=(msg)=>{
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.display='block'; t.style.opacity='1';
+  setTimeout(()=>{t.style.transition='opacity .3s'; t.style.opacity='0'; setTimeout(()=>t.style.display='none',300);},1400);
 };
 
-/* ======= 合服段（保留三段） ======= */
-const mergeGroups = [
-  { from: 2091, to: 2097, date: '2025-10-28' },
-  { from: 2098, to: 2104, date: '2025-10-31' },
-  { from: 2105, to: 2111, date: '2025-11-02' }
+const mergeGroups=[
+  {from:2091,to:2097,date:'2025-10-28'},
+  {from:2098,to:2104,date:'2025-10-31'},
+  {from:2105,to:2111,date:'2025-11-02'}
 ];
 
-/* ======= 游戏数据（含 2091-2116） ======= */
-const games = [
+const games=[
   {
-    id: 'swcq', name: '圣王传奇',
-    homepage9awan: 'http://www.9awan.com/home/server/283',
-    homepage3uyy: 'http://88.3uyy.com/home/server/283',
-    servers: Array.from({length: 2116-2091+1}, (_,i)=> ({ show: 2091+i, real: 98471+i }))
+    id:'swcq', name:'圣王传奇',
+    homepage9awan:'http://www.9awan.com/home/server/283',
+    homepage3uyy:'http://88.3uyy.com/home/server/283',
+    servers:Array.from({length:2116-2091+1},(_,i)=>({show:2091+i,real:98471+i}))
   },
-  { id: '111', name: '满V切割神域', homepage: 'http://gm.yx4f.com:81/games/111.html',
-    servers: [235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277] },
-  { id: '115', name: '满V悠久传奇', homepage: 'http://gm.yx4f.com:81/games/115.html', homepage2: 'http://gm.962yx.com/games/115.html',
-    servers: [105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123] },
-  { id: '137', name: 'GM赤焰无双', homepage: 'http://gm.yx4f.com:81/games/137.html', servers:[1,2,3,4,5,6,7,8,9,10,11,12] },
-  { id: 'tmss', name: '屠神', homepage: 'http://www.8syx.com/game/7/', servers: [25,26,30,31] }
+  {id:'111',name:'满V切割神域',homepage:'http://gm.yx4f.com:81/games/111.html',
+   servers:[235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277]},
+  {id:'115',name:'满V悠久传奇',homepage:'http://gm.yx4f.com:81/games/115.html',homepage2:'http://gm.962yx.com/games/115.html',
+   servers:[105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123]},
+  {id:'137',name:'GM赤焰无双',homepage:'http://gm.yx4f.com:81/games/137.html',
+   servers:[1,2,3,4,5,6,7,8,9,10,11,12]},
+  {id:'tmss',name:'屠神',homepage:'http://www.8syx.com/game/7/',
+   servers:[25,26,30,31]}
 ];
 
-/* ======= 北京时间工具 ======= */
-function beijingNow(){ const n=new Date(); return new Date(n.getTime() + (8*60 - n.getTimezoneOffset())*60000); }
-function beijingDayStart(d){ // returns Date at Beijing 00:00 of d
-  const s = new Date(d.toLocaleDateString('en-CA') + 'T00:00:00+08:00');
-  return s;
-}
-function daysSince(dateStr){
-  const start = new Date(dateStr + 'T00:00:00+08:00');
-  const todayStart = beijingDayStart(beijingNow());
-  return Math.floor((todayStart - start)/MS_DAY) + 1;
-}
+function beijingNow(){const n=new Date();return new Date(n.getTime()+(8*60-n.getTimezoneOffset())*60000);}
+function beijingDayStart(d){return new Date(d.toLocaleDateString('en-CA')+'T00:00:00+08:00');}
+function daysSince(dateStr){const s=new Date(dateStr+'T00:00:00+08:00');const t=beijingDayStart(beijingNow());return Math.floor((t-s)/MS_DAY)+1;}
 
-/* ======= 渲染函数 ======= */
-const tabsEl = document.getElementById('tabs');
-const contentEl = document.getElementById('content');
+const tabsEl=document.getElementById('tabs');
+const contentEl=document.getElementById('content');
 
 function renderTabs(){
-  tabsEl.innerHTML = '';
+  tabsEl.innerHTML='';
   games.forEach(g=>{
-    const btn = document.createElement('button');
-    btn.className = 'tab' + (g.id==='swcq' ? ' active' : '');
-    btn.textContent = g.name;
-    btn.onclick = ()=>{
+    const b=document.createElement('button');
+    b.className='tab'+(g.id==='swcq'?' active':'');
+    b.textContent=g.name;
+    b.onclick=()=>{
       document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active');
+      b.classList.add('active');
       renderContent(g.id);
     };
-    tabsEl.appendChild(btn);
+    tabsEl.appendChild(b);
   });
 }
 
-function renderContent(gameId){
-  contentEl.innerHTML = '';
-  const game = games.find(g=>g.id===gameId);
-  if(!game) return;
+function renderContent(id){
+  contentEl.innerHTML='';
+  const g=games.find(x=>x.id===id); if(!g) return;
+  const grid=document.createElement('div'); grid.className='grid';
+  const today=beijingNow(); const weekday=today.getDay();
 
-  const grid = document.createElement('div'); grid.className='grid';
-
-  if(game.id === 'swcq'){
-    // site small button
-    const siteCard = document.createElement('div'); siteCard.className='card';
-    const siteBtn = document.createElement('button'); siteBtn.className='small-btn';
-    siteBtn.textContent = `🌐 ${currentSWCQ === '9awan' ? '9awan' : '3uyy'}`;
-    siteBtn.onclick = ()=>{
-      currentSWCQ = currentSWCQ === '9awan' ? '3uyy' : '9awan';
-      showToast('圣王传奇已切换：' + currentSWCQ);
-      renderContent('swcq');
-    };
+  if(id==='swcq'){
+    const siteCard=document.createElement('div'); siteCard.className='card';
+    const siteBtn=document.createElement('a'); siteBtn.className='srv'; siteBtn.textContent='🌐 '+(currentSWCQ==='9awan'?'9awan':'3uyy');
+    siteBtn.onclick=(e)=>{e.preventDefault();currentSWCQ=currentSWCQ==='9awan'?'3uyy':'9awan';showToast('圣王传奇已切换：'+currentSWCQ);renderContent('swcq');};
     siteCard.appendChild(siteBtn);
-    siteCard.appendChild(Object.assign(document.createElement('div'), { className:'info', textContent:'切换站点或使用下面的开服表/区服' }));
     grid.appendChild(siteCard);
 
-    // homepage (small)
-    const homeCard = document.createElement('div'); homeCard.className='card';
-    const homeLink = document.createElement('a'); homeLink.className='small-btn'; homeLink.textContent='📅 开服表';
-    homeLink.href = currentSWCQ === '9awan' ? game.homepage9awan : game.homepage3uyy;
-    homeLink.target = '_blank';
-    homeCard.appendChild(homeLink);
-    grid.appendChild(homeCard);
+    const homeCard=document.createElement('div'); homeCard.className='card';
+    const homeBtn=document.createElement('a'); homeBtn.className='srv'; homeBtn.textContent='📅 开服表';
+    homeBtn.href=currentSWCQ==='9awan'?g.homepage9awan:g.homepage3uyy; homeBtn.target='_blank';
+    homeCard.appendChild(homeBtn); grid.appendChild(homeCard);
 
-    // servers
-    const today = beijingNow();
-    const weekday = today.getDay(); // 0..6
-    game.servers.forEach(s=>{
-      const c = document.createElement('div'); c.className='card';
-      const title = document.createElement('div'); title.className='title'; title.textContent = `${s.show}区`;
-      c.appendChild(title);
-
-      const srvLink = document.createElement('a'); srvLink.className='srv';
-      srvLink.textContent = (currentSWCQ === '9awan' ? '进入 9a' : '进入 3U');
-      srvLink.href = (currentSWCQ === '9awan') ? `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${s.real}` : `http://88.3uyy.com/game.php?action=play&game_id=283&server_id=${s.real}`;
-      srvLink.onclick = (e)=>{ e.preventDefault(); const url = srvLink.href; if(clickMode === 'open') window.open(url,'_blank'); else { navigator.clipboard.writeText(url); showToast('已复制链接'); } };
-      c.appendChild(srvLink);
-
-      // merge group check
-      const mg = mergeGroups.find(m => s.show >= m.from && s.show <= m.to);
-      if(mg){
-        const md = daysSince(mg.date);
-        const badges = document.createElement('div'); badges.className='badges';
-        const bd = document.createElement('div'); bd.className='badge badge-day'; bd.textContent = `合服第 ${md} 天`;
-        badges.appendChild(bd);
-        if(md === 3){ const ev = document.createElement('div'); ev.className='badge badge-event'; ev.textContent='👑 城主战'; badges.appendChild(ev); }
-        if(md >= 1 && (weekday === 3 || weekday === 6)){ const ev2 = document.createElement('div'); ev2.className='badge badge-event'; ev2.textContent='🏰 公会战日'; badges.appendChild(ev2); }
+    g.servers.forEach(s=>{
+      const c=document.createElement('div'); c.className='card';
+      const t=document.createElement('div'); t.className='title'; t.textContent=`${s.show}区`; c.appendChild(t);
+      const url=(currentSWCQ==='9awan')?`http://www.9awan.com/game.php?action=play&game_id=283&server_id=${s.real}`:`http://88.3uyy.com/game.php?action=play&game_id=283&server_id=${s.real}`;
+      const link=document.createElement('a'); link.className='srv'; link.textContent=(currentSWCQ==='9awan'?'进入 9a':'进入 3U'); link.href=url;
+      link.onclick=(e)=>{e.preventDefault();if(clickMode==='open')window.open(url,'_blank');else{navigator.clipboard.writeText(url);showToast('已复制链接');}};
+      c.appendChild(link);
+      const mg=mergeGroups.find(m=>s.show>=m.from&&s.show<=m.to);
+      if(mg){const md=daysSince(mg.date);const badges=document.createElement('div');badges.className='badges';
+        const bd=document.createElement('div');bd.className='badge badge-day';bd.textContent=`合服第 ${md} 天`;badges.appendChild(bd);
+        if(md===3){const ev=document.createElement('div');ev.className='badge badge-event';ev.textContent='👑 城主战';badges.appendChild(ev);}
+        if(md>=1&&(weekday===3||weekday===6)){const ev2=document.createElement('div');ev2.className='badge badge-event';ev2.textContent='🏰 公会战日';badges.appendChild(ev2);}
         c.appendChild(badges);
       }
-
       grid.appendChild(c);
     });
 
-  } else {
-    // other games
-    // for 悠久传奇, small site switch button
-    if(game.id === '115'){
-      const siteCard = document.createElement('div'); siteCard.className='card';
-      const siteBtn = document.createElement('button'); siteBtn.className='small-btn';
-      siteBtn.textContent = `🌐 ${currentYJ === 'yx4f' ? 'yx4f' : '962yx'}`;
-      siteBtn.onclick = ()=>{
-        currentYJ = currentYJ === 'yx4f' ? '962yx' : 'yx4f';
-        showToast('悠久传奇已切换：' + currentYJ);
-        renderContent('115');
-      };
-      siteCard.appendChild(siteBtn);
-      siteCard.appendChild(Object.assign(document.createElement('div'), { className:'info', textContent:'切换站点或使用下面的主页/区服' }));
-      grid.appendChild(siteCard);
+  }else{
+    if(id==='115'){
+      const siteCard=document.createElement('div'); siteCard.className='card';
+      const siteBtn=document.createElement('a'); siteBtn.className='srv'; siteBtn.textContent='🌐 '+(currentYJ==='yx4f'?'yx4f':'962yx');
+      siteBtn.onclick=(e)=>{e.preventDefault();currentYJ=currentYJ==='yx4f'?'962yx':'yx4f';showToast('悠久传奇已切换：'+currentYJ);renderContent('115');};
+      siteCard.appendChild(siteBtn); grid.appendChild(siteCard);
     }
 
-    // homepage small
-    const homeCard = document.createElement('div'); homeCard.className='card';
-    const homeLink = document.createElement('a'); homeLink.className='small-btn'; homeLink.textContent='🏠 游戏主页';
-    if(game.id === '115') homeLink.href = currentYJ === 'yx4f' ? game.homepage : game.homepage2;
-    else homeLink.href = game.homepage || '#';
-    homeLink.target = '_blank';
-    homeCard.appendChild(homeLink); grid.appendChild(homeCard);
+    const homeCard=document.createElement('div'); homeCard.className='card';
+    const homeBtn=document.createElement('a'); homeBtn.className='srv'; homeBtn.textContent='🏠 游戏主页';
+    if(id==='115') homeBtn.href=currentYJ==='yx4f'?g.homepage:g.homepage2; else homeBtn.href=g.homepage;
+    homeBtn.target='_blank'; homeCard.appendChild(homeBtn); grid.appendChild(homeCard);
 
-    // server grid compact
-    const srvGrid = document.createElement('div'); srvGrid.className='srv-grid';
-    game.servers.forEach(s=>{
-      const node = document.createElement('a'); node.className='srv'; node.textContent = `${s}区`;
-      let url = '#';
-      if(game.id === '111') url = `http://gm.yx4f.com:81/login/111/${s}.html`;
-      else if(game.id === '115') url = currentYJ === 'yx4f' ? `http://gm.yx4f.com:81/login/115/${s}.html` : `http://gm.962yx.com/login/115/${s}.html`;
-      else if(game.id === '137') url = `http://gm.yx4f.com:81/login/137/${s}.html`;
-      else if(game.id === 'tmss') url = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${s}`;
-      node.href = url;
-      node.onclick = (e)=>{ e.preventDefault(); if(clickMode === 'open') window.open(url,'_blank'); else { navigator.clipboard.writeText(url); showToast('已复制链接'); } };
-      srvGrid.appendChild(node);
+    g.servers.forEach(s=>{
+      const c=document.createElement('div'); c.className='card';
+      const t=document.createElement('div'); t.className='title'; t.textContent=`${s}区`; c.appendChild(t);
+      let url='#';
+      if(id==='111') url=`http://gm.yx4f.com:81/login/111/${s}.html`;
+      else if(id==='115') url=currentYJ==='yx4f'?`http://gm.yx4f.com:81/login/115/${s}.html`:`http://gm.962yx.com/login/115/${s}.html`;
+      else if(id==='137') url=`http://gm.yx4f.com:81/login/137/${s}.html`;
+      else if(id==='tmss') url=`http://www.8syx.com/Game/gameto.php?gid=7&sid=${s}`;
+      const link=document.createElement('a'); link.className='srv'; link.textContent='进入区服';
+      link.onclick=(e)=>{e.preventDefault();if(clickMode==='open')window.open(url,'_blank');else{navigator.clipboard.writeText(url);showToast('已复制链接');}};
+      c.appendChild(link);
+      grid.appendChild(c);
     });
-    grid.appendChild(srvGrid);
   }
 
   contentEl.appendChild(grid);
 }
 
-/* ======= 初始化 ======= */
 function init(){
-  // time
-  const tk = () => { document.getElementById('time').textContent = '北京时间：' + beijingNow().toLocaleString('zh-CN',{hour12:false}); };
+  const tk=()=>{document.getElementById('time').textContent='北京时间：'+beijingNow().toLocaleString('zh-CN',{hour12:false});};
   tk(); setInterval(tk,1000);
-
-  // tabs
-  renderTabs();
-  // initial show swcq only
-  renderContent('swcq');
-
-  // control buttons global behavior
-  document.getElementById('btnCopy').addEventListener('click', ()=>{
-    clickMode = 'copy'; document.getElementById('btnCopy').classList.add('active'); document.getElementById('btnOpen').classList.remove('active'); showToast('复制模式（全站）');
-  });
-  document.getElementById('btnOpen').addEventListener('click', ()=>{
-    clickMode = 'open'; document.getElementById('btnOpen').classList.add('active'); document.getElementById('btnCopy').classList.remove('active'); showToast('打开模式（全站）');
-  });
+  renderTabs(); renderContent('swcq');
+  document.getElementById('btnCopy').onclick=()=>{clickMode='copy';btnCopy.classList.add('active');btnOpen.classList.remove('active');showToast('复制模式（全站）');};
+  document.getElementById('btnOpen').onclick=()=>{clickMode='open';btnOpen.classList.add('active');btnCopy.classList.remove('active');showToast('打开模式（全站）');};
 }
-
 init();
 </script>
-  <!-- Footer -->
+    <!-- Footer -->
   <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
   </div>
