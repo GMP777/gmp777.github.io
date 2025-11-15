@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💎钻石计算器🧮</title>
+<!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(30, 30, 46, 0.85);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ffcc00;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        th {
+            background-color: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+        }
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+        }
+        .active-input {
+            border-color: #ff9900;
+            background: rgba(255, 153, 0, 0.2);
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.7);
+        }
+        .total-section {
+            background: rgba(255, 204, 0, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .total-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 10px 0;
+        }
+        .refresh-btn {
+            background: linear-gradient(to right, #36D1DC, #5B86E5);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(54, 209, 220, 0.4);
+        }
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(54, 209, 220, 0.6);
+        }
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .key-hint {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .key {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .key kbd {
+            background: #333;
+            padding: 3px 7px;
+            border-radius: 4px;
+            margin-right: 5px;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+        }
+        .completed {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .calculation-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .calculation-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .calculation-box h3 {
+            color: #ffcc00;
+            margin-top: 0;
+            text-align: center;
+        }
+        .calculation-result {
+            flex: 1;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .calc-btn {
+            background: linear-gradient(to right, #4A00E0, #8E2DE2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(142, 45, 226, 0.4);
+        }
+        .copy-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 176, 155, 0.4);
+        }
+        .copy-success {
+            color: #4CAF50;
+            font-size: 12px;
+            margin-top: 5px;
+            height: 16px;
+            text-align: center;
+        }
+        .item-list {
+            text-align: left;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .item-row {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+        .item-name {
+            flex: 1;
+        }
+        .item-count {
+            background: rgba(255, 204, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            min-width: 60px;
+            text-align: center;
+        }
+        .item-count:hover {
+            background: rgba(255, 204, 0, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(255, 204, 0, 0.3);
+        }
+        .item-count.copied {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+        .result-placeholder {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+        }
+        .total-info {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-weight: bold;
+        }
+        .copy-hint {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-top: 5px;
+        }
+        .reduction-info {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💎钻石计算器🧮</h1>
+        
+        <div class="instructions">
+            <p>请依次填写每个道具的数量：</p>
+            <div class="key-hint">
+                <div class="key"><kbd>Enter</kbd> 下一个道具</div>
+                <div class="key"><kbd>Shift</kbd> + <kbd>↑</kbd> 上一个道具</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>道具</th>
+                    <th>单价（钻石）</th>
+                    <th>数量</th>
+                    <th>小计（钻石）</th>
+                </tr>
+            </thead>
+            <tbody id="items-table">
+                <!-- 表格内容将通过JavaScript生成 -->
+            </tbody>
+        </table>
+        
+        <div class="total-section">
+            <h2>总价</h2>
+            <div class="total-value" id="total-value">0 万钻石</div>
+            <p>已完成填写：<span id="completed-count">0</span>/10</p>
+            <button class="refresh-btn" id="refresh-btn">刷新页面重新开始</button>
+        </div>
+        
+        <div class="calculation-section">
+            <div class="calculation-box">
+                <h3>50万钻石所需道具</h3>
+                <div class="calculation-result" id="result-50w">
+                    <div class="result-placeholder">点击下方按钮计算所需道具</div>
+                </div>
+                <button class="calc-btn" id="calc-50w">计算50万钻石道具</button>
+                <button class="copy-btn" id="copy-50w" style="display: none;">复制全部数量</button>
+                <div class="copy-success" id="copy-success-50w"></div>
+                <div class="copy-hint" id="copy-hint-50w">点击单个数字可复制该道具数量</div>
+            </div>
+            
+            <div class="calculation-box">
+                <h3>100万钻石所需道具</h3>
+                <div class="calculation-result" id="result-100w">
+                    <div class="result-placeholder">点击下方按钮计算所需道具</div>
+                </div>
+                <button class="calc-btn" id="calc-100w">计算100万钻石道具</button>
+                <button class="copy-btn" id="copy-100w" style="display: none;">复制全部数量</button>
+                <div class="copy-success" id="copy-success-100w"></div>
+                <div class="copy-hint" id="copy-hint-100w">点击单个数字可复制该道具数量</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 道具数据
+        const itemsData = [
+            { name: "可乐", price: 10 },
+            { name: "橙汁", price: 20 },
+            { name: "打火机", price: 50 },
+            { name: "小音响", price: 100 },
+            { name: "鼠标", price: 200 },
+            { name: "耳机", price: 500 },
+            { name: "手表", price: 1000 },
+            { name: "手机", price: 2000 },
+            { name: "摩托车", price: 5000 },
+            { name: "法拉利", price: 10000 }
+        ];
+
+        // 初始化数量和当前活动输入框索引
+        let quantities = Array(itemsData.length).fill(0);
+        let currentInputIndex = 0;
+
+        // 初始化表格
+        function initializeTable() {
+            const tableBody = document.getElementById('items-table');
+            tableBody.innerHTML = '';
+            
+            itemsData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.price.toLocaleString()}</td>
+                    <td>
+                        <input type="number" min="0" id="input-${index}" value="${quantities[index]}" 
+                               data-index="${index}" placeholder="输入数量">
+                    </td>
+                    <td id="subtotal-${index}">0</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 添加事件监听器
+            addEventListeners();
+            
+            // 设置第一个输入框为活动状态
+            setActiveInput(0);
+            
+            // 更新进度和总计
+            updateProgress();
+            calculateTotal();
+        }
+
+        // 添加事件监听器
+        function addEventListeners() {
+            // 输入框输入事件
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.addEventListener('input', function() {
+                    const index = parseInt(this.dataset.index);
+                    quantities[index] = parseInt(this.value) || 0;
+                    updateSubtotal(index);
+                    calculateTotal();
+                    updateProgress();
+                });
+                
+                input.addEventListener('focus', function() {
+                    const index = parseInt(this.dataset.index);
+                    setActiveInput(index);
+                });
+            });
+            
+            // 键盘事件
+            document.addEventListener('keydown', function(e) {
+                // 回车键 - 下一个输入框
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentInputIndex < itemsData.length - 1) {
+                        setActiveInput(currentInputIndex + 1);
+                    }
+                }
+                
+                // Shift + 上箭头 - 上一个输入框 (macOS优化)
+                if (e.shiftKey && e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentInputIndex > 0) {
+                        setActiveInput(currentInputIndex - 1);
+                    }
+                }
+            });
+            
+            // 刷新按钮 - 直接刷新页面
+            document.getElementById('refresh-btn').addEventListener('click', function() {
+                location.reload();
+            });
+            
+            // 计算按钮
+            document.getElementById('calc-50w').addEventListener('click', function() {
+                calculateRequiredItems(500000, '50w');
+            });
+            
+            document.getElementById('calc-100w').addEventListener('click', function() {
+                calculateRequiredItems(1000000, '100w');
+            });
+            
+            // 复制按钮
+            document.getElementById('copy-50w').addEventListener('click', function() {
+                copyAllItems('50w');
+            });
+            
+            document.getElementById('copy-100w').addEventListener('click', function() {
+                copyAllItems('100w');
+            });
+        }
+
+        // 设置活动输入框
+        function setActiveInput(index) {
+            // 移除所有活动状态
+            document.querySelectorAll('input[type="number"]').forEach(input => {
+                input.classList.remove('active-input');
+            });
+            
+            // 设置新的活动状态
+            const activeInput = document.getElementById(`input-${index}`);
+            if (activeInput) {
+                activeInput.classList.add('active-input');
+                activeInput.focus();
+                currentInputIndex = index;
+            }
+        }
+
+        // 更新小计
+        function updateSubtotal(index) {
+            const subtotal = quantities[index] * itemsData[index].price;
+            document.getElementById(`subtotal-${index}`).textContent = subtotal.toLocaleString();
+        }
+
+        // 计算总价
+        function calculateTotal() {
+            let total = 0;
+            itemsData.forEach((item, index) => {
+                total += quantities[index] * item.price;
+            });
+            
+            // 转换为万钻石
+            const totalInTenThousand = total / 10000;
+            document.getElementById('total-value').textContent = `${totalInTenThousand.toFixed(2)} 万钻石`;
+        }
+
+        // 更新进度
+        function updateProgress() {
+            const filledCount = quantities.filter(q => q > 0).length;
+            const progressPercentage = (filledCount / itemsData.length) * 100;
+            
+            document.getElementById('progress').style.width = `${progressPercentage}%`;
+            document.getElementById('completed-count').textContent = filledCount;
+            
+            // 如果全部填写完成，添加完成提示
+            if (filledCount === itemsData.length) {
+                document.getElementById('completed-count').classList.add('completed');
+            } else {
+                document.getElementById('completed-count').classList.remove('completed');
+            }
+        }
+
+        // 计算指定钻石数量所需道具（反向计算）
+        function calculateRequiredItems(targetDiamonds, id) {
+            // 计算当前总钻石数
+            let currentTotal = 0;
+            itemsData.forEach((item, index) => {
+                currentTotal += quantities[index] * item.price;
+            });
+            
+            // 计算与目标的差值
+            const difference = currentTotal - targetDiamonds;
+            
+            if (difference <= 0) {
+                // 如果当前数量不足，计算需要补充的道具
+                calculateAdditionalItems(targetDiamonds, id, currentTotal);
+            } else {
+                // 如果当前数量超过，计算需要减少的道具
+                calculateReductionItems(targetDiamonds, id, currentTotal, difference);
+            }
+        }
+
+        // 计算需要补充的道具（当前数量不足）
+        function calculateAdditionalItems(targetDiamonds, id, currentTotal) {
+            const neededDiamonds = targetDiamonds - currentTotal;
+            let remainingDiamonds = neededDiamonds;
+            const finalQuantities = [...quantities]; // 复制当前数量
+            
+            // 从最贵的道具开始计算需要补充的数量
+            for (let i = itemsData.length - 1; i >= 0; i--) {
+                if (remainingDiamonds <= 0) break;
+                
+                const item = itemsData[i];
+                const maxCount = Math.floor(remainingDiamonds / item.price);
+                
+                if (maxCount > 0) {
+                    finalQuantities[i] += maxCount;
+                    remainingDiamonds -= maxCount * item.price;
+                }
+            }
+            
+            // 显示结果
+            displayFinalItems(finalQuantities, id, targetDiamonds, currentTotal, '补充');
+        }
+
+        // 计算需要减少的道具（当前数量超过）
+        function calculateReductionItems(targetDiamonds, id, currentTotal, excessDiamonds) {
+            let remainingReduction = excessDiamonds;
+            const finalQuantities = [...quantities]; // 复制当前数量
+            
+            // 从最便宜的道具开始计算需要减少的数量
+            for (let i = 0; i < itemsData.length; i++) {
+                if (remainingReduction <= 0) break;
+                
+                const item = itemsData[i];
+                const currentCount = finalQuantities[i];
+                
+                if (currentCount > 0) {
+                    // 计算最多可以减少多少个这种道具
+                    const maxReduction = Math.min(
+                        currentCount,
+                        Math.ceil(remainingReduction / item.price)
+                    );
+                    
+                    if (maxReduction > 0) {
+                        finalQuantities[i] -= maxReduction;
+                        remainingReduction -= maxReduction * item.price;
+                    }
+                }
+            }
+            
+            // 显示结果
+            displayFinalItems(finalQuantities, id, targetDiamonds, currentTotal, '减少');
+        }
+
+        // 显示最终道具数量
+        function displayFinalItems(finalQuantities, id, targetDiamonds, currentTotal, operation) {
+            const resultElement = document.getElementById(`result-${id}`);
+            let html = '<div class="item-list">';
+            let finalTotal = 0;
+            let hasItems = false;
+            
+            itemsData.forEach((item, index) => {
+                if (finalQuantities[index] > 0) {
+                    const itemTotal = finalQuantities[index] * item.price;
+                    finalTotal += itemTotal;
+                    hasItems = true;
+                    
+                    html += `
+                        <div class="item-row">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-count" data-item="${item.name}" data-count="${finalQuantities[index]}">${finalQuantities[index].toLocaleString()}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (!hasItems) {
+                html += `<div>无需任何道具</div>`;
+            }
+            
+            html += `<div class="total-info">`;
+            html += `<div>当前: ${(currentTotal/10000).toFixed(2)}万钻石</div>`;
+            html += `<div>目标: ${(targetDiamonds/10000).toFixed(0)}万钻石</div>`;
+            html += `<div>最终: ${(finalTotal/10000).toFixed(2)}万钻石</div>`;
+            if (operation) {
+                html += `<div class="reduction-info">操作: ${operation}道具以达到目标</div>`;
+            }
+            html += `</div>`;
+            html += `</div>`;
+            
+            resultElement.innerHTML = html;
+            
+            // 添加点击复制事件
+            addCopyEventListeners(id);
+            
+            // 存储数据用于复制
+            resultElement.dataset.finalQuantities = JSON.stringify(finalQuantities);
+            resultElement.dataset.targetDiamonds = targetDiamonds;
+            
+            // 显示复制按钮和提示
+            document.getElementById(`copy-${id}`).style.display = 'block';
+            document.getElementById(`copy-hint-${id}`).style.display = 'block';
+        }
+
+        // 添加点击复制事件监听器
+        function addCopyEventListeners(id) {
+            const resultElement = document.getElementById(`result-${id}`);
+            const countElements = resultElement.querySelectorAll('.item-count');
+            
+            countElements.forEach(element => {
+                element.addEventListener('click', function() {
+                    const count = this.getAttribute('data-count');
+                    const itemName = this.getAttribute('data-item');
+                    
+                    // 复制到剪贴板
+                    navigator.clipboard.writeText(count).then(() => {
+                        // 显示复制成功效果
+                        this.classList.add('copied');
+                        this.textContent = '已复制!';
+                        
+                        setTimeout(() => {
+                            this.classList.remove('copied');
+                            this.textContent = parseInt(count).toLocaleString();
+                        }, 1000);
+                        
+                        // 显示成功消息
+                        showCopySuccess(id, `已复制 ${itemName} 数量: ${count}`);
+                    }).catch(err => {
+                        // 如果Clipboard API失败，使用传统方法
+                        const textArea = document.createElement("textarea");
+                        textArea.value = count;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        document.execCommand("copy");
+                        document.body.removeChild(textArea);
+                        
+                        // 显示复制成功效果
+                        this.classList.add('copied');
+                        this.textContent = '已复制!';
+                        
+                        setTimeout(() => {
+                            this.classList.remove('copied');
+                            this.textContent = parseInt(count).toLocaleString();
+                        }, 1000);
+                        
+                        showCopySuccess(id, `已复制 ${itemName} 数量: ${count}`);
+                    });
+                });
+            });
+        }
+
+        // 复制全部道具列表
+        function copyAllItems(id) {
+            const resultElement = document.getElementById(`result-${id}`);
+            const finalQuantities = JSON.parse(resultElement.dataset.finalQuantities || '[]');
+            const targetDiamonds = parseInt(resultElement.dataset.targetDiamonds) || 0;
+            
+            let text = `${targetDiamonds/10000}万钻石所需道具数量:\n\n`;
+            let hasItems = false;
+            
+            itemsData.forEach((item, index) => {
+                if (finalQuantities[index] > 0) {
+                    text += `${item.name} ${finalQuantities[index].toLocaleString()}\n`;
+                    hasItems = true;
+                }
+            });
+            
+            if (!hasItems) {
+                showCopySuccess(id, "没有道具可复制");
+                return;
+            }
+            
+            // 使用现代Clipboard API
+            navigator.clipboard.writeText(text).then(() => {
+                showCopySuccess(id, "已复制全部道具数量!");
+            }).catch(err => {
+                // 如果Clipboard API失败，使用传统方法
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+                showCopySuccess(id, "已复制全部道具数量!");
+            });
+        }
+
+        // 显示复制成功消息
+        function showCopySuccess(id, message) {
+            const successElement = document.getElementById(`copy-success-${id}`);
+            successElement.textContent = message;
+            
+            setTimeout(() => {
+                successElement.textContent = '';
+            }, 2000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initializeTable);
+    </script>
+  <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
