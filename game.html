@@ -133,6 +133,18 @@ h1 {
   background: #f59e0b;
   color: #111;
 }
+.badge-platform {
+  background: #8b5cf6;
+  color: #fff;
+}
+.badge-check {
+  background: #10b981;
+  color: white;
+}
+.badge-new {
+  background: #ec4899;
+  color: white;
+}
 #toast {
   position: fixed;
   bottom: 30px;
@@ -153,6 +165,43 @@ footer {
   font-size: 13px;
   margin-top: 15px;
 }
+.platform-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.platform-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #1a233c;
+  color: var(--muted);
+  border: 1px solid #2b3a5c;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+.platform-btn.active {
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  color: white;
+  border: none;
+}
+.server-info {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.check-mark {
+  color: #10b981;
+  margin-left: 4px;
+  font-weight: bold;
+}
+.new-mark {
+  color: #ec4899;
+  margin-left: 4px;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -163,38 +212,120 @@ footer {
     <button id="btnOpen" class="control-btn">🔗 打开模式</button>
   </div>
   <div class="tabs" id="tabs"></div>
+  
+  <!-- 圣王传奇平台切换器 -->
+  <div id="platformSwitcher" class="platform-switcher" style="display: none;">
+    <button class="platform-btn active" data-platform="9awan">9a玩平台</button>
+    <button class="platform-btn" data-platform="3uyy">3UYY平台</button>
+    <button class="platform-btn" data-platform="aa4">AA4平台</button>
+  </div>
+  
   <div id="content"></div>
   <div id="toast"></div>
   <footer>已就绪</footer>
 </div>
 <script>
 let clickMode = 'copy';
-let currentSW = '9awan';
+let currentPlatform = '9awan'; // 默认平台
 let currentYJ = 'yx4f';
 const MS_DAY = 86400000;
 
+// 游戏数据配置
 const games = [
   {
-    id: 'swcq', name: '圣王传奇',
-    homepage9a: 'http://www.9awan.com/home/server/283',
-    homepage3u: 'http://88.3uyy.com/home/server/283',
-    servers: Array.from({length: 2116 - 2091 + 1}, (_, i) => ({show: 2091 + i, real: 98471 + i}))
+    id: 'swcq',
+    name: '圣王传奇',
+    platforms: {
+      '9awan': {
+        name: '9a玩平台',
+        homepage: 'http://www.9awan.com/home/server/283',
+        serverUrlTemplate: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=',
+        servers: Array.from({length: 2116 - 2091 + 1}, (_, i) => ({show: 2091 + i, real: 98471 + i}))
+      },
+      '3uyy': {
+        name: '3UYY平台',
+        homepage: 'http://88.3uyy.com/home/server/283',
+        serverUrlTemplate: 'http://88.3uyy.com/game.php?action=play&game_id=283&server_id=',
+        servers: Array.from({length: 2116 - 2091 + 1}, (_, i) => ({show: 2091 + i, real: 98471 + i}))
+      },
+      'aa4': {
+        name: 'AA4平台',
+        homepage: 'http://www.aa4.cn/webgame/game/552',
+        serverUrlTemplate: 'http://www.aa4.cn/webgame/into/552/',
+        // AA4平台特殊的区服映射：显示编号2168-2177，实际ID从136262开始递增
+        // 2171和2175有特殊标记
+        // 新增：2183、2185-2190，ID从136271继续递增
+        servers: [
+          // 原有区服
+          {show: 2168, real: 136262, special: false, isNew: false},
+          {show: 2169, real: 136263, special: false, isNew: false},
+          {show: 2170, real: 136264, special: false, isNew: false},
+          {show: 2171, real: 136265, special: true, isNew: false},   // ✅
+          {show: 2172, real: 136266, special: false, isNew: false},
+          {show: 2173, real: 136267, special: false, isNew: false},
+          {show: 2174, real: 136268, special: false, isNew: false},
+          {show: 2175, real: 136269, special: true, isNew: false},   // ✅
+          {show: 2176, real: 136270, special: false, isNew: false},
+          {show: 2177, real: 136271, special: false, isNew: false},
+          
+          // 新增区服（从136272开始）
+          {show: 2183, real: 136272, special: false, isNew: true},   // 新服
+          {show: 2185, real: 136273, special: false, isNew: true},   // 新服
+          {show: 2186, real: 136274, special: false, isNew: true},   // 新服
+          {show: 2187, real: 136275, special: false, isNew: true},   // 新服
+          {show: 2188, real: 136276, special: false, isNew: true},   // 新服
+          {show: 2189, real: 136277, special: false, isNew: true},   // 新服
+          {show: 2190, real: 136278, special: false, isNew: true}    // 新服
+        ]
+      }
+    },
+    merges: [
+      {from:2091,to:2097,date:'2025-10-28'},
+      {from:2098,to:2104,date:'2025-10-31'},
+      {from:2105,to:2111,date:'2025-11-02'}
+    ],
+    isMultiPlatform: true
   },
-  {id: '111', name: '满V切割神域', homepage: 'http://gm.yx4f.com:81/games/111.html',
-    servers: [235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277]},
-  {id: '115', name: '满V悠久传奇',
-    homepage: 'http://gm.yx4f.com:81/games/115.html',
-    homepage2: 'http://gm.962yx.com/games/115.html',
-    servers: [1,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132]},
-  {id: '137', name: 'GM赤焰无双', homepage: 'http://gm.yx4f.com:81/games/137.html',
-    servers: [1,2,3,4,5,6,7,8,9,10,11,12]},
-  {id: 'ts', name: '屠神', homepage: 'http://www.8syx.com/game/7/', servers: [25,26,30,31,35]}
-];
-
-const merges = [
-  {from:2091,to:2097,date:'2025-10-28'},
-  {from:2098,to:2104,date:'2025-10-31'},
-  {from:2105,to:2111,date:'2025-11-02'}
+  {
+    id: '111',
+    name: '满V切割神域',
+    homepage: 'http://gm.yx4f.com:81/games/111.html',
+    servers: [235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277],
+    isMultiPlatform: false
+  },
+  {
+    id: '115',
+    name: '满V悠久传奇',
+    platforms: {
+      'yx4f': {
+        name: 'YX4F平台',
+        homepage: 'http://gm.yx4f.com:81/games/115.html',
+        serverUrlTemplate: 'http://gm.yx4f.com:81/login/115/',
+        servers: [1,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123]
+      },
+      '962yx': {
+        name: '962YX平台',
+        homepage: 'http://gm.962yx.com/games/115.html',
+        serverUrlTemplate: 'http://gm.962yx.com/login/115/',
+        servers: [1,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123]
+      }
+    },
+    isMultiPlatform: true
+  },
+  {
+    id: '137',
+    name: 'GM赤焰无双',
+    homepage: 'http://gm.yx4f.com:81/games/137.html',
+    servers: [1,2,3,4,5,6,7,8,9,10,11,12],
+    isMultiPlatform: false
+  },
+  {
+    id: 'ts',
+    name: '屠神',
+    homepage: 'http://www.8syx.com/game/7/',
+    servers: [25,26,30,31,35],
+    isMultiPlatform: false
+  }
 ];
 
 const toast = (msg)=>{
@@ -213,93 +344,345 @@ function daysSince(dateStr){
 }
 
 function renderTabs(){
-  const tabs=document.getElementById('tabs');
+  const tabs = document.getElementById('tabs');
   tabs.innerHTML='';
   games.forEach(g=>{
     const b=document.createElement('button');
     b.className='tab'+(g.id==='swcq'?' active':'');
     b.textContent=g.name;
-    b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderContent(g.id);};
+    b.onclick=()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      showPlatformSwitcher(g.id);
+      renderContent(g.id);
+    };
     tabs.appendChild(b);
   });
 }
 
+function showPlatformSwitcher(gameId){
+  const switcher = document.getElementById('platformSwitcher');
+  const game = games.find(g => g.id === gameId);
+  
+  if (game && game.isMultiPlatform) {
+    switcher.style.display = 'flex';
+    // 清除现有按钮
+    switcher.innerHTML = '';
+    
+    // 为每个平台创建按钮
+    Object.entries(game.platforms).forEach(([platformId, platform], index) => {
+      const btn = document.createElement('button');
+      btn.className = `platform-btn ${platformId === currentPlatform ? 'active' : ''}`;
+      btn.textContent = platform.name;
+      btn.dataset.platform = platformId;
+      btn.onclick = () => {
+        document.querySelectorAll('.platform-btn').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        currentPlatform = platformId;
+        toast(`已切换至 ${platform.name}`);
+        renderContent(gameId);
+      };
+      switcher.appendChild(btn);
+    });
+  } else {
+    switcher.style.display = 'none';
+  }
+}
+
 function renderContent(id){
-  const box=document.getElementById('content');
+  const box = document.getElementById('content');
   box.innerHTML='';
-  const g=games.find(x=>x.id===id);
-  if(!g)return;
-  const grid=document.createElement('div');grid.className='grid';
+  const game = games.find(x => x.id === id);
+  if(!game) return;
+  
+  const grid = document.createElement('div');
+  grid.className='grid';
 
-  if(id==='swcq'){
-    const switchBtn=document.createElement('a');
-    switchBtn.className='btn';
-    switchBtn.textContent='🌐 '+(currentSW==='9awan'?'9a玩':'3UYY');
-    switchBtn.onclick=(e)=>{e.preventDefault();currentSW=currentSW==='9awan'?'3uyy':'9awan';toast('已切换至 '+currentSW);renderContent('swcq');};
-    const siteCard=document.createElement('div');siteCard.className='card';siteCard.appendChild(switchBtn);
-    grid.appendChild(siteCard);
-
-    const homeBtn=document.createElement('a');
-    homeBtn.className='btn'; homeBtn.textContent='📅 开服表';
-    homeBtn.href=currentSW==='9awan'?g.homepage9a:g.homepage3u; homeBtn.target='_blank';
-    const homeCard=document.createElement('div');homeCard.className='card';homeCard.appendChild(homeBtn);
+  if(id === 'swcq'){
+    // 圣王传奇 - 多平台支持
+    const platform = game.platforms[currentPlatform];
+    
+    // 主页按钮
+    const homeBtn = document.createElement('a');
+    homeBtn.className = 'btn';
+    homeBtn.textContent = '📅 开服表';
+    homeBtn.href = platform.homepage;
+    homeBtn.target = '_blank';
+    const homeCard = document.createElement('div');
+    homeCard.className = 'card';
+    homeCard.appendChild(homeBtn);
     grid.appendChild(homeCard);
+    
+    // 添加平台标识
+    const platformBadge = document.createElement('div');
+    platformBadge.className = 'badge badge-platform';
+    platformBadge.textContent = platform.name;
+    homeCard.appendChild(platformBadge);
 
-    const weekday=(new Date().getUTCDay()+1)%7; // fix
-    g.servers.forEach(s=>{
-      const card=document.createElement('div');card.className='card';
-      const title=document.createElement('div');title.className='title';title.textContent=`${s.show}区`;card.appendChild(title);
-      const url=currentSW==='9awan'
-        ?`http://www.9awan.com/game.php?action=play&game_id=283&server_id=${s.real}`
-        :`http://88.3uyy.com/game.php?action=play&game_id=283&server_id=${s.real}`;
-      const btn=document.createElement('a');btn.className='btn';btn.textContent='点击区服';
-      btn.onclick=(e)=>{e.preventDefault();if(clickMode==='open')window.open(url,'_blank');else{navigator.clipboard.writeText(url);toast('已复制链接');}};
-      card.appendChild(btn);
-      const m=merges.find(m=>s.show>=m.from&&s.show<=m.to);
-      if(m){
-        const d=daysSince(m.date);
-        const badges=document.createElement('div');badges.className='badges';
-        const b1=document.createElement('div');b1.className='badge';b1.textContent=`合服第${d}天`;badges.appendChild(b1);
-        if(d===3){const b2=document.createElement('div');b2.className='badge badge-event';b2.textContent='👑城主战';badges.appendChild(b2);}
-        if([3,6].includes(new Date().getDay())){const b3=document.createElement('div');b3.className='badge badge-event';b3.textContent='🏰公会战日';badges.appendChild(b3);}
-        card.appendChild(badges);
+    const weekday = (new Date().getUTCDay()+1) % 7;
+    
+    // 渲染区服卡片
+    platform.servers.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      // 标题部分
+      const title = document.createElement('div');
+      title.className = 'title';
+      
+      // 根据不同类型设置标题
+      if (s.special && s.isNew) {
+        // 既是推荐又是新服
+        title.innerHTML = `${s.show}区 <span class="check-mark">✅</span> <span class="new-mark">🆕</span>`;
+      } else if (s.special) {
+        // 推荐区服
+        title.innerHTML = `${s.show}区 <span class="check-mark">✅</span>`;
+      } else if (s.isNew) {
+        // 新服
+        title.innerHTML = `${s.show}区 <span class="new-mark">🆕</span>`;
+      } else {
+        // 普通区服
+        title.textContent = `${s.show}区`;
       }
+      card.appendChild(title);
+      
+      // 显示服务器ID信息
+      if (currentPlatform === 'aa4') {
+        const info = document.createElement('div');
+        info.className = 'server-info';
+        info.textContent = `ID: ${s.real}`;
+        card.appendChild(info);
+      }
+      
+      // 构建链接
+      let url;
+      if (currentPlatform === 'aa4') {
+        // AA4平台链接格式：http://www.aa4.cn/webgame/into/552/服务器真实ID
+        url = `${platform.serverUrlTemplate}${s.real}`;
+      } else {
+        // 9awan和3uyy平台
+        url = `${platform.serverUrlTemplate}${s.real}`;
+      }
+      
+      const btn = document.createElement('a');
+      btn.className = 'btn';
+      btn.textContent = '点击区服';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        if(clickMode === 'open'){
+          window.open(url, '_blank');
+        } else {
+          navigator.clipboard.writeText(url);
+          toast('已复制链接');
+        }
+      };
+      card.appendChild(btn);
+      
+      // 徽章区域
+      const badges = document.createElement('div');
+      badges.className = 'badges';
+      
+      // AA4平台显示特殊标记
+      if (currentPlatform === 'aa4') {
+        if (s.special) {
+          const specialBadge = document.createElement('div');
+          specialBadge.className = 'badge badge-check';
+          specialBadge.textContent = '推荐';
+          badges.appendChild(specialBadge);
+        }
+        
+        if (s.isNew) {
+          const newBadge = document.createElement('div');
+          newBadge.className = 'badge badge-new';
+          newBadge.textContent = '新服';
+          badges.appendChild(newBadge);
+        }
+        
+        if (badges.children.length > 0) {
+          card.appendChild(badges);
+        }
+      } else {
+        // 9awan和3uyy平台显示合服信息
+        const merge = game.merges.find(m => s.show >= m.from && s.show <= m.to);
+        if(merge){
+          const days = daysSince(merge.date);
+          const dayBadge = document.createElement('div');
+          dayBadge.className = 'badge';
+          dayBadge.textContent = `合服第${days}天`;
+          badges.appendChild(dayBadge);
+          
+          if(days === 3){
+            const eventBadge = document.createElement('div');
+            eventBadge.className = 'badge badge-event';
+            eventBadge.textContent = '👑城主战';
+            badges.appendChild(eventBadge);
+          }
+          
+          if([3,6].includes(new Date().getDay())){
+            const warBadge = document.createElement('div');
+            warBadge.className = 'badge badge-event';
+            warBadge.textContent = '🏰公会战日';
+            badges.appendChild(warBadge);
+          }
+          
+          card.appendChild(badges);
+        }
+      }
+      
       grid.appendChild(card);
     });
-  }else{
-    if(id==='115'){
-      const sbtn=document.createElement('a');sbtn.className='btn';
-      sbtn.textContent='🌐 '+(currentYJ==='yx4f'?'yx4f':'962yx');
-      sbtn.onclick=(e)=>{e.preventDefault();currentYJ=currentYJ==='yx4f'?'962yx':'yx4f';toast('已切换至 '+currentYJ);renderContent('115');};
-      const scard=document.createElement('div');scard.className='card';scard.appendChild(sbtn);grid.appendChild(scard);
-    }
-    const homeBtn=document.createElement('a');homeBtn.className='btn';homeBtn.textContent='🏠 游戏主页';
-    if(id==='115')homeBtn.href=currentYJ==='yx4f'?g.homepage:g.homepage2;else homeBtn.href=g.homepage;
-    homeBtn.target='_blank';const hcard=document.createElement('div');hcard.className='card';hcard.appendChild(homeBtn);grid.appendChild(hcard);
-    g.servers.forEach(s=>{
-      const card=document.createElement('div');card.className='card';
-      const title=document.createElement('div');title.className='title';title.textContent=`${s}区`;card.appendChild(title);
-      let url='#';
-      if(id==='111')url=`http://gm.yx4f.com:81/login/111/${s}.html`;
-      else if(id==='115')url=currentYJ==='yx4f'?`http://gm.yx4f.com:81/login/115/${s}.html`:`http://gm.962yx.com/login/115/${s}.html`;
-      else if(id==='137')url=`http://gm.yx4f.com:81/login/137/${s}.html`;
-      else if(id==='ts')url=`http://www.8syx.com/Game/gameto.php?gid=7&sid=${s}`;
-      const btn=document.createElement('a');btn.className='btn';btn.textContent='点击区服';
-      btn.onclick=(e)=>{e.preventDefault();if(clickMode==='open')window.open(url,'_blank');else{navigator.clipboard.writeText(url);toast('已复制链接');}};
-      card.appendChild(btn);grid.appendChild(card);
+    
+  } else if(id === '115'){
+    // 满V悠久传奇 - 多平台支持
+    const platform = game.platforms[currentYJ];
+    
+    // 主页按钮
+    const homeBtn = document.createElement('a');
+    homeBtn.className = 'btn';
+    homeBtn.textContent = '🏠 游戏主页';
+    homeBtn.href = platform.homepage;
+    homeBtn.target = '_blank';
+    const homeCard = document.createElement('div');
+    homeCard.className = 'card';
+    homeCard.appendChild(homeBtn);
+    grid.appendChild(homeCard);
+    
+    // 平台切换按钮
+    const switchBtn = document.createElement('a');
+    switchBtn.className = 'btn';
+    switchBtn.textContent = '🌐 切换平台';
+    switchBtn.onclick = (e) => {
+      e.preventDefault();
+      currentYJ = currentYJ === 'yx4f' ? '962yx' : 'yx4f';
+      toast(`已切换至 ${game.platforms[currentYJ].name}`);
+      renderContent('115');
+    };
+    const switchCard = document.createElement('div');
+    switchCard.className = 'card';
+    switchCard.appendChild(switchBtn);
+    grid.appendChild(switchCard);
+    
+    // 添加平台标识
+    const platformBadge = document.createElement('div');
+    platformBadge.className = 'badge badge-platform';
+    platformBadge.textContent = platform.name;
+    switchCard.appendChild(platformBadge);
+    
+    // 区服列表
+    platform.servers.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = `${s}区`;
+      card.appendChild(title);
+      
+      const url = `${platform.serverUrlTemplate}${s}.html`;
+      const btn = document.createElement('a');
+      btn.className = 'btn';
+      btn.textContent = '点击区服';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        if(clickMode === 'open'){
+          window.open(url, '_blank');
+        } else {
+          navigator.clipboard.writeText(url);
+          toast('已复制链接');
+        }
+      };
+      card.appendChild(btn);
+      grid.appendChild(card);
+    });
+    
+  } else {
+    // 其他单平台游戏
+    const homeBtn = document.createElement('a');
+    homeBtn.className = 'btn';
+    homeBtn.textContent = '🏠 游戏主页';
+    homeBtn.href = game.homepage;
+    homeBtn.target = '_blank';
+    const hcard = document.createElement('div');
+    hcard.className = 'card';
+    hcard.appendChild(homeBtn);
+    grid.appendChild(hcard);
+    
+    game.servers.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const title = document.createElement('div');
+      title.className = 'title';
+      title.textContent = `${s}区`;
+      card.appendChild(title);
+      
+      let url = '#';
+      if(id === '111'){
+        url = `http://gm.yx4f.com:81/login/111/${s}.html`;
+      } else if(id === '137'){
+        url = `http://gm.yx4f.com:81/login/137/${s}.html`;
+      } else if(id === 'ts'){
+        url = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${s}`;
+      }
+      
+      const btn = document.createElement('a');
+      btn.className = 'btn';
+      btn.textContent = '点击区服';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        if(clickMode === 'open'){
+          window.open(url, '_blank');
+        } else {
+          navigator.clipboard.writeText(url);
+          toast('已复制链接');
+        }
+      };
+      card.appendChild(btn);
+      grid.appendChild(card);
     });
   }
+  
   box.appendChild(grid);
 }
 
 function init(){
-  const tick=()=>{const now=new Date();const bj=new Date(now.getTime()+(8*60-now.getTimezoneOffset())*60000);
-    document.getElementById('time').textContent='北京时间：'+bj.toLocaleString('zh-CN',{hour12:false});};
-  tick();setInterval(tick,1000);
-  renderTabs();renderContent('swcq');
-  document.getElementById('btnCopy').onclick=()=>{clickMode='copy';btnCopy.classList.add('active');btnOpen.classList.remove('active');toast('复制模式');};
-  document.getElementById('btnOpen').onclick=()=>{clickMode='open';btnOpen.classList.add('active');btnCopy.classList.remove('active');toast('打开模式');};
+  // 更新时间显示
+  const tick = () => {
+    const now = new Date();
+    const bj = new Date(now.getTime()+(8*60-now.getTimezoneOffset())*60000);
+    document.getElementById('time').textContent = '北京时间：'+bj.toLocaleString('zh-CN',{hour12:false});
+  };
+  tick();
+  setInterval(tick, 1000);
+  
+  // 渲染标签页
+  renderTabs();
+  
+  // 显示平台切换器
+  showPlatformSwitcher('swcq');
+  
+  // 初始渲染内容
+  renderContent('swcq');
+  
+  // 绑定控制按钮事件
+  const btnCopy = document.getElementById('btnCopy');
+  const btnOpen = document.getElementById('btnOpen');
+  
+  btnCopy.onclick = () => {
+    clickMode = 'copy';
+    btnCopy.classList.add('active');
+    btnOpen.classList.remove('active');
+    toast('复制模式');
+  };
+  
+  btnOpen.onclick = () => {
+    clickMode = 'open';
+    btnOpen.classList.add('active');
+    btnCopy.classList.remove('active');
+    toast('打开模式');
+  };
 }
+
+// 初始化
 init();
 </script>
     <!-- Footer -->
