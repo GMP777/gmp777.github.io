@@ -145,6 +145,10 @@ h1 {
   background: #ec4899;
   color: white;
 }
+.badge-coming {
+  background: #8b5cf6;
+  color: white;
+}
 #toast {
   position: fixed;
   bottom: 30px;
@@ -202,6 +206,31 @@ footer {
   margin-left: 4px;
   font-weight: bold;
 }
+.coming-soon {
+  font-size: 12px;
+  color: #8b5cf6;
+  margin-top: 6px;
+  font-weight: 600;
+}
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.status-open {
+  background-color: #10b981;
+}
+.status-coming {
+  background-color: #8b5cf6;
+}
+.id-info {
+  font-family: monospace;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
 </style>
 </head>
 <body>
@@ -230,6 +259,20 @@ let currentPlatform = '9awan'; // 默认平台
 let currentYJ = 'yx4f';
 const MS_DAY = 86400000;
 
+// 获取今天的日期（北京时间）
+function getTodayDate() {
+  const now = new Date();
+  const bj = new Date(now.getTime() + (8 * 60 - now.getTimezoneOffset()) * 60000);
+  return bj.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+}
+
+// 计算今天是周几（0-6，0是周日）
+function getTodayWeekday() {
+  const now = new Date();
+  const bj = new Date(now.getTime() + (8 * 60 - now.getTimezoneOffset()) * 60000);
+  return bj.getDay(); // 0=周日, 1=周一, ..., 6=周六
+}
+
 // 游戏数据配置
 const games = [
   {
@@ -252,31 +295,93 @@ const games = [
         name: 'AA4平台',
         homepage: 'http://www.aa4.cn/webgame/game/552',
         serverUrlTemplate: 'http://www.aa4.cn/webgame/into/552/',
-        // AA4平台特殊的区服映射：显示编号2168-2177，实际ID从136262开始递增
-        // 2171和2175有特殊标记
-        // 新增：2183、2185-2190，ID从136271继续递增
-        servers: [
-          // 原有区服
-          {show: 2168, real: 136262, special: false, isNew: false},
-          {show: 2169, real: 136263, special: false, isNew: false},
-          {show: 2170, real: 136264, special: false, isNew: false},
-          {show: 2171, real: 136265, special: true, isNew: false},   // ✅
-          {show: 2172, real: 136266, special: false, isNew: false},
-          {show: 2173, real: 136267, special: false, isNew: false},
-          {show: 2174, real: 136268, special: false, isNew: false},
-          {show: 2175, real: 136269, special: true, isNew: false},   // ✅
-          {show: 2176, real: 136270, special: false, isNew: false},
-          {show: 2177, real: 136271, special: false, isNew: false},
+        // AA4平台区服配置：根据日期动态开放
+        getServers: function() {
+          const today = getTodayDate();
           
-          // 新增区服（从136272开始）
-          {show: 2183, real: 136272, special: false, isNew: true},   // 新服
-          {show: 2185, real: 136273, special: false, isNew: true},   // 新服
-          {show: 2186, real: 136274, special: false, isNew: true},   // 新服
-          {show: 2187, real: 136275, special: false, isNew: true},   // 新服
-          {show: 2188, real: 136276, special: false, isNew: true},   // 新服
-          {show: 2189, real: 136277, special: false, isNew: true},   // 新服
-          {show: 2190, real: 136278, special: false, isNew: true}    // 新服
-        ]
+          // 从2178区开始，ID是136334，然后递增
+          // 根据显示编号计算真实ID
+          const calculateRealId = (showId) => {
+            // 2178区对应136334
+            const baseShowId = 2178;
+            const baseRealId = 136334;
+            return baseRealId + (showId - baseShowId);
+          };
+          
+          // 基础区服数据：显示编号、真实ID、开放日期
+          const serverData = [
+            // 已开放区服 (2168-2177，使用旧的ID)
+            {show: 2168, real: 136262, openDate: '2024-01-01', special: false},
+            {show: 2169, real: 136263, openDate: '2024-01-01', special: false},
+            {show: 2170, real: 136264, openDate: '2024-01-01', special: false},
+            {show: 2171, real: 136265, openDate: '2024-01-01', special: true},
+            {show: 2172, real: 136266, openDate: '2024-01-01', special: false},
+            {show: 2173, real: 136267, openDate: '2024-01-01', special: false},
+            {show: 2174, real: 136268, openDate: '2024-01-01', special: false},
+            {show: 2175, real: 136269, openDate: '2024-01-01', special: true},
+            {show: 2176, real: 136270, openDate: '2024-01-01', special: false},
+            {show: 2177, real: 136271, openDate: '2024-01-01', special: false},
+            
+            // 从2178区开始使用新的ID计算规则
+            {show: 2178, real: 136334, openDate: today, special: false, isNew: true},
+            {show: 2179, real: calculateRealId(2179), openDate: today, special: false, isNew: true},
+            {show: 2180, real: calculateRealId(2180), openDate: today, special: false, isNew: true},
+            {show: 2181, real: calculateRealId(2181), openDate: today, special: false, isNew: true},
+            {show: 2182, real: calculateRealId(2182), openDate: today, special: false, isNew: true},
+            {show: 2183, real: calculateRealId(2183), openDate: today, special: false, isNew: true},
+            {show: 2184, real: calculateRealId(2184), openDate: today, special: false, isNew: true},
+            {show: 2185, real: calculateRealId(2185), openDate: today, special: false, isNew: true},
+            {show: 2186, real: calculateRealId(2186), openDate: today, special: false, isNew: true},
+            {show: 2187, real: calculateRealId(2187), openDate: today, special: false, isNew: true},
+            {show: 2188, real: calculateRealId(2188), openDate: today, special: false, isNew: true},
+            {show: 2189, real: calculateRealId(2189), openDate: today, special: false, isNew: true},
+            {show: 2190, real: calculateRealId(2190), openDate: today, special: false, isNew: true},
+            
+            // 新增2191及以后的区服
+            {show: 2191, real: calculateRealId(2191), openDate: this.getNextOpenDate(1), special: false},
+            {show: 2192, real: calculateRealId(2192), openDate: this.getNextOpenDate(2), special: false},
+            {show: 2193, real: calculateRealId(2193), openDate: this.getNextOpenDate(3), special: false},
+            {show: 2194, real: calculateRealId(2194), openDate: this.getNextOpenDate(5), special: false},
+            {show: 2195, real: calculateRealId(2195), openDate: this.getNextOpenDate(7), special: false},
+            {show: 2196, real: calculateRealId(2196), openDate: this.getNextOpenDate(10), special: false},
+            {show: 2197, real: calculateRealId(2197), openDate: this.getNextOpenDate(12), special: false},
+            {show: 2198, real: calculateRealId(2198), openDate: this.getNextOpenDate(14), special: false},
+            {show: 2199, real: calculateRealId(2199), openDate: this.getNextOpenDate(16), special: false},
+            {show: 2200, real: calculateRealId(2200), openDate: this.getNextOpenDate(18), special: false},
+            {show: 2201, real: calculateRealId(2201), openDate: this.getNextOpenDate(20), special: false},
+            {show: 2202, real: calculateRealId(2202), openDate: this.getNextOpenDate(22), special: false},
+            {show: 2203, real: calculateRealId(2203), openDate: this.getNextOpenDate(24), special: false},
+            {show: 2204, real: calculateRealId(2204), openDate: this.getNextOpenDate(26), special: false},
+            {show: 2205, real: calculateRealId(2205), openDate: this.getNextOpenDate(28), special: false},
+            {show: 2206, real: calculateRealId(2206), openDate: this.getNextOpenDate(30), special: false},
+            {show: 2207, real: calculateRealId(2207), openDate: this.getNextOpenDate(32), special: false},
+            {show: 2208, real: calculateRealId(2208), openDate: this.getNextOpenDate(34), special: false}
+          ];
+          
+          // 过滤出今天及之前开放的区服
+          const todayServers = serverData.filter(server => {
+            return this.isDateBeforeOrEqual(server.openDate, today);
+          });
+          
+          console.log(`今天日期: ${today}, 开放区服数: ${todayServers.length}`);
+          console.log('ID计算规则：2178区=136334，之后每个区+1');
+          return todayServers;
+        },
+        
+        // 辅助函数：获取未来的开放日期
+        getNextOpenDate: function(daysFromNow) {
+          const today = new Date(getTodayDate());
+          const nextDate = new Date(today);
+          nextDate.setDate(today.getDate() + daysFromNow);
+          return nextDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+        },
+        
+        // 辅助函数：比较日期
+        isDateBeforeOrEqual: function(date1, date2) {
+          const d1 = new Date(date1);
+          const d2 = new Date(date2);
+          return d1 <= d2;
+        }
       }
     },
     merges: [
@@ -419,10 +524,47 @@ function renderContent(id){
     platformBadge.textContent = platform.name;
     homeCard.appendChild(platformBadge);
 
-    const weekday = (new Date().getUTCDay()+1) % 7;
+    const today = getTodayDate();
+    const weekday = getTodayWeekday();
+    
+    // 获取当前开放的区服（AA4平台动态获取）
+    const servers = currentPlatform === 'aa4' ? platform.getServers() : platform.servers;
+    
+    // 显示今日信息
+    const infoCard = document.createElement('div');
+    infoCard.className = 'card';
+    const infoTitle = document.createElement('div');
+    infoTitle.className = 'title';
+    infoTitle.textContent = `📅 ${today}`;
+    infoCard.appendChild(infoTitle);
+    
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+    const weekdayInfo = document.createElement('div');
+    weekdayInfo.textContent = `今日：${weekdays[weekday]}`;
+    weekdayInfo.style.fontSize = '14px';
+    weekdayInfo.style.color = 'var(--muted)';
+    infoCard.appendChild(weekdayInfo);
+    
+    const serverCount = document.createElement('div');
+    serverCount.textContent = `开放区服：${servers.length}个`;
+    serverCount.style.fontSize = '14px';
+    serverCount.style.color = 'var(--accent)';
+    serverCount.style.marginTop = '4px';
+    infoCard.appendChild(serverCount);
+    
+    // 显示ID计算规则
+    if (currentPlatform === 'aa4' && servers.length > 0) {
+      const idRule = document.createElement('div');
+      idRule.className = 'id-info';
+      idRule.textContent = 'ID规则：2178=136334，+1递增';
+      idRule.style.marginTop = '6px';
+      infoCard.appendChild(idRule);
+    }
+    
+    grid.appendChild(infoCard);
     
     // 渲染区服卡片
-    platform.servers.forEach(s => {
+    servers.forEach(s => {
       const card = document.createElement('div');
       card.className = 'card';
       
@@ -452,6 +594,28 @@ function renderContent(id){
         info.className = 'server-info';
         info.textContent = `ID: ${s.real}`;
         card.appendChild(info);
+        
+        // 显示开放日期
+        if (s.openDate) {
+          const dateInfo = document.createElement('div');
+          dateInfo.className = 'server-info';
+          if (s.openDate === today) {
+            dateInfo.innerHTML = `<span class="status-indicator status-open"></span>今日开放`;
+            dateInfo.style.color = '#10b981';
+          } else {
+            dateInfo.textContent = `开放：${s.openDate}`;
+          }
+          card.appendChild(dateInfo);
+        }
+        
+        // 显示ID计算增量（从2178开始）
+        if (s.show >= 2178) {
+          const incrementInfo = document.createElement('div');
+          incrementInfo.className = 'id-info';
+          const increment = s.show - 2178;
+          incrementInfo.textContent = `+${increment}`;
+          card.appendChild(incrementInfo);
+        }
       }
       
       // 构建链接
@@ -496,6 +660,21 @@ function renderContent(id){
           newBadge.className = 'badge badge-new';
           newBadge.textContent = '新服';
           badges.appendChild(newBadge);
+        }
+        
+        if (s.openDate === today) {
+          const todayBadge = document.createElement('div');
+          todayBadge.className = 'badge badge-new';
+          todayBadge.textContent = '今日新区';
+          badges.appendChild(todayBadge);
+        }
+        
+        // 标记从2178开始的区服
+        if (s.show === 2178) {
+          const newRuleBadge = document.createElement('div');
+          newRuleBadge.className = 'badge badge-coming';
+          newRuleBadge.textContent = '新ID规则';
+          badges.appendChild(newRuleBadge);
         }
         
         if (badges.children.length > 0) {
@@ -650,9 +829,27 @@ function init(){
     const now = new Date();
     const bj = new Date(now.getTime()+(8*60-now.getTimezoneOffset())*60000);
     document.getElementById('time').textContent = '北京时间：'+bj.toLocaleString('zh-CN',{hour12:false});
+    
+    // 每分钟检查一次是否需要刷新（用于跨日刷新）
+    const minutes = bj.getMinutes();
+    if (minutes === 0) {
+      // 整点时检查，如果是0点则刷新页面内容
+      const hours = bj.getHours();
+      if (hours === 0 && currentPlatform === 'aa4') {
+        console.log('检测到新的一天，刷新AA4区服列表');
+        renderContent('swcq');
+      }
+    }
   };
   tick();
-  setInterval(tick, 1000);
+  setInterval(tick, 60000); // 每分钟更新一次时间
+  
+  // 每秒更新时间显示
+  setInterval(() => {
+    const now = new Date();
+    const bj = new Date(now.getTime()+(8*60-now.getTimezoneOffset())*60000);
+    document.getElementById('time').textContent = '北京时间：'+bj.toLocaleString('zh-CN',{hour12:false});
+  }, 1000);
   
   // 渲染标签页
   renderTabs();
@@ -680,6 +877,14 @@ function init(){
     btnCopy.classList.remove('active');
     toast('打开模式');
   };
+  
+  // 添加页面可见性检测，当页面重新可见时刷新
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && currentPlatform === 'aa4') {
+      // 页面重新可见时刷新AA4区服
+      renderContent('swcq');
+    }
+  });
 }
 
 // 初始化
