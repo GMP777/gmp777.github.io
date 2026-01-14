@@ -129,20 +129,12 @@ h1 {
   font-size: 12px;
   font-weight: bold;
 }
-.badge-event {
-  background: #f59e0b;
-  color: #111;
-}
 .badge-platform {
   background: #8b5cf6;
   color: #fff;
 }
 .badge-check {
   background: #10b981;
-  color: white;
-}
-.badge-custom {
-  background: #f97316;
   color: white;
 }
 #toast {
@@ -197,27 +189,6 @@ footer {
   margin-left: 4px;
   font-weight: bold;
 }
-.status-indicator {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-.status-open {
-  background-color: #10b981;
-}
-.id-info {
-  font-family: monospace;
-  font-size: 11px;
-  color: #9ca3af;
-  margin-top: 2px;
-}
-.simple-title {
-  font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
 .swcq-simple-card {
   background: var(--card);
   border-radius: 12px;
@@ -229,36 +200,9 @@ footer {
   color: #10b981;
   margin-left: 4px;
 }
-.json-input-container {
-  margin: 10px 0;
-  text-align: center;
-}
-.json-textarea {
-  width: 100%;
-  max-width: 600px;
-  height: 80px;
-  background: #1a233c;
-  color: var(--text);
-  border: 1px solid #2b3a5c;
-  border-radius: 8px;
-  padding: 10px;
-  font-family: monospace;
-  font-size: 12px;
-  resize: vertical;
-  margin-bottom: 8px;
-}
-.json-btn {
-  background: linear-gradient(90deg, #f97316, #fb923c);
+.new-server-tab {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6);
   color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-}
-.json-btn:hover {
-  background: linear-gradient(90deg, #ea580c, #f97316);
 }
 </style>
 </head>
@@ -274,15 +218,6 @@ footer {
   <!-- 平台切换器 - 动态显示 -->
   <div id="platformSwitcher" class="platform-switcher" style="display: none;"></div>
   
-  <!-- JSON自定义区服输入框 -->
-  <div id="jsonInputContainer" class="json-input-container" style="display: none;">
-    <textarea id="jsonInput" class="json-textarea" placeholder='输入自定义区服JSON，格式如：{"2183": 136339, "2195": 136351}
-一行一个，区服:ID
-支持批量添加，例如：
-{"2183": 136339, "2195": 136351, "2200": 136356}'></textarea>
-    <button id="applyJsonBtn" class="json-btn">应用自定义区服</button>
-  </div>
-  
   <div id="content"></div>
   <div id="toast"></div>
   <footer>已就绪</footer>
@@ -291,67 +226,45 @@ footer {
 let clickMode = 'copy';
 let currentPlatform = '9awan'; // 圣王传奇默认平台
 let currentYJ = 'yx4f'; // 悠久传奇默认平台
-const MS_DAY = 86400000;
 
-// 存储自定义区服映射
-let customServersMap = {};
+// 自定义区服映射（在这里修改）
+const customServersMap = {
+  // 格式：区服号: ID
+  // 示例："2183": 136339
+  // 如果有特殊区服就在这里添加
+};
+
+// 获取当前北京时间
+function getBeijingTime() {
+  const now = new Date();
+  // 北京时间是UTC+8
+  const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+  return beijingTime;
+}
 
 // 获取今天的日期（北京时间）
 function getTodayDate() {
-  const now = new Date();
-  const bj = new Date(now.getTime() + (8 * 60 - now.getTimezoneOffset()) * 60000);
-  return bj.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
+  const beijingTime = getBeijingTime();
+  const year = beijingTime.getUTCFullYear();
+  const month = String(beijingTime.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(beijingTime.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
-// 计算今天是周几（0-6，0是周日）
-function getTodayWeekday() {
-  const now = new Date();
-  const bj = new Date(now.getTime() + (8 * 60 - now.getTimezoneOffset()) * 60000);
-  return bj.getDay(); // 0=周日, 1=周一, ..., 6=周六
+// 格式化日期为YYYY-MM-DD
+function formatDate(date) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // 计算两个日期之间的天数差
-function getDaysBetween(date1, date2) {
-  const d1 = new Date(date1);
-  const d2 = new Date(date2);
-  const diffTime = Math.abs(d2 - d1);
-  return Math.ceil(diffTime / MS_DAY);
-}
-
-// 解析JSON输入
-function parseCustomJson(jsonStr) {
-  try {
-    if (!jsonStr.trim()) {
-      return {};
-    }
-    
-    // 尝试解析JSON
-    const parsed = JSON.parse(jsonStr);
-    
-    // 验证格式
-    if (typeof parsed !== 'object' || parsed === null) {
-      throw new Error('JSON格式错误：必须是对象格式');
-    }
-    
-    // 转换键为数字
-    const result = {};
-    for (const [key, value] of Object.entries(parsed)) {
-      const showId = parseInt(key);
-      const realId = parseInt(value);
-      
-      if (isNaN(showId) || isNaN(realId)) {
-        throw new Error(`无效的数字格式：${key}: ${value}`);
-      }
-      
-      result[showId] = realId;
-    }
-    
-    return result;
-  } catch (error) {
-    toast('JSON解析错误：' + error.message);
-    console.error('JSON解析错误:', error);
-    return null;
-  }
+function getDaysBetween(dateStr1, dateStr2) {
+  const date1 = new Date(dateStr1 + 'T00:00:00Z');
+  const date2 = new Date(dateStr2 + 'T00:00:00Z');
+  const diffTime = Math.abs(date2 - date1);
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
 // 游戏数据配置
@@ -363,26 +276,57 @@ const games = [
       '9awan': {
         name: '9a玩平台',
         homepage: 'http://www.9awan.com/home/server/283',
-        serverUrlTemplate: 'http://www.9awan.com/game.php?action=play&game_id=283&server_id=',
-        servers: Array.from({length: 2116 - 2091 + 1}, (_, i) => ({show: 2091 + i, real: 98471 + i}))
+        // 9a玩平台区服链接格式
+        getServers: function() {
+          const servers = [];
+          // 2091-2116区
+          for (let showId = 2091; showId <= 2116; showId++) {
+            // 9awan平台：2091区对应server_id=98471，依次递增
+            const realId = 98471 + (showId - 2091);
+            servers.push({
+              show: showId,
+              real: realId,
+              special: false
+            });
+          }
+          return servers;
+        },
+        // 生成链接函数
+        getServerUrl: function(server) {
+          return `http://www.9awan.com/game.php?action=play&game_id=283&server_id=${server.real}`;
+        }
       },
       '3uyy': {
         name: '3UYY平台',
         homepage: 'http://88.3uyy.com/home/server/283',
-        serverUrlTemplate: 'http://88.3uyy.com/game.php?action=play&game_id=283&server_id=',
-        servers: Array.from({length: 2116 - 2091 + 1}, (_, i) => ({show: 2091 + i, real: 98471 + i}))
+        // 3UYY平台区服链接格式
+        getServers: function() {
+          const servers = [];
+          // 2091-2116区
+          for (let showId = 2091; showId <= 2116; showId++) {
+            // 3uyy平台：2091区对应server_id=98471，依次递增
+            const realId = 98471 + (showId - 2091);
+            servers.push({
+              show: showId,
+              real: realId,
+              special: false
+            });
+          }
+          return servers;
+        },
+        // 生成链接函数
+        getServerUrl: function(server) {
+          return `http://88.3uyy.com/game.php?action=play&game_id=283&server_id=${server.real}`;
+        }
       },
       'aa4': {
         name: 'AA4平台',
-        homepage: 'http://www.aa4.cn/webgame/kaifu/552',
-        serverUrlTemplate: 'http://www.aa4.cn/webgame/into/552/',
-        // AA4平台区服配置：根据日期动态开放
+        homepage: 'http://www.aa4.cn/webgame/game/552',
+        // 普通区服（不包含2178-2182）
         getServers: function() {
           const today = getTodayDate();
-          const baseDate = '2026-01-14'; // 2191区开启的基准日期
           
           // 从2178区开始，ID是136334，然后递增
-          // 根据显示编号计算真实ID
           const calculateRealId = (showId) => {
             // 2178区对应136334
             const baseShowId = 2178;
@@ -397,84 +341,39 @@ const games = [
             return baseRealId + (showId - baseShowId);
           };
           
-          // 基础区服数据：显示编号、真实ID、开放日期
+          // 基础区服数据 - 移除2178-2182
           const serverData = [
             // 已开放区服 (2168-2177，使用旧的ID)
-            {show: 2168, real: 136262, openDate: '2024-01-01', special: false},
-            {show: 2169, real: 136263, openDate: '2024-01-01', special: false},
-            {show: 2170, real: 136264, openDate: '2024-01-01', special: false},
-            {show: 2171, real: 136265, openDate: '2024-01-01', special: true},  // ✅
-            {show: 2172, real: 136266, openDate: '2024-01-01', special: false},
-            {show: 2173, real: 136267, openDate: '2024-01-01', special: false},
-            {show: 2174, real: 136268, openDate: '2024-01-01', special: false},
-            {show: 2175, real: 136269, openDate: '2024-01-01', special: true},  // ✅
-            {show: 2176, real: 136270, openDate: '2024-01-01', special: false},
-            {show: 2177, real: 136271, openDate: '2024-01-01', special: false},
+            {show: 2168, real: 136262, special: false},
+            {show: 2169, real: 136263, special: false},
+            {show: 2170, real: 136264, special: false},
+            {show: 2171, real: 136265, special: true},  // ✅
+            {show: 2172, real: 136266, special: false},
+            {show: 2173, real: 136267, special: false},
+            {show: 2174, real: 136268, special: false},
+            {show: 2175, real: 136269, special: true},  // ✅
+            {show: 2176, real: 136270, special: false},
+            {show: 2177, real: 136271, special: false},
             
-            // 从2178区开始使用新的ID计算规则
-            {show: 2178, real: calculateRealId(2178), openDate: '2026-01-01', special: false, isCustom: customServersMap[2178] !== undefined},
-            {show: 2179, real: calculateRealId(2179), openDate: '2026-01-01', special: false, isCustom: customServersMap[2179] !== undefined},
-            {show: 2180, real: calculateRealId(2180), openDate: '2026-01-01', special: false, isCustom: customServersMap[2180] !== undefined},
-            {show: 2181, real: calculateRealId(2181), openDate: '2026-01-01', special: false, isCustom: customServersMap[2181] !== undefined},
-            {show: 2182, real: calculateRealId(2182), openDate: '2026-01-01', special: false, isCustom: customServersMap[2182] !== undefined},
-            {show: 2183, real: calculateRealId(2183), openDate: '2026-01-01', special: false, isCustom: customServersMap[2183] !== undefined},
-            {show: 2185, real: calculateRealId(2185), openDate: '2026-01-01', special: false, isCustom: customServersMap[2185] !== undefined},
-            {show: 2186, real: calculateRealId(2186), openDate: '2026-01-01', special: false, isCustom: customServersMap[2186] !== undefined},
-            {show: 2187, real: calculateRealId(2187), openDate: '2026-01-01', special: false, isCustom: customServersMap[2187] !== undefined},
-            {show: 2188, real: calculateRealId(2188), openDate: '2026-01-01', special: false, isCustom: customServersMap[2188] !== undefined},
-            {show: 2189, real: calculateRealId(2189), openDate: '2026-01-01', special: false, isCustom: customServersMap[2189] !== undefined},
-            {show: 2190, real: calculateRealId(2190), openDate: '2026-01-01', special: false, isCustom: customServersMap[2190] !== undefined},
+            // 从2183区开始使用新的ID计算规则（跳过2178-2182）
+            {show: 2183, real: calculateRealId(2183)},
+            {show: 2184, real: calculateRealId(2184)},
+            {show: 2185, real: calculateRealId(2185)},
+            {show: 2186, real: calculateRealId(2186)},
+            {show: 2187, real: calculateRealId(2187)},
+            {show: 2188, real: calculateRealId(2188)},
+            {show: 2189, real: calculateRealId(2189)},
+            {show: 2190, real: calculateRealId(2190)},
           ];
           
-          // 计算今天距离基准日期的天数
-          const daysFromBase = getDaysBetween(baseDate, today);
-          
-          // 2191区及以后的最大区服编号（每天开一个新区）
-          const maxServerShowId = 2191 + Math.max(0, daysFromBase);
-          
-          // 动态生成2191及以后的区服
-          for (let showId = 2191; showId <= maxServerShowId; showId++) {
-            // 计算开放日期：基准日期 + (区服编号-2191)天
-            const openDate = new Date(baseDate);
-            openDate.setDate(openDate.getDate() + (showId - 2191));
-            const openDateStr = openDate.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
-            
-            const isCustom = customServersMap[showId] !== undefined;
-            
-            serverData.push({
-              show: showId,
-              real: calculateRealId(showId),
-              openDate: openDateStr,
-              special: false,
-              isCustom: isCustom
-            });
-          }
-          
-          // 过滤出今天及之前开放的区服
-          const todayServers = serverData.filter(server => {
-            return this.isDateBeforeOrEqual(server.openDate, today);
-          });
-          
-          console.log(`今天日期: ${today}, 基准日期: ${baseDate}, 天数差: ${daysFromBase}`);
-          console.log(`最大开放区服: ${maxServerShowId}, 实际开放区服数: ${todayServers.length}`);
-          console.log(`自定义区服映射:`, customServersMap);
-          
-          return todayServers;
+          return serverData;
         },
-        
-        // 辅助函数：比较日期
-        isDateBeforeOrEqual: function(date1, date2) {
-          const d1 = new Date(date1);
-          const d2 = new Date(date2);
-          return d1 <= d2;
+        // 生成链接函数
+        getServerUrl: function(server) {
+          return `http://www.aa4.cn/webgame/into/552/${server.real}`;
         }
       }
     },
-    merges: [
-      {from:2091,to:2097,date:'2025-10-28'},
-      {from:2098,to:2104,date:'2025-10-31'},
-      {from:2105,to:2111,date:'2025-11-02'}
-    ],
     isMultiPlatform: true
   },
   {
@@ -482,7 +381,10 @@ const games = [
     name: '满V切割神域',
     homepage: 'http://gm.yx4f.com:81/games/111.html',
     servers: [235,236,237,248,249,250,251,252,253,254,259,260,261,262,263,264,265,275,276,277],
-    isMultiPlatform: false
+    isMultiPlatform: false,
+    getServerUrl: function(server) {
+      return `http://gm.yx4f.com:81/login/111/${server}.html`;
+    }
   },
   {
     id: '115',
@@ -491,26 +393,28 @@ const games = [
       'yx4f': {
         name: 'YX4F平台',
         homepage: 'http://gm.yx4f.com:81/games/115.html',
-        serverUrlTemplate: 'http://gm.yx4f.com:81/login/115/',
-        // 原有1-123区，新增124-132区
         servers: [
           // 原有区服 1-123
           1, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123,
           // 新增区服 124-132
           124, 125, 126, 127, 128, 129, 130, 131, 132
-        ]
+        ],
+        getServerUrl: function(server) {
+          return `http://gm.yx4f.com:81/login/115/${server}.html`;
+        }
       },
       '962yx': {
         name: '962YX平台',
         homepage: 'http://gm.962yx.com/games/115.html',
-        serverUrlTemplate: 'http://gm.962yx.com/login/115/',
-        // 原有1-123区，新增124-132区
         servers: [
           // 原有区服 1-123
           1, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123,
           // 新增区服 124-132
           124, 125, 126, 127, 128, 129, 130, 131, 132
-        ]
+        ],
+        getServerUrl: function(server) {
+          return `http://gm.962yx.com/login/115/${server}.html`;
+        }
       }
     },
     isMultiPlatform: true
@@ -520,16 +424,84 @@ const games = [
     name: 'GM赤焰无双',
     homepage: 'http://gm.yx4f.com:81/games/137.html',
     servers: [1,2,3,4,5,6,7,8,9,10,11,12],
-    isMultiPlatform: false
+    isMultiPlatform: false,
+    getServerUrl: function(server) {
+      return `http://gm.yx4f.com:81/login/137/${server}.html`;
+    }
   },
   {
     id: 'ts',
     name: '屠神',
     homepage: 'http://www.8syx.com/game/7/',
     servers: [25,26,30,31,35],
-    isMultiPlatform: false
+    isMultiPlatform: false,
+    getServerUrl: function(server) {
+      return `http://www.8syx.com/Game/gameto.php?gid=7&sid=${server}`;
+    }
   }
 ];
+
+// 新增游戏 - 圣王传奇新服
+const newServersGame = {
+  id: 'swcq_new',
+  name: '圣王传奇新服',
+  platforms: {
+    'aa4': {
+      name: 'AA4平台',
+      homepage: 'http://www.aa4.cn/webgame/game/552',
+      // 只获取新服
+      getServers: function() {
+        const today = getTodayDate();
+        const baseDate = '2026-01-14'; // 2191区开启的基准日期
+        
+        // 从2178区开始，ID是136334，然后递增
+        const calculateRealId = (showId) => {
+          // 2178区对应136334
+          const baseShowId = 2178;
+          const baseRealId = 136334;
+          
+          // 首先检查自定义映射
+          if (customServersMap[showId]) {
+            return customServersMap[showId];
+          }
+          
+          // 否则使用标准计算
+          return baseRealId + (showId - baseShowId);
+        };
+        
+        // 计算今天距离基准日期的天数
+        const daysFromBase = getDaysBetween(baseDate, today);
+        
+        // 2191区及以后的最大区服编号（每天开一个新区）
+        const maxServerShowId = 2191 + Math.max(0, daysFromBase);
+        
+        const newServers = [];
+        
+        // 动态生成2191及以后的区服
+        for (let showId = 2191; showId <= maxServerShowId; showId++) {
+          // 计算开放日期：基准日期 + (区服编号-2191)天
+          const openDate = new Date(baseDate + 'T00:00:00Z');
+          openDate.setUTCDate(openDate.getUTCDate() + (showId - 2191));
+          const openDateStr = formatDate(openDate);
+          
+          newServers.push({
+            show: showId,
+            real: calculateRealId(showId),
+            openDate: openDateStr,
+            isNew: true
+          });
+        }
+        
+        return newServers;
+      },
+      // 生成链接函数
+      getServerUrl: function(server) {
+        return `http://www.aa4.cn/webgame/into/552/${server.real}`;
+      }
+    }
+  },
+  isMultiPlatform: true
+};
 
 const toast = (msg)=>{
   const t = document.getElementById('toast');
@@ -538,17 +510,11 @@ const toast = (msg)=>{
   setTimeout(()=>t.style.display='none',300);},1400);
 };
 
-function daysSince(dateStr){
-  const s = new Date(dateStr+'T00:00:00+08:00');
-  const t = new Date();
-  const now = new Date(t.getTime()+(8*60 - t.getTimezoneOffset())*60000);
-  const d = new Date(now.toLocaleDateString('en-CA')+'T00:00:00+08:00');
-  return Math.floor((d-s)/MS_DAY)+1;
-}
-
 function renderTabs(){
   const tabs = document.getElementById('tabs');
   tabs.innerHTML='';
+  
+  // 添加所有游戏标签
   games.forEach(g=>{
     const b=document.createElement('button');
     b.className='tab'+(g.id==='swcq'?' active':'');
@@ -557,52 +523,78 @@ function renderTabs(){
       document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
       b.classList.add('active');
       showPlatformSwitcher(g.id);
-      showJsonInput(g.id);
       renderContent(g.id);
     };
     tabs.appendChild(b);
   });
+  
+  // 添加新服标签
+  const newTab = document.createElement('button');
+  newTab.className='tab new-server-tab';
+  newTab.textContent='圣王传奇新服';
+  newTab.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    newTab.classList.add('active');
+    showPlatformSwitcher(newServersGame.id);
+    renderContent(newServersGame.id);
+  };
+  tabs.appendChild(newTab);
 }
 
 function showPlatformSwitcher(gameId){
   const switcher = document.getElementById('platformSwitcher');
-  const game = games.find(g => g.id === gameId);
   
-  if (game && game.isMultiPlatform) {
+  // 如果是圣王传奇或新服，显示平台切换器
+  if (gameId === 'swcq' || gameId === 'swcq_new') {
     switcher.style.display = 'flex';
     // 清除现有按钮
     switcher.innerHTML = '';
     
     // 为每个平台创建按钮
-    Object.entries(game.platforms).forEach(([platformId, platform], index) => {
+    let platforms;
+    if (gameId === 'swcq') {
+      platforms = games.find(g => g.id === 'swcq').platforms;
+    } else {
+      platforms = newServersGame.platforms;
+    }
+    
+    Object.entries(platforms).forEach(([platformId, platform], index) => {
       const btn = document.createElement('button');
       
       // 设置默认选中状态
-      let isActive = false;
-      if (gameId === 'swcq') {
-        isActive = platformId === currentPlatform;
-      } else if (gameId === '115') {
-        isActive = platformId === currentYJ;
-      }
+      const isActive = platformId === currentPlatform;
       
       btn.className = `platform-btn ${isActive ? 'active' : ''}`;
       btn.textContent = platform.name;
       btn.dataset.platform = platformId;
-      btn.dataset.gameId = gameId; // 添加游戏ID标识
       btn.onclick = () => {
-        // 移除所有按钮的active状态
         document.querySelectorAll('.platform-btn').forEach(x => x.classList.remove('active'));
         btn.classList.add('active');
-        
-        // 根据游戏ID更新对应的平台变量
-        if (gameId === 'swcq') {
-          currentPlatform = platformId;
-        } else if (gameId === '115') {
-          currentYJ = platformId;
-        }
-        
+        currentPlatform = platformId;
         toast(`已切换至 ${platform.name}`);
         renderContent(gameId);
+      };
+      switcher.appendChild(btn);
+    });
+  } else if (gameId === '115') {
+    // 悠久传奇的平台切换器
+    switcher.style.display = 'flex';
+    switcher.innerHTML = '';
+    
+    const game = games.find(g => g.id === '115');
+    Object.entries(game.platforms).forEach(([platformId, platform], index) => {
+      const btn = document.createElement('button');
+      const isActive = platformId === currentYJ;
+      
+      btn.className = `platform-btn ${isActive ? 'active' : ''}`;
+      btn.textContent = platform.name;
+      btn.dataset.platform = platformId;
+      btn.onclick = () => {
+        document.querySelectorAll('.platform-btn').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        currentYJ = platformId;
+        toast(`已切换至 ${platform.name}`);
+        renderContent('115');
       };
       switcher.appendChild(btn);
     });
@@ -611,28 +603,26 @@ function showPlatformSwitcher(gameId){
   }
 }
 
-function showJsonInput(gameId){
-  const jsonContainer = document.getElementById('jsonInputContainer');
-  const game = games.find(g => g.id === gameId);
-  
-  // 只在AA4平台的圣王传奇显示JSON输入框
-  if (game && game.id === 'swcq' && currentPlatform === 'aa4') {
-    jsonContainer.style.display = 'block';
-  } else {
-    jsonContainer.style.display = 'none';
-  }
-}
-
 function renderContent(id){
   const box = document.getElementById('content');
   box.innerHTML='';
-  const game = games.find(x => x.id === id);
+  
+  let game;
+  let isNewServer = false;
+  
+  if (id === 'swcq_new') {
+    game = newServersGame;
+    isNewServer = true;
+  } else {
+    game = games.find(x => x.id === id);
+  }
+  
   if(!game) return;
   
   const grid = document.createElement('div');
   grid.className='grid';
 
-  if(id === 'swcq'){
+  if(id === 'swcq' || id === 'swcq_new'){
     // 圣王传奇 - 多平台支持
     const platform = game.platforms[currentPlatform];
     
@@ -654,9 +644,19 @@ function renderContent(id){
     homeCard.appendChild(platformBadge);
 
     const today = getTodayDate();
+    const beijingTime = getBeijingTime();
+    const displayTime = beijingTime.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).replace(/\//g, '-');
     
-    // 获取当前开放的区服（AA4平台动态获取）
-    const servers = currentPlatform === 'aa4' ? platform.getServers() : platform.servers;
+    // 获取当前开放的区服
+    const servers = platform.getServers();
     
     // 显示今日信息
     const infoCard = document.createElement('div');
@@ -666,6 +666,13 @@ function renderContent(id){
     infoTitle.textContent = `📅 ${today}`;
     infoCard.appendChild(infoTitle);
     
+    const timeInfo = document.createElement('div');
+    timeInfo.textContent = displayTime;
+    timeInfo.style.fontSize = '12px';
+    timeInfo.style.color = 'var(--muted)';
+    timeInfo.style.marginTop = '2px';
+    infoCard.appendChild(timeInfo);
+    
     const serverCount = document.createElement('div');
     serverCount.textContent = `开放区服：${servers.length}个`;
     serverCount.style.fontSize = '14px';
@@ -673,72 +680,69 @@ function renderContent(id){
     serverCount.style.marginTop = '4px';
     infoCard.appendChild(serverCount);
     
-    // 显示自定义区服数量
-    const customCount = Object.keys(customServersMap).length;
-    if (currentPlatform === 'aa4' && customCount > 0) {
-      const customInfo = document.createElement('div');
-      customInfo.textContent = `自定义区服：${customCount}个`;
-      customInfo.style.fontSize = '12px';
-      customInfo.style.color = '#f97316';
-      customInfo.style.marginTop = '2px';
-      infoCard.appendChild(customInfo);
-    }
-    
-    // 显示ID计算规则（仅AA4平台）
-    if (currentPlatform === 'aa4' && servers.length > 0) {
-      const idRule = document.createElement('div');
-      idRule.className = 'id-info';
-      idRule.textContent = 'ID规则：2178区=136334，之后每个区+1';
-      idRule.style.marginTop = '6px';
-      infoCard.appendChild(idRule);
-      
-      // 显示开服规则
+    // 显示开服规则（仅新服）
+    if (isNewServer && servers.length > 0) {
       const openRule = document.createElement('div');
-      openRule.className = 'id-info';
-      openRule.textContent = '开服规则：2026/01/14开启2191区，之后每天开一个新区';
-      openRule.style.marginTop = '2px';
+      openRule.textContent = '开服规则：2026-01-14开启2191区，之后每天开一个新区';
+      openRule.style.fontSize = '12px';
+      openRule.style.color = 'var(--muted)';
+      openRule.style.marginTop = '4px';
       infoCard.appendChild(openRule);
+      
+      // 显示下一个新服信息
+      const nextServer = servers[servers.length - 1];
+      if (nextServer.openDate !== today) {
+        const nextInfo = document.createElement('div');
+        nextInfo.textContent = `下一个新区：${nextServer.openDate} 开启${nextServer.show}区`;
+        nextInfo.style.fontSize = '12px';
+        nextInfo.style.color = '#ec4899';
+        nextInfo.style.marginTop = '2px';
+        infoCard.appendChild(nextInfo);
+      }
     }
     
     grid.appendChild(infoCard);
     
-    // 渲染区服卡片 - 简化版本
+    // 渲染区服卡片
     servers.forEach(s => {
       const card = document.createElement('div');
       card.className = 'swcq-simple-card';
       
-      // 标题部分 - 只显示区服编号，2171和2175加✅
+      // 标题部分
       const title = document.createElement('div');
-      title.className = 'simple-title';
+      title.className = 'title';
       
-      if (currentPlatform === 'aa4' && (s.show === 2171 || s.show === 2175)) {
+      if (currentPlatform === 'aa4' && s.special) {
         title.innerHTML = `${s.show}区 <span class="swcq-check">✅</span>`;
       } else {
         title.textContent = `${s.show}区`;
       }
       card.appendChild(title);
       
-      // 显示服务器ID信息（仅AA4平台）
+      // 显示服务器ID（仅aa4平台）
       if (currentPlatform === 'aa4') {
-        const info = document.createElement('div');
-        info.className = 'server-info';
-        info.textContent = `ID: ${s.real}`;
-        if (s.isCustom) {
-          info.style.color = '#f97316';
-          info.style.fontWeight = 'bold';
+        const idInfo = document.createElement('div');
+        idInfo.className = 'server-info';
+        idInfo.textContent = `ID: ${s.real}`;
+        card.appendChild(idInfo);
+      }
+      
+      // 显示开放日期（新服）
+      if (isNewServer && s.openDate) {
+        const dateInfo = document.createElement('div');
+        dateInfo.className = 'server-info';
+        if (s.openDate === today) {
+          dateInfo.innerHTML = `📅 今日开放`;
+          dateInfo.style.color = '#10b981';
+          dateInfo.style.fontWeight = 'bold';
+        } else {
+          dateInfo.textContent = `📅 开放：${s.openDate}`;
         }
-        card.appendChild(info);
+        card.appendChild(dateInfo);
       }
       
       // 构建链接
-      let url;
-      if (currentPlatform === 'aa4') {
-        // AA4平台链接格式：http://www.aa4.cn/webgame/into/552/服务器真实ID
-        url = `${platform.serverUrlTemplate}${s.real}`;
-      } else {
-        // 9awan和3uyy平台
-        url = `${platform.serverUrlTemplate}${s.real}`;
-      }
+      const url = platform.getServerUrl(s);
       
       const btn = document.createElement('a');
       btn.className = 'btn';
@@ -753,19 +757,6 @@ function renderContent(id){
         }
       };
       card.appendChild(btn);
-      
-      // 显示自定义徽章
-      if (s.isCustom) {
-        const badges = document.createElement('div');
-        badges.className = 'badges';
-        
-        const customBadge = document.createElement('div');
-        customBadge.className = 'badge badge-custom';
-        customBadge.textContent = '自定义';
-        badges.appendChild(customBadge);
-        
-        card.appendChild(badges);
-      }
       
       grid.appendChild(card);
     });
@@ -791,29 +782,6 @@ function renderContent(id){
     platformBadge.textContent = platform.name;
     homeCard.appendChild(platformBadge);
     
-    // 显示当前平台和区服统计
-    const statsCard = document.createElement('div');
-    statsCard.className = 'card';
-    const statsTitle = document.createElement('div');
-    statsTitle.className = 'title';
-    statsTitle.textContent = `📊 区服统计`;
-    statsCard.appendChild(statsTitle);
-    
-    const serverCountInfo = document.createElement('div');
-    serverCountInfo.textContent = `总区服数: ${platform.servers.length}个`;
-    serverCountInfo.style.fontSize = '14px';
-    serverCountInfo.style.color = 'var(--accent)';
-    statsCard.appendChild(serverCountInfo);
-    
-    const serverRangeInfo = document.createElement('div');
-    serverRangeInfo.textContent = `范围: 1-123, 124-132区`;
-    serverRangeInfo.style.fontSize = '12px';
-    serverRangeInfo.style.color = 'var(--muted)';
-    serverRangeInfo.style.marginTop = '2px';
-    statsCard.appendChild(serverRangeInfo);
-    
-    grid.appendChild(statsCard);
-    
     // 区服列表
     platform.servers.forEach(s => {
       const card = document.createElement('div');
@@ -824,7 +792,9 @@ function renderContent(id){
       title.textContent = `${s}区`;
       card.appendChild(title);
       
-      const url = `${platform.serverUrlTemplate}${s}.html`;
+      // 悠久传奇链接
+      const url = platform.getServerUrl(s);
+      
       const btn = document.createElement('a');
       btn.className = 'btn';
       btn.textContent = '点击区服';
@@ -862,14 +832,7 @@ function renderContent(id){
       title.textContent = `${s}区`;
       card.appendChild(title);
       
-      let url = '#';
-      if(id === '111'){
-        url = `http://gm.yx4f.com:81/login/111/${s}.html`;
-      } else if(id === '137'){
-        url = `http://gm.yx4f.com:81/login/137/${s}.html`;
-      } else if(id === 'ts'){
-        url = `http://www.8syx.com/Game/gameto.php?gid=7&sid=${s}`;
-      }
+      const url = game.getServerUrl(s);
       
       const btn = document.createElement('a');
       btn.className = 'btn';
@@ -893,40 +856,27 @@ function renderContent(id){
 
 function init(){
   // 更新时间显示
-  const tick = () => {
-    const now = new Date();
-    const bj = new Date(now.getTime()+(8*60-now.getTimezoneOffset())*60000);
-    document.getElementById('time').textContent = '北京时间：'+bj.toLocaleString('zh-CN',{hour12:false});
-    
-    // 每分钟检查一次是否需要刷新（用于跨日刷新）
-    const minutes = bj.getMinutes();
-    if (minutes === 0) {
-      // 整点时检查，如果是0点则刷新页面内容
-      const hours = bj.getHours();
-      if (hours === 0 && currentPlatform === 'aa4') {
-        console.log('检测到新的一天，刷新AA4区服列表');
-        renderContent('swcq');
-      }
-    }
+  const updateTime = () => {
+    const beijingTime = getBeijingTime();
+    document.getElementById('time').textContent = '北京时间：' + beijingTime.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).replace(/\//g, '-');
   };
-  tick();
-  setInterval(tick, 60000); // 每分钟更新一次时间
   
-  // 每秒更新时间显示
-  setInterval(() => {
-    const now = new Date();
-    const bj = new Date(now.getTime()+(8*60-now.getTimezoneOffset())*60000);
-    document.getElementById('time').textContent = '北京时间：'+bj.toLocaleString('zh-CN',{hour12:false});
-  }, 1000);
+  updateTime();
+  setInterval(updateTime, 1000);
   
   // 渲染标签页
   renderTabs();
   
-  // 显示平台切换器（初始显示圣王传奇的）
+  // 显示平台切换器
   showPlatformSwitcher('swcq');
-  
-  // 显示JSON输入框
-  showJsonInput('swcq');
   
   // 初始渲染内容
   renderContent('swcq');
@@ -948,64 +898,6 @@ function init(){
     btnCopy.classList.remove('active');
     toast('打开模式');
   };
-  
-  // 绑定JSON应用按钮事件
-  const applyJsonBtn = document.getElementById('applyJsonBtn');
-  applyJsonBtn.onclick = () => {
-    const jsonInput = document.getElementById('jsonInput');
-    const newMap = parseCustomJson(jsonInput.value);
-    
-    if (newMap !== null) {
-      // 合并新的自定义映射
-      customServersMap = { ...customServersMap, ...newMap };
-      
-      // 保存到localStorage
-      try {
-        localStorage.setItem('aa4_custom_servers', JSON.stringify(customServersMap));
-      } catch (e) {
-        console.log('无法保存到localStorage:', e);
-      }
-      
-      toast(`已应用 ${Object.keys(newMap).length} 个自定义区服`);
-      
-      // 刷新显示
-      const activeTab = document.querySelector('.tab.active');
-      if (activeTab) {
-        const gameId = games.find(g => g.name === activeTab.textContent)?.id;
-        if (gameId) {
-          renderContent(gameId);
-        }
-      }
-    }
-  };
-  
-  // 从localStorage加载自定义区服
-  try {
-    const saved = localStorage.getItem('aa4_custom_servers');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && typeof parsed === 'object') {
-        customServersMap = parsed;
-        console.log('已加载自定义区服:', customServersMap);
-      }
-    }
-  } catch (e) {
-    console.log('无法从localStorage加载:', e);
-  }
-  
-  // 添加页面可见性检测，当页面重新可见时刷新
-  document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) {
-      const activeTab = document.querySelector('.tab.active');
-      if (activeTab) {
-        const gameId = games.find(g => g.name === activeTab.textContent)?.id;
-        if (gameId === 'swcq' && currentPlatform === 'aa4') {
-          // 页面重新可见时刷新AA4区服
-          renderContent('swcq');
-        }
-      }
-    }
-  });
 }
 
 // 初始化
