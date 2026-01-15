@@ -204,6 +204,43 @@ footer {
   background: linear-gradient(90deg, #ec4899, #8b5cf6);
   color: white;
 }
+.crown-badge {
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  color: #78350f;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-top: 4px;
+  display: inline-block;
+}
+.server-title {
+  font-weight: bold;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.crown-mark {
+  color: #fbbf24;
+}
+.reminder-card {
+  background: linear-gradient(90deg, #1e293b, #334155);
+  border-left: 4px solid #fbbf24;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+.reminder-title {
+  color: #fbbf24;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.reminder-text {
+  font-size: 13px;
+  color: var(--muted);
+}
 </style>
 </head>
 <body>
@@ -218,13 +255,16 @@ footer {
   <!-- 平台切换器 - 动态显示 -->
   <div id="platformSwitcher" class="platform-switcher" style="display: none;"></div>
   
+  <!-- 智能提醒区域 -->
+  <div id="reminderContainer" style="display: none;"></div>
+  
   <div id="content"></div>
   <div id="toast"></div>
   <footer>已就绪</footer>
 </div>
 <script>
 let clickMode = 'copy';
-let currentPlatform = '9awan'; // 圣王传奇默认平台
+let currentPlatform = 'aa4'; // 默认选择AA4平台
 let currentYJ = 'yx4f'; // 悠久传奇默认平台
 
 // 自定义区服映射（在这里修改）
@@ -265,6 +305,101 @@ function getDaysBetween(dateStr1, dateStr2) {
   const date2 = new Date(dateStr2 + 'T00:00:00Z');
   const diffTime = Math.abs(date2 - date1);
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
+// 计算开服天数（开服当天为第一天）
+function getDaysSinceOpen(openDateStr) {
+  const today = getTodayDate();
+  const days = getDaysBetween(openDateStr, today) + 1; // 开服当天为第一天
+  return Math.max(1, days); // 最少为1天
+}
+
+// 圣王传奇区服开服日期配置
+const swcqOpenDates = {
+  // 2178-2182区（跳过）
+  // 从2183区开始，基于ID推算
+  2183: '2026-01-06',
+  2184: '2026-01-07',
+  2185: '2026-01-08',
+  2186: '2026-01-09',
+  2187: '2026-01-10',
+  2188: '2026-01-11',
+  2189: '2026-01-12',
+  2190: '2026-01-13',
+  2191: '2026-01-14',
+  2192: '2026-01-15', // 今天是开服第一天
+};
+
+// 根据区服ID推算开服日期（基于已知区服的开服规律）
+function calculateOpenDateByServerId(showId, realId) {
+  // 已知参考点：2183区（ID: 136334）开服日期：2026-01-06
+  const referenceShowId = 2183;
+  const referenceRealId = 136334;
+  const referenceOpenDate = '2026-01-06';
+  
+  // 计算区服间隔
+  const showIdDiff = showId - referenceShowId;
+  const realIdDiff = realId - referenceRealId;
+  
+  // 验证ID间隔是否与区服号间隔一致（确保推算准确）
+  if (showIdDiff === realIdDiff) {
+    // 从参考日期开始，每天开一个新区
+    const openDate = new Date(referenceOpenDate + 'T00:00:00Z');
+    openDate.setUTCDate(openDate.getUTCDate() + showIdDiff);
+    return formatDate(openDate);
+  }
+  
+  return null; // 无法推算
+}
+
+// 智能提醒系统：检测需要添加的区服
+function checkMissingServers() {
+  const today = getTodayDate();
+  const missingServers = [];
+  const suggestions = [];
+  
+  // 获取当前配置的所有区服
+  const swcqGame = games.find(g => g.id === 'swcq');
+  const aa4Platform = swcqGame.platforms['aa4'];
+  const currentServers = aa4Platform.getServers();
+  
+  // 找出最大的区服号
+  const maxServer = Math.max(...currentServers.map(s => s.show));
+  
+  // 基于开服规律推算应该有哪些区服
+  // 已知：每天开一个新区，从2183区开始
+  
+  // 推算今天应该开放的区服号
+  const baseDate = '2026-01-06'; // 2183区开服日期
+  const daysSinceBase = getDaysBetween(baseDate, today);
+  const expectedMaxServer = 2183 + Math.max(0, daysSinceBase);
+  
+  // 检查是否有遗漏的区服
+  if (expectedMaxServer > maxServer) {
+    for (let showId = maxServer + 1; showId <= expectedMaxServer; showId++) {
+      // 根据规律计算真实ID
+      const realId = 136334 + (showId - 2183);
+      const calculatedOpenDate = calculateOpenDateByServerId(showId, realId);
+      
+      if (calculatedOpenDate) {
+        const daysSinceOpen = getDaysSinceOpen(calculatedOpenDate);
+        const shouldShowCrown = daysSinceOpen === 3;
+        
+        missingServers.push({
+          show: showId,
+          real: realId,
+          openDate: calculatedOpenDate,
+          daysSinceOpen: daysSinceOpen,
+          shouldShowCrown: shouldShowCrown
+        });
+        
+        // 生成添加建议
+        suggestions.push(`{show: ${showId}, real: ${realId}, special: false}`);
+      }
+    }
+  }
+  
+  return { missingServers, suggestions };
 }
 
 // 游戏数据配置
@@ -363,9 +498,28 @@ const games = [
             {show: 2188, real: calculateRealId(2188)},
             {show: 2189, real: calculateRealId(2189)},
             {show: 2190, real: calculateRealId(2190)},
+            {show: 2192, real: calculateRealId(2192)},
           ];
           
-          return serverData;
+          // 为每个区服添加开服信息
+          return serverData.map(server => {
+            let openDate = swcqOpenDates[server.show];
+            
+            // 如果没有预配置的开服日期，尝试推算
+            if (!openDate) {
+              openDate = calculateOpenDateByServerId(server.show, server.real);
+            }
+            
+            const daysSinceOpen = openDate ? getDaysSinceOpen(openDate) : 0;
+            const shouldShowCrown = daysSinceOpen === 3; // 开服第三天显示👑
+            
+            return {
+              ...server,
+              openDate: openDate,
+              daysSinceOpen: daysSinceOpen,
+              shouldShowCrown: shouldShowCrown
+            };
+          });
         },
         // 生成链接函数
         getServerUrl: function(server) {
@@ -483,11 +637,15 @@ const newServersGame = {
           openDate.setUTCDate(openDate.getUTCDate() + (showId - 2191));
           const openDateStr = formatDate(openDate);
           
+          // 计算开服天数（今天是第几天）
+          const daysSinceOpen = getDaysSinceOpen(openDateStr);
+          
           newServers.push({
             show: showId,
             real: calculateRealId(showId),
             openDate: openDateStr,
-            isNew: true
+            isNew: true,
+            daysSinceOpen: daysSinceOpen
           });
         }
         
@@ -508,6 +666,53 @@ const toast = (msg)=>{
   setTimeout(()=>{t.style.transition='opacity .3s'; t.style.opacity='0';
   setTimeout(()=>t.style.display='none',300);},1400);
 };
+
+// 显示智能提醒
+function showReminders() {
+  const container = document.getElementById('reminderContainer');
+  const { missingServers, suggestions } = checkMissingServers();
+  
+  if (missingServers.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+  
+  container.style.display = 'block';
+  container.innerHTML = '';
+  
+  // 创建提醒卡片
+  const reminderCard = document.createElement('div');
+  reminderCard.className = 'reminder-card';
+  
+  const reminderTitle = document.createElement('div');
+  reminderTitle.className = 'reminder-title';
+  reminderTitle.textContent = '🚨 智能提醒：需要添加的区服';
+  reminderCard.appendChild(reminderTitle);
+  
+  const reminderText = document.createElement('div');
+  reminderText.className = 'reminder-text';
+  
+  let html = `检测到 ${missingServers.length} 个缺失区服：<br>`;
+  
+  missingServers.forEach(server => {
+    html += `• ${server.show}区 (ID: ${server.real}) - 开服日期: ${server.openDate} - 开服天数: ${server.daysSinceOpen}天`;
+    if (server.shouldShowCrown) {
+      html += ' 👑 (今天第三天，需要👑标记)';
+    }
+    html += '<br>';
+  });
+  
+  html += '<br><strong>建议添加到代码中的区服配置：</strong><br>';
+  suggestions.forEach(suggestion => {
+    html += `<code style="font-size: 11px;">${suggestion},</code><br>`;
+  });
+  
+  html += '<br><em>请将以上配置添加到圣王传奇AA4平台的serverData数组中。</em>';
+  
+  reminderText.innerHTML = html;
+  reminderCard.appendChild(reminderText);
+  container.appendChild(reminderCard);
+}
 
 function renderTabs(){
   const tabs = document.getElementById('tabs');
@@ -679,6 +884,32 @@ function renderContent(id){
     serverCount.style.marginTop = '4px';
     infoCard.appendChild(serverCount);
     
+    // 显示今日新区信息（仅限圣王传奇AA4平台）
+    if (id === 'swcq' && currentPlatform === 'aa4') {
+      const todayNewServer = servers.find(server => server.openDate === today);
+      if (todayNewServer) {
+        const newServerInfo = document.createElement('div');
+        newServerInfo.textContent = `🎉 今日新区：${todayNewServer.show}区`;
+        newServerInfo.style.fontSize = '14px';
+        newServerInfo.style.color = '#ec4899';
+        newServerInfo.style.fontWeight = 'bold';
+        newServerInfo.style.marginTop = '4px';
+        infoCard.appendChild(newServerInfo);
+      }
+      
+      // 显示今天需要👑标记的区服
+      const crownServers = servers.filter(server => server.shouldShowCrown);
+      if (crownServers.length > 0) {
+        const crownInfo = document.createElement('div');
+        crownInfo.textContent = `👑 今天第三天：${crownServers.map(s => s.show + '区').join(', ')}`;
+        crownInfo.style.fontSize = '13px';
+        crownInfo.style.color = '#fbbf24';
+        crownInfo.style.fontWeight = 'bold';
+        crownInfo.style.marginTop = '4px';
+        infoCard.appendChild(crownInfo);
+      }
+    }
+    
     // 显示开服规则（仅新服）
     if (isNewServer && servers.length > 0) {
       const openRule = document.createElement('div');
@@ -709,13 +940,36 @@ function renderContent(id){
       
       // 标题部分
       const title = document.createElement('div');
-      title.className = 'title';
+      title.className = 'server-title';
       
-      if (currentPlatform === 'aa4' && s.special) {
-        title.innerHTML = `${s.show}区 <span class="swcq-check">✅</span>`;
+      // 显示区服号
+      const serverNumber = document.createElement('span');
+      serverNumber.textContent = `${s.show}区`;
+      
+      // 添加特殊标记（普通圣王传奇页面 - AA4平台）
+      if (!isNewServer && currentPlatform === 'aa4') {
+        title.appendChild(serverNumber);
+        
+        // 显示✅标记（如果有）
+        if (s.special) {
+          const checkMark = document.createElement('span');
+          checkMark.className = 'swcq-check';
+          checkMark.textContent = '✅';
+          title.appendChild(checkMark);
+        }
+        
+        // 显示👑标记（开服第三天）
+        if (s.shouldShowCrown) {
+          const crownMark = document.createElement('span');
+          crownMark.className = 'crown-mark';
+          crownMark.textContent = '👑';
+          crownMark.title = '开服第三天活动';
+          title.appendChild(crownMark);
+        }
       } else {
-        title.textContent = `${s.show}区`;
+        title.appendChild(serverNumber);
       }
+      
       card.appendChild(title);
       
       // 显示服务器ID（仅aa4平台）
@@ -724,6 +978,35 @@ function renderContent(id){
         idInfo.className = 'server-info';
         idInfo.textContent = `ID: ${s.real}`;
         card.appendChild(idInfo);
+      }
+      
+      // 显示开服信息（仅限圣王传奇AA4平台）
+      if (id === 'swcq' && currentPlatform === 'aa4' && s.openDate) {
+        const openInfo = document.createElement('div');
+        openInfo.className = 'server-info';
+        
+        if (s.openDate === today) {
+          openInfo.innerHTML = `📅 今日开放`;
+          openInfo.style.color = '#10b981';
+          openInfo.style.fontWeight = 'bold';
+        } else {
+          openInfo.textContent = `📅 ${s.openDate}`;
+          
+          // 显示开服天数
+          if (s.daysSinceOpen > 0) {
+            const daysInfo = document.createElement('div');
+            daysInfo.className = 'server-info';
+            daysInfo.textContent = `开服第${s.daysSinceOpen}天`;
+            
+            // 如果是开服第三天，用特殊颜色显示
+            if (s.daysSinceOpen === 3) {
+              daysInfo.style.color = '#fbbf24';
+              daysInfo.style.fontWeight = 'bold';
+            }
+            card.appendChild(daysInfo);
+          }
+        }
+        card.appendChild(openInfo);
       }
       
       // 显示开放日期（新服）
@@ -756,6 +1039,14 @@ function renderContent(id){
         }
       };
       card.appendChild(btn);
+      
+      // 添加👑标记说明（如果显示👑）
+      if (id === 'swcq' && currentPlatform === 'aa4' && s.shouldShowCrown) {
+        const crownBadge = document.createElement('div');
+        crownBadge.className = 'crown-badge';
+        crownBadge.textContent = '开服第三天活动';
+        card.appendChild(crownBadge);
+      }
       
       grid.appendChild(card);
     });
@@ -851,6 +1142,11 @@ function renderContent(id){
   }
   
   box.appendChild(grid);
+  
+  // 如果是圣王传奇页面，显示智能提醒
+  if (id === 'swcq' && currentPlatform === 'aa4') {
+    showReminders();
+  }
 }
 
 function init(){
