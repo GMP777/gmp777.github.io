@@ -241,6 +241,16 @@ footer {
   font-size: 13px;
   color: var(--muted);
 }
+.auto-add-btn {
+  background: linear-gradient(90deg, #10b981, #34d399);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
 </style>
 </head>
 <body>
@@ -314,25 +324,72 @@ function getDaysSinceOpen(openDateStr) {
   return Math.max(1, days); // 最少为1天
 }
 
-// 圣王传奇区服开服日期配置
+// 圣王传奇区服开服日期基准配置
 const swcqOpenDates = {
-  // 2178-2182区（跳过）
-  // 从2183区开始，基于ID推算
-  2183: '2026-01-06',
-  2184: '2026-01-07',
-  2185: '2026-01-08',
-  2186: '2026-01-09',
-  2187: '2026-01-10',
-  2188: '2026-01-11',
-  2189: '2026-01-12',
-  2190: '2026-01-13',
-  2191: '2026-01-14',
-  2192: '2026-01-15', // 今天是开服第一天
+  // 已知的基准区服开服日期
+  2183: '2026-01-06', // 基准点1：2183区开服日期
+  2191: '2026-01-14', // 基准点2：2191区开服日期（新服开始）
 };
+
+// 开服规则配置
+const swcqOpenRules = {
+  // 2183区开始的普通区服开服规则
+  baseRule: {
+    startServer: 2183,
+    startDate: '2026-01-06',
+    interval: 1, // 每天开一个区
+  },
+  // 2191区开始的新服开服规则
+  newRule: {
+    startServer: 2191,
+    startDate: '2026-01-14',
+    interval: 1, // 每天开一个区
+  }
+};
+
+// 根据区服号自动推算开服日期
+function calculateOpenDateByServerNumber(showId) {
+  // 规则1：2183-2190区遵循基础规则（每天一个区）
+  if (showId >= 2183 && showId <= 2190) {
+    const baseRule = swcqOpenRules.baseRule;
+    const startDate = new Date(baseRule.startDate + 'T00:00:00Z');
+    const daysDiff = (showId - baseRule.startServer) * baseRule.interval;
+    startDate.setUTCDate(startDate.getUTCDate() + daysDiff);
+    return formatDate(startDate);
+  }
+  
+  // 规则2：2191及以后的区服遵循新服规则
+  if (showId >= 2191) {
+    const newRule = swcqOpenRules.newRule;
+    const startDate = new Date(newRule.startDate + 'T00:00:00Z');
+    const daysDiff = (showId - newRule.startServer) * newRule.interval;
+    startDate.setUTCDate(startDate.getUTCDate() + daysDiff);
+    return formatDate(startDate);
+  }
+  
+  // 规则3：2168-2177区（较老的区服）
+  if (showId >= 2168 && showId <= 2177) {
+    // 这些区服在2183区之前，按倒推计算
+    const baseDate = '2026-01-06'; // 2183区开服日期
+    const baseServer = 2183;
+    const startDate = new Date(baseDate + 'T00:00:00Z');
+    const daysDiff = (showId - baseServer); // 负值，表示之前开的区
+    startDate.setUTCDate(startDate.getUTCDate() + daysDiff);
+    return formatDate(startDate);
+  }
+  
+  return null; // 无法推算
+}
 
 // 根据区服ID推算开服日期（基于已知区服的开服规律）
 function calculateOpenDateByServerId(showId, realId) {
-  // 已知参考点：2183区（ID: 136334）开服日期：2026-01-06
+  // 首先尝试根据区服号推算
+  const dateByNumber = calculateOpenDateByServerNumber(showId);
+  if (dateByNumber) {
+    return dateByNumber;
+  }
+  
+  // 备用方法：基于已知的2183区推算
   const referenceShowId = 2183;
   const referenceRealId = 136334;
   const referenceOpenDate = '2026-01-06';
@@ -357,6 +414,7 @@ function checkMissingServers() {
   const today = getTodayDate();
   const missingServers = [];
   const suggestions = [];
+  const autoAddServers = []; // 可以自动添加的区服
   
   // 获取当前配置的所有区服
   const swcqGame = games.find(g => g.id === 'swcq');
@@ -370,8 +428,7 @@ function checkMissingServers() {
   // 已知：每天开一个新区，从2183区开始
   
   // 推算今天应该开放的区服号
-  const baseDate = '2026-01-06'; // 2183区开服日期
-  const daysSinceBase = getDaysBetween(baseDate, today);
+  const daysSinceBase = getDaysBetween('2026-01-06', today);
   const expectedMaxServer = 2183 + Math.max(0, daysSinceBase);
   
   // 检查是否有遗漏的区服
@@ -395,11 +452,19 @@ function checkMissingServers() {
         
         // 生成添加建议
         suggestions.push(`{show: ${showId}, real: ${realId}, special: false}`);
+        
+        // 记录可以自动添加的区服
+        autoAddServers.push({
+          show: showId,
+          real: realId,
+          openDate: calculatedOpenDate,
+          special: false
+        });
       }
     }
   }
   
-  return { missingServers, suggestions };
+  return { missingServers, suggestions, autoAddServers };
 }
 
 // 游戏数据配置
@@ -499,16 +564,16 @@ const games = [
             {show: 2189, real: calculateRealId(2189)},
             {show: 2190, real: calculateRealId(2190)},
             {show: 2192, real: calculateRealId(2192)},
-            {show: 2193, real: calculateRealId(2193)},
+            {show: 2194, real: calculateRealId(2194)},
           ];
           
-          // 为每个区服添加开服信息
+          // 为每个区服添加开服信息（自动推算）
           return serverData.map(server => {
-            let openDate = swcqOpenDates[server.show];
+            let openDate = calculateOpenDateByServerNumber(server.show);
             
-            // 如果没有预配置的开服日期，尝试推算
-            if (!openDate) {
-              openDate = calculateOpenDateByServerId(server.show, server.real);
+            // 如果没有推算出开服日期，使用预配置的
+            if (!openDate && swcqOpenDates[server.show]) {
+              openDate = swcqOpenDates[server.show];
             }
             
             const daysSinceOpen = openDate ? getDaysSinceOpen(openDate) : 0;
@@ -604,7 +669,6 @@ const newServersGame = {
       // 只获取新服
       getServers: function() {
         const today = getTodayDate();
-        const baseDate = '2026-01-14'; // 2191区开启的基准日期
         
         // 从2178区开始，ID是136334，然后递增
         const calculateRealId = (showId) => {
@@ -622,7 +686,7 @@ const newServersGame = {
         };
         
         // 计算今天距离基准日期的天数
-        const daysFromBase = getDaysBetween(baseDate, today);
+        const daysFromBase = getDaysBetween('2026-01-14', today);
         
         // 2191区及以后的最大区服编号（每天开一个新区）
         const maxServerShowId = 2191 + Math.max(0, daysFromBase);
@@ -631,21 +695,21 @@ const newServersGame = {
         
         // 动态生成2191及以后的区服
         for (let showId = 2191; showId <= maxServerShowId; showId++) {
-          // 计算开放日期：基准日期 + (区服编号-2191)天
-          const openDate = new Date(baseDate + 'T00:00:00Z');
-          openDate.setUTCDate(openDate.getUTCDate() + (showId - 2191));
-          const openDateStr = formatDate(openDate);
+          // 自动推算开放日期
+          const openDateStr = calculateOpenDateByServerNumber(showId);
           
-          // 计算开服天数（今天是第几天）
-          const daysSinceOpen = getDaysSinceOpen(openDateStr);
-          
-          newServers.push({
-            show: showId,
-            real: calculateRealId(showId),
-            openDate: openDateStr,
-            isNew: true,
-            daysSinceOpen: daysSinceOpen
-          });
+          if (openDateStr) {
+            // 计算开服天数（今天是第几天）
+            const daysSinceOpen = getDaysSinceOpen(openDateStr);
+            
+            newServers.push({
+              show: showId,
+              real: calculateRealId(showId),
+              openDate: openDateStr,
+              isNew: true,
+              daysSinceOpen: daysSinceOpen
+            });
+          }
         }
         
         return newServers;
@@ -669,7 +733,7 @@ const toast = (msg)=>{
 // 显示智能提醒
 function showReminders() {
   const container = document.getElementById('reminderContainer');
-  const { missingServers, suggestions } = checkMissingServers();
+  const { missingServers, suggestions, autoAddServers } = checkMissingServers();
   
   if (missingServers.length === 0) {
     container.style.display = 'none';
@@ -701,15 +765,38 @@ function showReminders() {
     html += '<br>';
   });
   
-  html += '<br><strong>建议添加到代码中的区服配置：</strong><br>';
+  html += '<br><strong>开服规则说明：</strong><br>';
+  html += '• 2183区：2026-01-06开服（基准点）<br>';
+  html += '• 2191区：2026-01-14开服（新服起点）<br>';
+  html += '• 开服间隔：每天开放一个新区<br><br>';
+  
+  html += '<strong>建议添加到代码中的区服配置：</strong><br>';
   suggestions.forEach(suggestion => {
     html += `<code style="font-size: 11px;">${suggestion},</code><br>`;
   });
   
-  html += '<br><em>请将以上配置添加到圣王传奇AA4平台的serverData数组中。</em>';
+  html += '<br><em>提示：系统已自动为新区服计算开服日期，开服日期基于2183区和2191区两个基准点推算。</em>';
   
   reminderText.innerHTML = html;
   reminderCard.appendChild(reminderText);
+  
+  // 添加自动添加按钮（仅演示，实际需要手动添加）
+  if (autoAddServers.length > 0) {
+    const autoAddBtn = document.createElement('button');
+    autoAddBtn.className = 'auto-add-btn';
+    autoAddBtn.textContent = `📝 查看详细添加说明`;
+    autoAddBtn.onclick = () => {
+      let codeToAdd = '\n// 需要添加到serverData数组中的配置：\n';
+      autoAddServers.forEach(server => {
+        codeToAdd += `{show: ${server.show}, real: ${server.real}, special: false},\n`;
+      });
+      codeToAdd += '\n// 开服日期会自动推算，无需手动设置';
+      alert(codeToAdd);
+      toast('已生成添加代码，请复制到配置中');
+    };
+    reminderCard.appendChild(autoAddBtn);
+  }
+  
   container.appendChild(reminderCard);
 }
 
@@ -882,6 +969,16 @@ function renderContent(id){
     serverCount.style.color = 'var(--accent)';
     serverCount.style.marginTop = '4px';
     infoCard.appendChild(serverCount);
+    
+    // 显示开服规则说明（仅限圣王传奇AA4平台）
+    if (id === 'swcq' && currentPlatform === 'aa4') {
+      const ruleInfo = document.createElement('div');
+      ruleInfo.innerHTML = `📅 开服规则：<br>• 2183区：2026-01-06<br>• 2191区：2026-01-14<br>• 每天开一个新区`;
+      ruleInfo.style.fontSize = '12px';
+      ruleInfo.style.color = 'var(--muted)';
+      ruleInfo.style.marginTop = '4px';
+      infoCard.appendChild(ruleInfo);
+    }
     
     // 显示今日新区信息（仅限圣王传奇AA4平台）
     if (id === 'swcq' && currentPlatform === 'aa4') {
