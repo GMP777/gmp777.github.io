@@ -265,7 +265,7 @@ footer {
   <!-- 平台切换器 - 动态显示 -->
   <div id="platformSwitcher" class="platform-switcher" style="display: none;"></div>
   
-  <!-- 智能提醒区域 -->
+  <!-- 智能提醒区域 - 已移除 -->
   <div id="reminderContainer" style="display: none;"></div>
   
   <div id="content"></div>
@@ -329,6 +329,7 @@ const swcqOpenDates = {
   // 已知的基准区服开服日期
   2183: '2026-01-06', // 基准点1：2183区开服日期
   2191: '2026-01-14', // 基准点2：2191区开服日期（新服开始）
+  2209: '2026-02-01', // 2209区开服日期
 };
 
 // 开服规则配置
@@ -344,6 +345,12 @@ const swcqOpenRules = {
     startServer: 2191,
     startDate: '2026-01-14',
     interval: 1, // 每天开一个区
+  },
+  // 2209区开始的最新区服规则
+  latestRule: {
+    startServer: 2209,
+    startDate: '2026-02-01',
+    interval: 1, // 每天开一个区
   }
 };
 
@@ -358,8 +365,8 @@ function calculateOpenDateByServerNumber(showId) {
     return formatDate(startDate);
   }
   
-  // 规则2：2191及以后的区服遵循新服规则
-  if (showId >= 2191) {
+  // 规则2：2191-2208区遵循新服规则
+  if (showId >= 2191 && showId <= 2208) {
     const newRule = swcqOpenRules.newRule;
     const startDate = new Date(newRule.startDate + 'T00:00:00Z');
     const daysDiff = (showId - newRule.startServer) * newRule.interval;
@@ -367,7 +374,16 @@ function calculateOpenDateByServerNumber(showId) {
     return formatDate(startDate);
   }
   
-  // 规则3：2168-2177区（较老的区服）
+  // 规则3：2209-2236区遵循最新规则（从2026-02-01开始）
+  if (showId >= 2209 && showId <= 2236) {
+    const latestRule = swcqOpenRules.latestRule;
+    const startDate = new Date(latestRule.startDate + 'T00:00:00Z');
+    const daysDiff = (showId - latestRule.startServer) * latestRule.interval;
+    startDate.setUTCDate(startDate.getUTCDate() + daysDiff);
+    return formatDate(startDate);
+  }
+  
+  // 规则4：2168-2177区（较老的区服）
   if (showId >= 2168 && showId <= 2177) {
     // 这些区服在2183区之前，按倒推计算
     const baseDate = '2026-01-06'; // 2183区开服日期
@@ -379,92 +395,6 @@ function calculateOpenDateByServerNumber(showId) {
   }
   
   return null; // 无法推算
-}
-
-// 根据区服ID推算开服日期（基于已知区服的开服规律）
-function calculateOpenDateByServerId(showId, realId) {
-  // 首先尝试根据区服号推算
-  const dateByNumber = calculateOpenDateByServerNumber(showId);
-  if (dateByNumber) {
-    return dateByNumber;
-  }
-  
-  // 备用方法：基于已知的2183区推算
-  const referenceShowId = 2183;
-  const referenceRealId = 136334;
-  const referenceOpenDate = '2026-01-06';
-  
-  // 计算区服间隔
-  const showIdDiff = showId - referenceShowId;
-  const realIdDiff = realId - referenceRealId;
-  
-  // 验证ID间隔是否与区服号间隔一致（确保推算准确）
-  if (showIdDiff === realIdDiff) {
-    // 从参考日期开始，每天开一个新区
-    const openDate = new Date(referenceOpenDate + 'T00:00:00Z');
-    openDate.setUTCDate(openDate.getUTCDate() + showIdDiff);
-    return formatDate(openDate);
-  }
-  
-  return null; // 无法推算
-}
-
-// 智能提醒系统：检测需要添加的区服
-function checkMissingServers() {
-  const today = getTodayDate();
-  const missingServers = [];
-  const suggestions = [];
-  const autoAddServers = []; // 可以自动添加的区服
-  
-  // 获取当前配置的所有区服
-  const swcqGame = games.find(g => g.id === 'swcq');
-  const aa4Platform = swcqGame.platforms['aa4'];
-  const currentServers = aa4Platform.getServers();
-  
-  // 找出最大的区服号
-  const maxServer = Math.max(...currentServers.map(s => s.show));
-  
-  // 基于开服规律推算应该有哪些区服
-  // 已知：每天开一个新区，从2183区开始
-  
-  // 推算今天应该开放的区服号
-  const daysSinceBase = getDaysBetween('2026-01-06', today);
-  const expectedMaxServer = 2183 + Math.max(0, daysSinceBase);
-  
-  // 检查是否有遗漏的区服
-  if (expectedMaxServer > maxServer) {
-    for (let showId = maxServer + 1; showId <= expectedMaxServer; showId++) {
-      // 根据规律计算真实ID
-      const realId = 136334 + (showId - 2183);
-      const calculatedOpenDate = calculateOpenDateByServerId(showId, realId);
-      
-      if (calculatedOpenDate) {
-        const daysSinceOpen = getDaysSinceOpen(calculatedOpenDate);
-        const shouldShowCrown = daysSinceOpen === 3;
-        
-        missingServers.push({
-          show: showId,
-          real: realId,
-          openDate: calculatedOpenDate,
-          daysSinceOpen: daysSinceOpen,
-          shouldShowCrown: shouldShowCrown
-        });
-        
-        // 生成添加建议
-        suggestions.push(`{show: ${showId}, real: ${realId}, special: false}`);
-        
-        // 记录可以自动添加的区服
-        autoAddServers.push({
-          show: showId,
-          real: realId,
-          openDate: calculatedOpenDate,
-          special: false
-        });
-      }
-    }
-  }
-  
-  return { missingServers, suggestions, autoAddServers };
 }
 
 // 游戏数据配置
@@ -522,7 +452,7 @@ const games = [
       'aa4': {
         name: 'AA4平台',
         homepage: 'http://www.aa4.cn/webgame/game/552',
-        // 普通区服（不包含2178-2182）
+        // 普通区服（包含2209-2236新区）
         getServers: function() {
           const today = getTodayDate();
           
@@ -541,7 +471,7 @@ const games = [
             return baseRealId + (showId - baseShowId);
           };
           
-          // 基础区服数据 - 移除2178-2182
+          // 基础区服数据
           const serverData = [
             // 已开放区服 (2168-2177，使用旧的ID)
             {show: 2168, real: 136262, special: false},
@@ -555,7 +485,7 @@ const games = [
             {show: 2176, real: 136270, special: false},
             {show: 2177, real: 136271, special: false},
             
-            // 从2183区开始使用新的ID计算规则（跳过2178-2182）
+            // 从2183区开始使用新的ID计算规则
             {show: 2183, real: calculateRealId(2183)},
             {show: 2185, real: calculateRealId(2185)},
             {show: 2186, real: calculateRealId(2186)},
@@ -578,6 +508,36 @@ const games = [
             {show: 2206, real: calculateRealId(2206)},
             {show: 2207, real: calculateRealId(2207)},
             {show: 2208, real: calculateRealId(2208)},
+            
+            // 新增2209-2236区服，ID从136396到136423
+            {show: 2209, real: 136396, special: false},
+            {show: 2210, real: 136397, special: false},
+            {show: 2211, real: 136398, special: false},
+            {show: 2212, real: 136399, special: false},
+            {show: 2213, real: 136400, special: false},
+            {show: 2214, real: 136401, special: false},
+            {show: 2215, real: 136402, special: false},
+            {show: 2216, real: 136403, special: false},
+            {show: 2217, real: 136404, special: false},
+            {show: 2218, real: 136405, special: false},
+            {show: 2219, real: 136406, special: false},
+            {show: 2220, real: 136407, special: false},
+            {show: 2221, real: 136408, special: false},
+            {show: 2222, real: 136409, special: false},
+            {show: 2223, real: 136410, special: false},
+            {show: 2224, real: 136411, special: false},
+            {show: 2225, real: 136412, special: false},
+            {show: 2226, real: 136413, special: false},
+            {show: 2227, real: 136414, special: false},
+            {show: 2228, real: 136415, special: false},
+            {show: 2229, real: 136416, special: false},
+            {show: 2230, real: 136417, special: false},
+            {show: 2231, real: 136418, special: false},
+            {show: 2232, real: 136419, special: false},
+            {show: 2233, real: 136420, special: false},
+            {show: 2234, real: 136421, special: false},
+            {show: 2235, real: 136422, special: false},
+            {show: 2236, real: 136423, special: false}
           ];
           
           // 为每个区服添加开服信息（自动推算）
@@ -669,7 +629,7 @@ const games = [
   }
 ];
 
-// 新增游戏 - 圣王传奇新服
+// 新增游戏 - 圣王传奇新服（显示2209-2236区）
 const newServersGame = {
   id: 'swcq_new',
   name: '圣王传奇新服',
@@ -677,15 +637,15 @@ const newServersGame = {
     'aa4': {
       name: 'AA4平台',
       homepage: 'http://www.aa4.cn/webgame/game/552',
-      // 只获取新服
+      // 获取2209-2236的新服
       getServers: function() {
         const today = getTodayDate();
         
-        // 从2178区开始，ID是136334，然后递增
+        // 2209区开始的ID序列（136396-136423）
         const calculateRealId = (showId) => {
-          // 2178区对应136334
-          const baseShowId = 2178;
-          const baseRealId = 136334;
+          // 2209区对应136396
+          const baseShowId = 2209;
+          const baseRealId = 136396;
           
           // 首先检查自定义映射
           if (customServersMap[showId]) {
@@ -696,17 +656,11 @@ const newServersGame = {
           return baseRealId + (showId - baseShowId);
         };
         
-        // 计算今天距离基准日期的天数
-        const daysFromBase = getDaysBetween('2026-01-14', today);
-        
-        // 2191区及以后的最大区服编号（每天开一个新区）
-        const maxServerShowId = 2191 + Math.max(0, daysFromBase);
-        
         const newServers = [];
         
-        // 动态生成2191及以后的区服
-        for (let showId = 2191; showId <= maxServerShowId; showId++) {
-          // 自动推算开放日期
+        // 生成2209-2236的所有区服
+        for (let showId = 2209; showId <= 2236; showId++) {
+          // 自动推算开放日期（从2026-02-01开始）
           const openDateStr = calculateOpenDateByServerNumber(showId);
           
           if (openDateStr) {
@@ -718,7 +672,8 @@ const newServersGame = {
               real: calculateRealId(showId),
               openDate: openDateStr,
               isNew: true,
-              daysSinceOpen: daysSinceOpen
+              daysSinceOpen: daysSinceOpen,
+              special: false
             });
           }
         }
@@ -740,76 +695,6 @@ const toast = (msg)=>{
   setTimeout(()=>{t.style.transition='opacity .3s'; t.style.opacity='0';
   setTimeout(()=>t.style.display='none',300);},1400);
 };
-
-// 显示智能提醒
-function showReminders() {
-  const container = document.getElementById('reminderContainer');
-  const { missingServers, suggestions, autoAddServers } = checkMissingServers();
-  
-  if (missingServers.length === 0) {
-    container.style.display = 'none';
-    return;
-  }
-  
-  container.style.display = 'block';
-  container.innerHTML = '';
-  
-  // 创建提醒卡片
-  const reminderCard = document.createElement('div');
-  reminderCard.className = 'reminder-card';
-  
-  const reminderTitle = document.createElement('div');
-  reminderTitle.className = 'reminder-title';
-  reminderTitle.textContent = '🚨 智能提醒：需要添加的区服';
-  reminderCard.appendChild(reminderTitle);
-  
-  const reminderText = document.createElement('div');
-  reminderText.className = 'reminder-text';
-  
-  let html = `检测到 ${missingServers.length} 个缺失区服：<br>`;
-  
-  missingServers.forEach(server => {
-    html += `• ${server.show}区 (ID: ${server.real}) - 开服日期: ${server.openDate} - 开服天数: ${server.daysSinceOpen}天`;
-    if (server.shouldShowCrown) {
-      html += ' 👑 (今天第三天，需要👑标记)';
-    }
-    html += '<br>';
-  });
-  
-  html += '<br><strong>开服规则说明：</strong><br>';
-  html += '• 2183区：2026-01-06开服（基准点）<br>';
-  html += '• 2191区：2026-01-14开服（新服起点）<br>';
-  html += '• 开服间隔：每天开放一个新区<br><br>';
-  
-  html += '<strong>建议添加到代码中的区服配置：</strong><br>';
-  suggestions.forEach(suggestion => {
-    html += `<code style="font-size: 11px;">${suggestion},</code><br>`;
-  });
-  
-  html += '<br><em>提示：系统已自动为新区服计算开服日期，开服日期基于2183区和2191区两个基准点推算。</em>';
-  
-  reminderText.innerHTML = html;
-  reminderCard.appendChild(reminderText);
-  
-  // 添加自动添加按钮（仅演示，实际需要手动添加）
-  if (autoAddServers.length > 0) {
-    const autoAddBtn = document.createElement('button');
-    autoAddBtn.className = 'auto-add-btn';
-    autoAddBtn.textContent = `📝 查看详细添加说明`;
-    autoAddBtn.onclick = () => {
-      let codeToAdd = '\n// 需要添加到serverData数组中的配置：\n';
-      autoAddServers.forEach(server => {
-        codeToAdd += `{show: ${server.show}, real: ${server.real}, special: false},\n`;
-      });
-      codeToAdd += '\n// 开服日期会自动推算，无需手动设置';
-      alert(codeToAdd);
-      toast('已生成添加代码，请复制到配置中');
-    };
-    reminderCard.appendChild(autoAddBtn);
-  }
-  
-  container.appendChild(reminderCard);
-}
 
 function renderTabs(){
   const tabs = document.getElementById('tabs');
@@ -984,7 +869,7 @@ function renderContent(id){
     // 显示开服规则说明（仅限圣王传奇AA4平台）
     if (id === 'swcq' && currentPlatform === 'aa4') {
       const ruleInfo = document.createElement('div');
-      ruleInfo.innerHTML = `📅 开服规则：<br>• 2183区：2026-01-06<br>• 2191区：2026-01-14<br>• 每天开一个新区`;
+      ruleInfo.innerHTML = `📅 开服规则：<br>• 2183区：2026-01-06<br>• 2191区：2026-01-14<br>• 2209区：2026-02-01<br>• 每天开一个新区`;
       ruleInfo.style.fontSize = '12px';
       ruleInfo.style.color = 'var(--muted)';
       ruleInfo.style.marginTop = '4px';
@@ -1020,7 +905,7 @@ function renderContent(id){
     // 显示开服规则（仅新服）
     if (isNewServer && servers.length > 0) {
       const openRule = document.createElement('div');
-      openRule.textContent = '开服规则：2026-01-14开启2191区，之后每天开一个新区';
+      openRule.textContent = '开服规则：2026-02-01开启2209区，之后每天开一个新区';
       openRule.style.fontSize = '12px';
       openRule.style.color = 'var(--muted)';
       openRule.style.marginTop = '4px';
@@ -1249,11 +1134,6 @@ function renderContent(id){
   }
   
   box.appendChild(grid);
-  
-  // 如果是圣王传奇页面，显示智能提醒
-  if (id === 'swcq' && currentPlatform === 'aa4') {
-    showReminders();
-  }
 }
 
 function init(){
