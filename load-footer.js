@@ -7,6 +7,8 @@ function getFooterFile() {
     return '/footer.html';
   } else if (path.includes('/c/')) {
     return '/footer.html';
+  } else if (path.includes('/qq/')) {
+    return '/footer.html';
   } else {
     return '/footer.html'; // 根目录默认 footer
   }
