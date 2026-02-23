@@ -16,6 +16,7 @@
 |小号抽卡|[v.3.0](https://gmp777.github.io/x.html)`2025-08-07 05:18:46`|
 |圣王传奇区服|[v.1.0](https://gmp777.github.io/sw.html)`2025-10-14 04:56:20`|
 |天界神炉|[v.1.0](https://gmp777.github.io/y/tjsl.html)|
+|农场计算器|[v.1.0](https://gmp777.github.io/qq/qqnc.html)
 
   <!-- Footer -->
   <div class="footer-wrapper">
