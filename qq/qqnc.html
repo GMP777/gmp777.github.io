@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱农场计算器🌱</title>
+  <!-- 载入 footer 样式 -->
+<link rel="stylesheet" href="/footer.css" />
+<!-- 载入 footer 样式 -->
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #1b3b1a 0%, #2d5e2c 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 16px;
+        }
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: #f9f2da;
+            background-image: radial-gradient(circle at 30% 30%, #fff6d5 0%, #f0e2b9 100%);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 25px 40px rgba(0, 20, 0, 0.7), inset 2px 2px 10px #fffbe6, inset -3px -3px 8px #bba88a;
+            padding: 28px 28px 38px;
+            border: 4px solid #ac8e68;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #233d1e;
+            text-shadow: 2px 2px 0 #e9d194, 4px 4px 0 #7b5f3a;
+            margin-top: 0;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+            word-break: break-word;
+        }
+        .field-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 18px;
+            margin-bottom: 28px;
+            justify-content: center;
+        }
+        .input-item {
+            flex: 1 1 160px;
+            min-width: 140px;
+        }
+        .input-item label {
+            display: block;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #2a471f;
+            margin-bottom: 6px;
+            margin-left: 6px;
+            letter-spacing: 0.3px;
+        }
+        .input-item input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: #fcf9ea;
+            border: 3px solid #836f48;
+            border-radius: 60px;
+            box-shadow: inset 2px 4px 8px #b39d7a, 0 2px 0 #fff2c0;
+            outline: none;
+            transition: 0.15s;
+            color: #1d3a14;
+        }
+        .input-item input:focus {
+            border-color: #4d7c3b;
+            background: #fffff2;
+            box-shadow: inset 2px 4px 8px #9b895f, 0 0 0 4px #d9c194;
+        }
+        .input-item input[type=number]::-webkit-inner-spin-button,
+        .input-item input[type=number]::-webkit-outer-spin-button {
+            opacity: 0.6;
+        }
+        .button-area {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 30px;
+        }
+        .calc-btn {
+            background: #5e964a;
+            border: none;
+            border-bottom: 8px solid #2d5720;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fffcd1;
+            text-shadow: 2px 2px 0 #2f6122;
+            padding: 18px 45px;
+            border-radius: 80px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.1s ease;
+            box-shadow: 0 8px 0 #1e3e13, 0 10px 20px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 380px;
+        }
+        .calc-btn:active {
+            transform: translateY(6px);
+            border-bottom-width: 2px;
+            box-shadow: 0 4px 0 #1e3e13, 0 8px 15px rgba(0,0,0,0.3);
+        }
+        .results-panel {
+            background: #dccdab;
+            border-radius: 42px;
+            padding: 28px 22px;
+            border: 4px solid #9c864d;
+            box-shadow: inset 1px 1px 10px #fef4d3, inset -3px -3px 8px #8b7643, 0 12px 18px #1b3416;
+        }
+        .result-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #f3e9c9;
+            padding: 18px 25px;
+            margin-bottom: 16px;
+            border-radius: 50px;
+            border: 2px solid #b4975a;
+            box-shadow: 0 2px 6px #7f6d41;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #253d18;
+        }
+        .result-row:last-child {
+            margin-bottom: 0;
+        }
+        .result-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .badge-icon {
+            background: #3c692c;
+            color: #ffe99b;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            box-shadow: inset -1px -2px 0 #1f3f14, 0 3px 0 #795d32;
+        }
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: #283e1d;
+            color: #ffe88e;
+            padding: 8px 24px;
+            border-radius: 40px;
+            border: 3px solid #fad475;
+            box-shadow: inset 0 1px 5px #5b7e3c, 0 4px 0 #694f25;
+            text-align: center;
+            min-width: 130px;
+        }
+        .note {
+            text-align: center;
+            color: #3f572b;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 28px;
+            background: #eee1bd;
+            padding: 14px 10px;
+            border-radius: 100px;
+            border: 2px solid #ad914b;
+        }
+        .note strong {
+            color: #1a4f0e;
+            font-size: 1.2rem;
+        }
+        hr {
+            border: 2px dashed #a4894e;
+            margin: 20px 0;
+        }
+        .footer-small {
+            font-size: 0.95rem;
+            color: #494021;
+            text-align: center;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🌾 经验·种子·化肥 🌽</h1>
+
+        <div class="field-group">
+            <div class="input-item">
+                <label>🌟 现经验值</label>
+                <input type="number" id="curExp" value="8183" step="1" min="0">
+            </div>
+            <div class="input-item">
+                <label>🎯 总经验值</label>
+                <input type="number" id="targetExp" value="113300" step="1" min="0">
+            </div>
+            <div class="input-item">
+                <label>⏱️ 成熟时间 (小时)</label>
+                <input type="number" id="matureHours" value="4" step="0.1" min="0.1">
+            </div>
+            <div class="input-item">
+                <label>🌱 种子收获经验</label>
+                <input type="number" id="seedExp" value="508" step="1" min="1">
+            </div>
+            <div class="input-item">
+                <label>🧩 土地格子数量</label>
+                <input type="number" id="plotSize" value="24" step="1" min="1">
+            </div>
+        </div>
+
+        <div class="button-area">
+            <button class="calc-btn" id="calculateBtn">计 算</button>
+        </div>
+
+        <div class="results-panel" id="resultsPanel">
+            <div class="result-row">
+                <span class="result-label">
+                    <span class="badge-icon">①</span> 需购买种子
+                </span>
+                <span class="result-value" id="seedCount">0 颗</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">
+                    <span class="badge-icon">②</span> 播种次数
+                </span>
+                <span class="result-value" id="plantTimes">0 次</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">
+                    <span class="badge-icon">③</span> 总化肥小时
+                </span>
+                <span class="result-value" id="fertilizerHours">0 小时</span>
+            </div>
+            <hr>
+            <div class="note">
+                <strong>🧾 计算规则</strong> &nbsp; 化肥总量 = 成熟时间 × 需要种植的数量 (小时单位) <br>
+                播种次数 = 需要种植的数量 ÷ 土地格子数 (向上取整)
+            </div>
+        </div>
+        <div class="footer-small">
+            ⚡ 每次购买按填满格子计，最后一次可能不满
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const curExpInput = document.getElementById('curExp');
+            const targetExpInput = document.getElementById('targetExp');
+            const matureHoursInput = document.getElementById('matureHours');
+            const seedExpInput = document.getElementById('seedExp');
+            const plotSizeInput = document.getElementById('plotSize');
+
+            const seedCountSpan = document.getElementById('seedCount');
+            const plantTimesSpan = document.getElementById('plantTimes');
+            const fertilizerHoursSpan = document.getElementById('fertilizerHours');
+
+            function calculate() {
+                // 读取输入值并转为数字
+                let curExp = parseFloat(curExpInput.value);
+                let targetExp = parseFloat(targetExpInput.value);
+                let matureHours = parseFloat(matureHoursInput.value);
+                let seedExp = parseFloat(seedExpInput.value);
+                let plotSize = parseFloat(plotSizeInput.value);
+
+                // 处理无效/空输入
+                if (isNaN(curExp) || curExp < 0) curExp = 0;
+                if (isNaN(targetExp) || targetExp < 0) targetExp = 0;
+                if (isNaN(matureHours) || matureHours <= 0) matureHours = 0.1;  // 避免除零/零小时
+                if (isNaN(seedExp) || seedExp <= 0) seedExp = 1;
+                if (isNaN(plotSize) || plotSize < 1) plotSize = 1;
+
+                // 确保目标大于当前，否则不需要种
+                let expNeeded = targetExp - curExp;
+                if (expNeeded < 0) expNeeded = 0;
+
+                // 需要种植多少颗 (向上取整，因为必须超出或等于所需经验)
+                let seedsRequired = 0;
+                if (expNeeded > 0 && seedExp > 0) {
+                    seedsRequired = Math.ceil(expNeeded / seedExp);
+                } else if (expNeeded === 0) {
+                    seedsRequired = 0;
+                } else {
+                    seedsRequired = 0; // 种子经验为0不合理，但兜底
+                }
+
+                // 播种次数 = ceil(seedsRequired / plotSize)
+                let plantTimes = 0;
+                if (seedsRequired > 0 && plotSize > 0) {
+                    plantTimes = Math.ceil(seedsRequired / plotSize);
+                } else {
+                    plantTimes = 0;
+                }
+
+                // 总化肥小时 = 成熟时间 × 需要种植的数量
+                let fertilizerHours = matureHours * seedsRequired;
+
+                // 更新DOM
+                seedCountSpan.innerText = seedsRequired + ' 颗';
+                plantTimesSpan.innerText = plantTimes + ' 次';
+                fertilizerHoursSpan.innerText = fertilizerHours.toFixed(2) + ' 小时';
+            }
+
+            // 绑定点击事件
+            document.getElementById('calculateBtn').addEventListener('click', calculate);
+
+            // 页面加载时自动计算一次 (显示初始值)
+            window.addEventListener('load', calculate);
+
+            // 额外：回车触发计算
+            const inputs = [curExpInput, targetExpInput, matureHoursInput, seedExpInput, plotSizeInput];
+            inputs.forEach(inp => {
+                inp.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') calculate();
+                });
+            });
+        })();
+    </script>
+    <!-- Footer -->
+  <div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+  </div>
+  <script src="/load-footer.js"></script>
+<!-- footer -->
+</body>
+</html>
