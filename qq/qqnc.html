@@ -2,70 +2,84 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌱农场计算器🌱</title>
-  <!-- 载入 footer 样式 -->
-<link rel="stylesheet" href="/footer.css" />
-<!-- 载入 footer 样式 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>🌱 农场计算器 · 自适应完善版 🌱</title>
+    <!-- 全面自适应 + 完善细节 -->
     <style>
         * {
             box-sizing: border-box;
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
         }
+
         body {
             background: linear-gradient(145deg, #1b3b1a 0%, #2d5e2c 100%);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 16px;
+            padding: 12px;
         }
+
+        /* 主卡片 - 完全自适应 */
         .card {
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             background: #f9f2da;
             background-image: radial-gradient(circle at 30% 30%, #fff6d5 0%, #f0e2b9 100%);
-            border-radius: 48px 48px 32px 32px;
-            box-shadow: 0 25px 40px rgba(0, 20, 0, 0.7), inset 2px 2px 10px #fffbe6, inset -3px -3px 8px #bba88a;
-            padding: 28px 28px 38px;
+            border-radius: max(32px, min(6vw, 48px)) max(32px, min(6vw, 48px)) max(24px, min(4vw, 32px)) max(24px, min(4vw, 32px));
+            box-shadow: 0 20px 35px rgba(0, 20, 0, 0.7), inset 2px 2px 10px #fffbe6, inset -3px -3px 8px #bba88a;
+            padding: clamp(16px, 5vw, 32px);
             border: 4px solid #ac8e68;
+            margin-bottom: 20px;
+            transition: all 0.2s;
         }
+
         h1 {
             text-align: center;
-            font-size: 2.2rem;
+            font-size: clamp(1.8rem, 8vw, 2.8rem);
             font-weight: 800;
             color: #233d1e;
             text-shadow: 2px 2px 0 #e9d194, 4px 4px 0 #7b5f3a;
             margin-top: 0;
-            margin-bottom: 18px;
+            margin-bottom: clamp(12px, 3vw, 24px);
             letter-spacing: 1px;
             word-break: break-word;
+            line-height: 1.2;
         }
+
+        /* 输入区域网格 - 自适应flex */
         .field-group {
             display: flex;
             flex-wrap: wrap;
-            gap: 16px 18px;
-            margin-bottom: 28px;
+            gap: clamp(10px, 2vw, 18px);
+            margin-bottom: clamp(16px, 4vw, 28px);
             justify-content: center;
         }
+
         .input-item {
-            flex: 1 1 160px;
-            min-width: 140px;
+            flex: 1 1 min(200px, 100%);
+            min-width: min(100%, 220px);
+            max-width: 100%;
         }
+
         .input-item label {
             display: block;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
             color: #2a471f;
             margin-bottom: 6px;
             margin-left: 6px;
             letter-spacing: 0.3px;
         }
+
         .input-item input {
             width: 100%;
-            padding: 14px 16px;
-            font-size: 1.2rem;
+            padding: clamp(12px, 3vw, 16px) clamp(14px, 3vw, 18px);
+            font-size: clamp(1rem, 4vw, 1.3rem);
             font-weight: 600;
             background: #fcf9ea;
             border: 3px solid #836f48;
@@ -75,156 +89,288 @@
             transition: 0.15s;
             color: #1d3a14;
         }
+
         .input-item input:focus {
             border-color: #4d7c3b;
             background: #fffff2;
             box-shadow: inset 2px 4px 8px #9b895f, 0 0 0 4px #d9c194;
         }
+
         .input-item input[type=number]::-webkit-inner-spin-button,
         .input-item input[type=number]::-webkit-outer-spin-button {
             opacity: 0.6;
+            height: 24px;
         }
-        .button-area {
+
+        /* 双按钮区域 - 自适应布局 */
+        .action-buttons {
             display: flex;
+            flex-wrap: wrap;
+            gap: clamp(12px, 3vw, 20px);
             justify-content: center;
-            margin: 20px 0 30px;
+            margin: clamp(10px, 3vw, 20px) 0 clamp(20px, 5vw, 30px);
         }
+
         .calc-btn {
             background: #5e964a;
             border: none;
             border-bottom: 8px solid #2d5720;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 6vw, 2.2rem);
             font-weight: 800;
             color: #fffcd1;
             text-shadow: 2px 2px 0 #2f6122;
-            padding: 18px 45px;
+            padding: clamp(12px, 3vw, 18px) clamp(20px, 6vw, 45px);
             border-radius: 80px;
             letter-spacing: 2px;
             cursor: pointer;
             transition: 0.1s ease;
             box-shadow: 0 8px 0 #1e3e13, 0 10px 20px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 380px;
+            flex: 1 1 auto;
+            min-width: min(250px, 100%);
+            max-width: 100%;
+            line-height: 1.2;
         }
+
+        .clear-btn {
+            background: #b57c48;
+            border-bottom: 8px solid #7a4f28;
+            text-shadow: 2px 2px 0 #6b431e;
+            box-shadow: 0 8px 0 #543d1b, 0 10px 20px rgba(0,0,0,0.3);
+        }
+
         .calc-btn:active {
             transform: translateY(6px);
             border-bottom-width: 2px;
             box-shadow: 0 4px 0 #1e3e13, 0 8px 15px rgba(0,0,0,0.3);
         }
+
+        .clear-btn:active {
+            box-shadow: 0 4px 0 #543d1b, 0 8px 15px rgba(0,0,0,0.3);
+        }
+
+        /* 结果面板 - 自适应内边距 */
         .results-panel {
             background: #dccdab;
-            border-radius: 42px;
-            padding: 28px 22px;
+            border-radius: max(24px, min(5vw, 42px));
+            padding: clamp(18px, 4vw, 28px);
             border: 4px solid #9c864d;
             box-shadow: inset 1px 1px 10px #fef4d3, inset -3px -3px 8px #8b7643, 0 12px 18px #1b3416;
         }
+
         .result-row {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: clamp(8px, 2vw, 15px);
             background: #f3e9c9;
-            padding: 18px 25px;
-            margin-bottom: 16px;
-            border-radius: 50px;
+            padding: clamp(14px, 3vw, 20px) clamp(16px, 4vw, 25px);
+            margin-bottom: clamp(12px, 2vw, 16px);
+            border-radius: max(40px, min(6vw, 60px));
             border: 2px solid #b4975a;
             box-shadow: 0 2px 6px #7f6d41;
-            font-size: 1.4rem;
+            font-size: clamp(1.1rem, 4vw, 1.5rem);
             font-weight: 600;
             color: #253d18;
         }
+
         .result-row:last-child {
             margin-bottom: 0;
         }
+
         .result-label {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: clamp(8px, 2vw, 15px);
+            flex-wrap: wrap;
         }
+
         .badge-icon {
             background: #3c692c;
             color: #ffe99b;
             border-radius: 50%;
-            width: 42px;
-            height: 42px;
+            width: clamp(36px, 8vw, 48px);
+            height: clamp(36px, 8vw, 48px);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             font-weight: 700;
             box-shadow: inset -1px -2px 0 #1f3f14, 0 3px 0 #795d32;
+            flex-shrink: 0;
         }
+
         .result-value {
-            font-size: 2rem;
+            font-size: clamp(1.3rem, 5vw, 2.2rem);
             font-weight: 800;
             background: #283e1d;
             color: #ffe88e;
-            padding: 8px 24px;
+            padding: clamp(6px, 2vw, 10px) clamp(16px, 4vw, 28px);
             border-radius: 40px;
             border: 3px solid #fad475;
             box-shadow: inset 0 1px 5px #5b7e3c, 0 4px 0 #694f25;
             text-align: center;
-            min-width: 130px;
+            min-width: min(110px, 30vw);
+            white-space: nowrap;
+            line-height: 1.2;
         }
+
+        /* 针对超小屏优化 */
+        @media (max-width: 400px) {
+            .result-value {
+                white-space: normal;
+                word-break: keep-all;
+                font-size: 1.2rem;
+                min-width: 80px;
+            }
+            .badge-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1.3rem;
+            }
+        }
+
         .note {
             text-align: center;
             color: #3f572b;
             font-weight: 600;
-            font-size: 1rem;
-            margin-top: 28px;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            margin-top: clamp(20px, 4vw, 28px);
             background: #eee1bd;
-            padding: 14px 10px;
+            padding: clamp(10px, 2.5vw, 14px);
             border-radius: 100px;
             border: 2px solid #ad914b;
+            line-height: 1.5;
         }
+
         .note strong {
             color: #1a4f0e;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
         }
+
         hr {
             border: 2px dashed #a4894e;
-            margin: 20px 0;
+            margin: clamp(16px, 3vw, 24px) 0;
         }
+
         .footer-small {
-            font-size: 0.95rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
             color: #494021;
             text-align: center;
-            margin-top: 16px;
+            margin-top: clamp(12px, 2.5vw, 18px);
+        }
+
+        /* ========= 页脚容器 - 全面自适应 ========= */
+        .footer-wrapper {
+            max-width: 800px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #footer-container {
+            width: 100%;
+            background: #d9c89e;
+            border-radius: max(40px, min(6vw, 60px)) max(40px, min(6vw, 60px)) max(20px, min(4vw, 30px)) max(20px, min(4vw, 30px));
+            padding: clamp(14px, 3vw, 22px) clamp(16px, 4vw, 28px);
+            border: 4px solid #8f7b4a;
+            box-shadow: 0 15px 20px rgba(0, 20, 0, 0.5), inset 0 2px 8px #ffefc0;
+            text-align: center;
+            color: #2a471f;
+            font-weight: 600;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            transition: all 0.2s;
+        }
+
+        /* 页脚链接样式 - 自适应图标大小 */
+        #footer-container a {
+            color: #1d641d;
+            text-decoration: none;
+            font-weight: 700;
+            border-bottom: 2px solid #b4822e;
+            padding-bottom: 2px;
+            margin: 0 6px;
+            font-size: clamp(1.3rem, 6vw, 2rem);
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        #footer-container a:hover {
+            color: #ffefb2;
+            border-bottom-color: #ffcd7e;
+            transform: scale(1.1);
+        }
+
+        /* 备用页脚内flex布局自适应 */
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(12px, 4vw, 30px);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+            opacity: 0.8;
+            margin-top: clamp(8px, 2vw, 14px);
+            color: #2a471f;
+        }
+
+        /* 保留动画但可忽略 */
+        .footer-heart {
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+            font-size: 1.3rem;
+            margin: 0 4px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .footer-wheat {
+            font-size: 1.2rem;
+            filter: drop-shadow(0 2px 2px #735e34);
         }
     </style>
 </head>
 <body>
+    <!-- 主卡片 - 完全自适应内容 -->
     <div class="card">
         <h1>🌾 经验·种子·化肥 🌽</h1>
 
         <div class="field-group">
             <div class="input-item">
                 <label>🌟 现经验值</label>
-                <input type="number" id="curExp" value="8183" step="1" min="0">
+                <input type="number" id="curExp" value="8183" step="1" min="0" placeholder="当前经验" inputmode="numeric">
             </div>
             <div class="input-item">
                 <label>🎯 总经验值</label>
-                <input type="number" id="targetExp" value="113300" step="1" min="0">
+                <input type="number" id="targetExp" value="113300" step="1" min="0" placeholder="目标经验" inputmode="numeric">
             </div>
             <div class="input-item">
                 <label>⏱️ 成熟时间 (小时)</label>
-                <input type="number" id="matureHours" value="4" step="0.1" min="0.1">
+                <input type="number" id="matureHours" value="4" step="0.1" min="0.1" placeholder="小时" inputmode="decimal">
             </div>
             <div class="input-item">
                 <label>🌱 种子收获经验</label>
-                <input type="number" id="seedExp" value="508" step="1" min="1">
+                <input type="number" id="seedExp" value="508" step="1" min="1" placeholder="每颗经验" inputmode="numeric">
             </div>
             <div class="input-item">
                 <label>🧩 土地格子数量</label>
-                <input type="number" id="plotSize" value="24" step="1" min="1">
+                <input type="number" id="plotSize" value="24" step="1" min="1" placeholder="格子数" inputmode="numeric">
             </div>
         </div>
 
-        <div class="button-area">
+        <!-- 双按钮组 -->
+        <div class="action-buttons">
             <button class="calc-btn" id="calculateBtn">计 算</button>
+            <button class="calc-btn clear-btn" id="clearBtn">🧹 清空输入</button>
         </div>
 
+        <!-- 结果面板 -->
         <div class="results-panel" id="resultsPanel">
             <div class="result-row">
                 <span class="result-label">
@@ -255,8 +401,14 @@
         </div>
     </div>
 
+    <!-- 页脚容器 - 动态加载外部 footer.html，失败则显示四个链接备用 -->
+    <div class="footer-wrapper">
+        <footer id="footer-container">🌱 加载页脚中...</footer>
+    </div>
+
     <script>
         (function() {
+            // DOM 元素
             const curExpInput = document.getElementById('curExp');
             const targetExpInput = document.getElementById('targetExp');
             const matureHoursInput = document.getElementById('matureHours');
@@ -267,8 +419,12 @@
             const plantTimesSpan = document.getElementById('plantTimes');
             const fertilizerHoursSpan = document.getElementById('fertilizerHours');
 
+            const calcBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const footerContainer = document.getElementById('footer-container');
+
+            // 核心计算
             function calculate() {
-                // 读取输入值并转为数字
                 let curExp = parseFloat(curExpInput.value);
                 let targetExp = parseFloat(targetExpInput.value);
                 let matureHours = parseFloat(matureHoursInput.value);
@@ -278,61 +434,83 @@
                 // 处理无效/空输入
                 if (isNaN(curExp) || curExp < 0) curExp = 0;
                 if (isNaN(targetExp) || targetExp < 0) targetExp = 0;
-                if (isNaN(matureHours) || matureHours <= 0) matureHours = 0.1;  // 避免除零/零小时
+                if (isNaN(matureHours) || matureHours <= 0) matureHours = 0.1;
                 if (isNaN(seedExp) || seedExp <= 0) seedExp = 1;
                 if (isNaN(plotSize) || plotSize < 1) plotSize = 1;
 
-                // 确保目标大于当前，否则不需要种
                 let expNeeded = targetExp - curExp;
                 if (expNeeded < 0) expNeeded = 0;
 
-                // 需要种植多少颗 (向上取整，因为必须超出或等于所需经验)
                 let seedsRequired = 0;
                 if (expNeeded > 0 && seedExp > 0) {
                     seedsRequired = Math.ceil(expNeeded / seedExp);
-                } else if (expNeeded === 0) {
-                    seedsRequired = 0;
-                } else {
-                    seedsRequired = 0; // 种子经验为0不合理，但兜底
                 }
 
-                // 播种次数 = ceil(seedsRequired / plotSize)
                 let plantTimes = 0;
                 if (seedsRequired > 0 && plotSize > 0) {
                     plantTimes = Math.ceil(seedsRequired / plotSize);
-                } else {
-                    plantTimes = 0;
                 }
 
-                // 总化肥小时 = 成熟时间 × 需要种植的数量
                 let fertilizerHours = matureHours * seedsRequired;
 
-                // 更新DOM
                 seedCountSpan.innerText = seedsRequired + ' 颗';
                 plantTimesSpan.innerText = plantTimes + ' 次';
                 fertilizerHoursSpan.innerText = fertilizerHours.toFixed(2) + ' 小时';
             }
 
-            // 绑定点击事件
-            document.getElementById('calculateBtn').addEventListener('click', calculate);
+            // 清空输入
+            function clearAllInputs() {
+                curExpInput.value = '';
+                targetExpInput.value = '';
+                matureHoursInput.value = '';
+                seedExpInput.value = '';
+                plotSizeInput.value = '';
 
-            // 页面加载时自动计算一次 (显示初始值)
+                seedCountSpan.innerText = '0 颗';
+                plantTimesSpan.innerText = '0 次';
+                fertilizerHoursSpan.innerText = '0.00 小时';
+
+                curExpInput.focus();
+            }
+
+            // 绑定事件
+            calcBtn.addEventListener('click', calculate);
+            clearBtn.addEventListener('click', clearAllInputs);
             window.addEventListener('load', calculate);
 
-            // 额外：回车触发计算
+            // 回车触发
             const inputs = [curExpInput, targetExpInput, matureHoursInput, seedExpInput, plotSizeInput];
             inputs.forEach(inp => {
                 inp.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') calculate();
                 });
             });
+
+            // 动态加载外部 footer.html，备用为四个指定链接（自适应布局）
+            fetch('/footer.html')
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.text();
+                })
+                .then(html => {
+                    footerContainer.innerHTML = html;
+                })
+                .catch(() => {
+                    console.warn('使用自定义备用页脚 (四个图标)');
+                    // 备用页脚：四个指定链接 + 自适应class
+                    footerContainer.innerHTML = `
+                        <div class="footer-links">
+                            <a href="https://blog.654321777.xyz/" target="_blank" title="博客">📚</a>
+                            <a href="https://github.com/GMP777/gmp777.github.io" target="_blank" title="GitHub">💻</a>
+                            <a href="https://gmp777.github.io/game.html" target="_blank" title="游戏">🎮</a>
+                            <a href="https://gmp777.github.io/" target="_blank" title="主页">🏠</a>
+                        </div>
+                        <div class="footer-copyright">
+                            🌱 备用页脚 · 点击图标跳转
+                        </div>
+                    `;
+                });
         })();
     </script>
-    <!-- Footer -->
-  <div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-  </div>
-  <script src="/load-footer.js"></script>
-<!-- footer -->
 </body>
 </html>
