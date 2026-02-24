@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
         }
+
         body {
             background: #1b2b27;
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
@@ -19,24 +20,27 @@
             flex-direction: column;
             align-items: center;
         }
+
         .container {
             max-width: 1600px;
             width: 100%;
             flex: 1 0 auto;
         }
+
         h1 {
             color: #fad57e;
             text-shadow: 0 3px 0 #725f36;
-            font-size: 2.8rem;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
             font-weight: 700;
             text-align: center;
             margin-bottom: 8px;
             line-height: 1.2;
         }
+
         .sub {
             color: #b0cfb1;
             text-align: center;
-            font-size: 1.1rem;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
             margin-bottom: 30px;
             display: flex;
             justify-content: center;
@@ -44,175 +48,311 @@
             flex-wrap: wrap;
             padding: 0 10px;
         }
-        /* 双栏布局 - 使用align-items: stretch确保等高 */
+
+        /* 双栏布局 */
         .double-col {
             display: flex;
             gap: 28px;
             align-items: stretch;
             flex-wrap: wrap;
+            width: 100%;
         }
+
         /* 左侧面板 */
         .left-panel {
-            flex: 1.1;
-            min-width: 460px;
+            flex: 1 1 460px;
+            min-width: 300px;
             background: #1d372f;
-            border-radius: 50px;
+            border-radius: 30px;
             border: 1px solid #5b8a74;
-            padding: 28px 22px;
+            padding: 25px 20px;
             box-shadow: 0 15px 20px -10px #0d1f1a;
-            display: flex;
-            flex-direction: column;
         }
-        /* 右侧面板 - 与左侧等高 */
+
+        /* 右侧面板 */
         .right-panel {
-            flex: 2;
-            min-width: 500px;
+            flex: 2 1 500px;
+            min-width: 300px;
             background: #1a332c;
-            border-radius: 60px;
+            border-radius: 30px;
             border: 1px solid #618b74;
-            padding: 28px 22px;
+            padding: 25px 20px;
             box-shadow: 0 15px 20px -10px #0d1f1a;
             display: flex;
             flex-direction: column;
         }
-        /* 小屏幕适配 */
-        @media screen and (max-width: 1100px) {
-            .double-col { flex-direction: column; }
-            .left-panel, .right-panel { min-width: auto; width: 100%; }
-            h1 { font-size: 2.2rem; }
-        }
-        @media screen and (max-width: 600px) {
-            body { padding: 15px 10px; }
-            .left-panel, .right-panel { padding: 20px 15px; border-radius: 40px; }
-            .preview-row { padding: 6px 10px; }
-            .preview-level-badge { min-width: 45px; font-size: 1.1rem; }
-            .preview-icon { width: 55px; }
-            .preview-icon .mini-img { width: 40px; height: 40px; }
-            .form-row { flex-direction: column; gap: 10px; }
-            .btn-add { padding: 12px 20px; }
+
+        /* 小屏幕优化 */
+        @media screen and (max-width: 768px) {
+            .double-col {
+                gap: 20px;
+            }
+            .left-panel, .right-panel {
+                padding: 20px 15px;
+                border-radius: 25px;
+            }
+            body {
+                padding: 15px 10px;
+            }
         }
 
         .left-panel h2, .right-panel h2 {
             color: #ffd98c;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem);
             margin-bottom: 20px;
             border-left: 8px solid #b98f4a;
             padding-left: 20px;
             word-break: break-word;
         }
-        
-        /* 录入表单 */
-        .input-form {
-            background: #1f3d33;
-            border-radius: 50px;
-            padding: 26px 24px;
-            border: 1px solid #669479;
-            margin-bottom: 25px;
-        }
-        .form-row {
+
+        /* 装备图库 */
+        .preview-grid {
             display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-items: flex-end;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            flex: 1 1 160px;
-        }
-        .form-group label {
-            display: block;
-            color: #d7ecbe;
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-            letter-spacing: 0.5px;
-        }
-        .form-control {
-            width: 100%;
-            background: #2b5341;
-            border: 1px solid #7fa386;
-            border-radius: 40px;
-            padding: 14px 18px;
-            color: #fcf5da;
-            font-size: 1rem;
-            font-weight: 500;
-            outline: none;
-        }
-        .form-control:focus {
-            border-color: #efc476;
-            box-shadow: 0 0 0 2px #dcb05580;
-        }
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5e3b3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 18px center;
-            background-size: 18px;
-        }
-        .btn-add {
-            background: #5f884a;
-            border: none;
-            border-radius: 60px;
-            padding: 14px 36px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #fef5cf;
-            border: 1px solid #bde2a3;
-            cursor: pointer;
-            box-shadow: 0 7px 0 #35633e;
-            transition: 0.1s;
-            margin-top: 12px;
+            flex-direction: column;
+            gap: 12px;
+            background: #244137;
+            border-radius: 30px;
+            padding: 20px 15px;
+            border: 1px solid #608a73;
             width: 100%;
         }
-        .btn-add:hover {
-            background: #72a259;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 0 #35633e;
-        }
-        .btn-add:active {
-            transform: translateY(4px);
-            box-shadow: 0 3px 0 #35633e;
-        }
-        
-        /* JSON 编辑区 - 现在放在中间位置（表单下面，图库上面） */
-        .json-editor-section {
-            margin-bottom: 25px;
-            background: #1b3b2e;
-            border-radius: 50px;
-            padding: 22px;
-            border: 2px solid #aa8e4c;
-        }
-        .json-editor-section h3 {
-            color: #f7cf89;
-            font-size: 1.4rem;
-            margin-bottom: 12px;
+
+        .preview-row {
             display: flex;
             align-items: center;
+            gap: 15px;
+            background: #1f3a30;
+            border-radius: 25px;
+            padding: 8px 15px;
+            border: 1px solid #5e8e72;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .preview-level-badge {
+            min-width: 50px;
+            background: #3a604e;
+            color: #fbeba7;
+            border-radius: 30px;
+            padding: 6px 0;
+            font-weight: 700;
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            text-align: center;
+            border: 1px solid #9ebe8e;
+            box-shadow: inset 0 2px 5px #2b4d38;
+        }
+
+        .preview-icons-row {
+            display: flex;
+            flex: 1;
+            gap: clamp(10px, 2vw, 20px);
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .preview-icon {
+            width: clamp(60px, 12vw, 75px);
+            background: #2d4f3e;
+            border-radius: 16px;
+            border: 2px solid #5d8d72;
+            padding: 5px 0 2px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .preview-icon .mini-img {
+            width: clamp(40px, 8vw, 52px);
+            height: clamp(40px, 8vw, 52px);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #345f46;
+            border-radius: 12px;
+            border: 1px solid #86b692;
+        }
+
+        .preview-icon .mini-label {
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            background: #1e3d2e;
+            color: #eddba5;
+            width: 100%;
+            text-align: center;
+            border-radius: 0 0 14px 14px;
+            font-weight: 600;
+            padding: 3px 0;
+        }
+
+        /* 右侧卡片 */
+        .server-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 700px;
+            padding-right: 8px;
+            width: 100%;
+        }
+
+        .server-card {
+            background: #25473b;
+            border-radius: 30px;
+            border: 2px solid #b87e3e;
+            padding: 18px 18px;
+            box-shadow: 0 8px 0 #1b352b;
+            width: 100%;
+        }
+
+        .server-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #b87e3e;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
             gap: 10px;
         }
-        .json-textarea {
+
+        .server-name {
+            font-size: clamp(1.3rem, 4vw, 1.8rem);
+            font-weight: 700;
+            color: #fbdd9d;
+            word-break: break-word;
+        }
+
+        .missing-badge {
+            background: #b9523a;
+            color: #fbeac3;
+            border-radius: 30px;
+            padding: 4px 15px;
+            font-weight: 600;
+            border: 1px solid #ffad6b;
+            white-space: nowrap;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        /* 等级块容器 */
+        .missing-levels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        /* 单个等级块 */
+        .missing-level-block {
+            background: #2d4f3e;
+            border-radius: 25px;
+            padding: 10px 10px 8px 10px;
+            border: 1px solid #7aa982;
+            min-width: 100px;
+            flex: 0 1 auto;
+        }
+
+        .missing-level-block .level-title-compact {
+            text-align: center;
+            background: #5f4a2b;
+            color: #ffeaa2;
+            font-weight: 700;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            padding: 4px 0;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            border: 1px solid #e2b86b;
+        }
+
+        .missing-equip-compact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .missing-equip-item {
+            width: clamp(55px, 10vw, 65px);
+            background: #654728;
+            border-radius: 16px;
+            border: 2px solid #d7943a;
+            padding: 3px 0 2px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .missing-equip-item .equip-img {
+            width: clamp(36px, 7vw, 42px);
+            height: clamp(36px, 7vw, 42px);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #4f3f28;
+            border-radius: 12px;
+            border: 1px solid #efb060;
+        }
+
+        .missing-equip-item .equip-label {
             width: 100%;
-            background: #253b34;
+            text-align: center;
+            background: #a8682b;
+            color: #211500;
+            font-size: clamp(0.7rem, 2vw, 0.75rem);
+            padding: 2px 0;
+            border-radius: 0 0 12px 12px;
+            font-weight: 600;
+        }
+
+        .empty-note {
+            color: #afcaad;
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2rem;
+        }
+
+        /* 数据编辑区域 */
+        .data-editor {
+            margin: 40px 0 30px;
+            background: #1d372f;
+            border-radius: 30px;
+            padding: 25px;
+            border: 1px solid #b87e3e;
+            color: #e6dbb2;
+        }
+
+        .data-editor h3 {
+            color: #f7cf89;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            margin-bottom: 15px;
+        }
+
+        .data-editor textarea {
+            width: 100%;
+            background: #0f2a22;
             border: 1px solid #c9af6b;
-            color: #fcf0c7;
-            padding: 18px;
-            border-radius: 36px;
-            font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+            color: #ffd966;
+            padding: 15px;
+            border-radius: 20px;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
             font-size: 0.9rem;
             resize: vertical;
             margin-bottom: 15px;
+            line-height: 1.5;
         }
-        .json-textarea:focus {
+
+        .data-editor textarea:focus {
             border-color: #f3b35e;
             outline: none;
         }
-        .json-buttons {
+
+        .btn-group {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-        .btn-json {
-            background: #426454;
+
+        .btn {
+            background: #5f884a;
             border: none;
             border-radius: 40px;
             padding: 12px 25px;
@@ -221,316 +361,109 @@
             border: 1px solid #97ba8c;
             cursor: pointer;
             box-shadow: 0 4px 0 #1f3a30;
+            transition: 0.1s;
+            font-size: 1rem;
         }
-        .btn-json-warning {
+
+        .btn:hover {
+            background: #72a259;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #1f3a30;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #1f3a30;
+        }
+
+        .btn-warning {
             background: #8f623b;
             border-color: #ebbc7e;
         }
 
-        /* 装备图库 - 现在放在最下面 */
-        .preview-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: #244137;
-            border-radius: 60px;
-            padding: 25px 20px;
-            border: 1px solid #608a73;
-        }
-        .preview-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: #1f3a30;
-            border-radius: 50px;
-            padding: 8px 20px;
-            border: 1px solid #5e8e72;
-            flex-wrap: wrap;
-        }
-        .preview-level-badge {
-            min-width: 60px;
-            background: #3a604e;
-            color: #fbeba7;
-            border-radius: 40px;
-            padding: 8px 0;
-            font-weight: 700;
-            font-size: 1.3rem;
-            text-align: center;
-            border: 1px solid #9ebe8e;
-            box-shadow: inset 0 2px 5px #2b4d38;
-        }
-        .preview-icons-row {
-            display: flex;
-            flex: 1;
-            gap: 20px;
-            justify-content: flex-start;
-            flex-wrap: wrap;
-        }
-        .preview-icon {
-            width: 75px;
-            background: #2d4f3e;
-            border-radius: 20px;
-            border: 2px solid #5d8d72;
-            padding: 6px 0 2px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .preview-icon .mini-img {
-            width: 52px;
-            height: 52px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #345f46;
-            border-radius: 14px;
-            border: 1px solid #86b692;
-        }
-        .preview-icon .mini-label {
-            font-size: 0.85rem;
-            background: #1e3d2e;
-            color: #eddba5;
-            width: 100%;
-            text-align: center;
-            border-radius: 0 0 16px 16px;
-            font-weight: 600;
-            padding: 3px 0;
+        .btn-warning:hover {
+            background: #a57a4c;
         }
 
-        /* ===== 右侧卡片：等级在上，装备在下，所有等级块一行内换行 ===== */
-        .server-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            flex: 1; /* 让卡片容器填充剩余空间 */
-            overflow-y: auto;
-            max-height: 700px; /* 限制最大高度，但会根据内容调整 */
-            padding-right: 8px;
+        .format-guide {
+            margin-top: 15px;
+            background: #0f2a22;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
         }
-        .server-card {
-            background: #25473b;
-            border-radius: 48px;
-            border: 2px solid #b87e3e;
-            padding: 20px 22px;
-            box-shadow: 0 8px 0 #1b352b;
+
+        .format-guide p {
+            margin-bottom: 8px;
         }
-        .server-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #b87e3e;
-            padding-bottom: 12px;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-            gap: 10px;
+
+        .format-guide code {
+            background: #1d372f;
+            padding: 2px 6px;
+            border-radius: 12px;
+            color: #ffd966;
+            border: 1px solid #a58e4a;
         }
-        .server-name {
-            font-size: 1.9rem;
-            font-weight: 700;
-            color: #fbdd9d;
-            word-break: break-word;
-        }
-        .missing-badge {
-            background: #b9523a;
-            color: #fbeac3;
-            border-radius: 40px;
-            padding: 4px 18px;
-            font-weight: 600;
-            border: 1px solid #ffad6b;
-            white-space: nowrap;
-        }
-        
-        /* 等级块容器 - 使用flex-wrap实现自动换行 */
-        .missing-levels-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: flex-start;
-        }
-        
-        /* 单个等级块 - 垂直结构：等级在上，装备在下 */
-        .missing-level-block {
-            background: #2d4f3e;
-            border-radius: 30px;
-            padding: 12px 12px 8px 12px;
-            border: 1px solid #7aa982;
-            min-width: 110px;
-            flex: 0 1 auto;
-        }
-        .missing-level-block .level-title-compact {
-            text-align: center;
-            background: #5f4a2b;
-            color: #ffeaa2;
-            font-weight: 700;
-            font-size: 1.1rem;
-            padding: 5px 0;
-            border-radius: 25px;
-            margin-bottom: 10px;
-            border: 1px solid #e2b86b;
-        }
-        .missing-equip-compact {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-        }
-        .missing-equip-item {
-            width: 70px;
-            background: #654728;
-            border-radius: 18px;
-            border: 2px solid #d7943a;
-            padding: 4px 0 2px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 0 0 2px #efc158;
-        }
-        .missing-equip-item .equip-img {
-            width: 46px;
-            height: 46px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #4f3f28;
-            border-radius: 14px;
-            border: 1px solid #efb060;
-        }
-        .missing-equip-item .equip-label {
-            width: 100%;
-            text-align: center;
-            background: #a8682b;
-            color: #211500;
-            font-size: 0.8rem;
-            padding: 3px 0;
-            border-radius: 0 0 14px 14px;
-            font-weight: 600;
-        }
-        
-        .empty-note {
-            color: #afcaad;
-            text-align: center;
-            padding: 40px;
-            font-size: 1.3rem;
-        }
+
         .footer-note {
-            margin-top: 30px;
+            margin: 30px 0;
             color: #689177;
             text-align: center;
-        }
-        
-        /* footer样式 */
-        .footer-wrapper {
-            width: 100%;
-            margin-top: 50px;
-            background: #1a2f28;
-            border-radius: 60px 60px 0 0;
-            padding: 30px 20px 25px;
-            border-top: 3px solid #b87e3e;
-            color: #bdd0b0;
-            text-align: center;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
-        }
-        #footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            font-size: 1.1rem;
-            color: #fbdd9d;
-            font-weight: 500;
-        }
-        .footer-wrapper footer {
-            width: 100%;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>💎 钻石回收 · 优化布局 · 等高双栏</h1>
+    <h1>💎 钻石回收 · 装备缺失管理</h1>
     <div class="sub">
-        <span>武器·衣服·镯·指 43~49级 (全PNG)</span>
-        <span>登记 → JSON → 图库 · 右侧等高</span>
+        <span>武器·衣服·镯·指 43~49级</span>
+        <span>左侧图库 · 右侧各区服缺失</span>
     </div>
 
     <div class="double-col">
-        <!-- ========= 左侧面板：表单 → JSON → 图库 ========= -->
+        <!-- 左侧面板：装备图库 -->
         <div class="left-panel">
-            <h2>📋 装备登记</h2>
-            
-            <!-- 录入表单 -->
-            <div class="input-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>🗺️ 区服名称</label>
-                        <input type="text" id="serverNameInput" class="form-control" placeholder="例如 131区·战神" value="131区·战神">
-                    </div>
-                    <div class="form-group">
-                        <label>⚡ 等级</label>
-                        <select id="levelSelect" class="form-control">
-                            <option value="43">43级</option>
-                            <option value="44">44级</option>
-                            <option value="45">45级</option>
-                            <option value="46">46级</option>
-                            <option value="47">47级</option>
-                            <option value="48">48级</option>
-                            <option value="49">49级</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>🛡️ 部位</label>
-                        <select id="partSelect" class="form-control">
-                            <option value="wq">武器 (wq)</option>
-                            <option value="jia">衣服 (jia)</option>
-                            <option value="zhuo">镯 (zhuo)</option>
-                            <option value="zhi">指 (zhi)</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn-add" id="addMissingBtn">➕ 添加缺失装备</button>
-            </div>
-
-            <!-- 集中JSON数据 - 现在放在中间 -->
-            <div class="json-editor-section">
-                <h3>📦 集中JSON数据</h3>
-                <textarea id="globalJsonInput" class="json-textarea" rows="6">[
-  { "server": "131区·战神", "missing": ["43_zhuo", "45_jia", "46_wq", "49_jia"] },
-  { "server": "S2·虎啸", "missing": ["43_wq", "43_jia", "44_zhuo", "45_zhi", "47_wq", "48_jia", "49_zhuo"] },
-  { "server": "S3·凤凰", "missing": ["45_wq", "45_jia", "46_zhuo", "46_zhi", "48_zhuo", "49_zhi", "43_zhuo"] }
-]</textarea>
-                <div class="json-buttons">
-                    <button class="btn-json" id="applyJsonBtn">📥 应用JSON数据</button>
-                    <button class="btn-json btn-json-warning" id="resetJsonBtn">↩️ 重置默认</button>
-                </div>
-                <p style="color: #aac9b2; margin-top: 10px; font-size:0.9rem;">格式: [{ "server":"区名", "missing":["43_wq","45_jia"...] }]</p>
-            </div>
-
-            <!-- 装备图库 - 放在最下面 -->
-            <h2 style="margin-top: 0;">📋 装备图库</h2>
+            <h2>📋 装备图库</h2>
             <div class="preview-grid" id="previewGrid"></div>
         </div>
 
-        <!-- ========= 右侧面板：紧凑显示缺失，与左侧等高 ========= -->
+        <!-- 右侧面板：区服缺失装备 -->
         <div class="right-panel">
             <h2>📦 各区服缺失装备</h2>
-            <div id="serverCardContainer" class="server-cards">
-                <!-- 动态渲染 -->
-            </div>
+            <div class="server-cards" id="serverCardsContainer"></div>
         </div>
     </div>
+
+    <!-- 数据编辑区域 -->
+    <div class="data-editor">
+        <h3>📝 编辑区服缺失数据</h3>
+        <textarea id="dataInput" rows="8" placeholder="每行一个区服，格式：区服名称+装备1、装备2、装备3">131区·战神+43镯、45衣服、46武器、49衣服
+S2·虎啸+43武器、43衣服、44镯、45指、47武器、48衣服、49镯
+S3·凤凰+45武器、45衣服、46镯、46指、48镯、49指、43镯</textarea>
+        <div class="btn-group">
+            <button class="btn" id="updateBtn">🔄 更新显示</button>
+            <button class="btn btn-warning" id="resetBtn">↩️ 重置示例</button>
+            <button class="btn" id="clearBtn">🗑️ 清空所有</button>
+        </div>
+        
+        <div class="format-guide">
+            <p><strong>格式说明：</strong></p>
+            <p>• 每行格式：<code>区服名称+装备1、装备2、装备3</code></p>
+            <p>• 多个装备用中文逗号、顿号或空格分隔</p>
+            <p>• 每个装备格式：<code>等级+部位</code>（如：43镯、45衣服、46武器、49衣服）</p>
+            <p>• 部位可用：武/武器、衣/衣服、镯、指</p>
+        </div>
+    </div>
+
     <div class="footer-note">
-        ⚡ 右侧每个等级块：等级在上，装备在下，所有等级块自动换行。
+        ⚡ 在上方编辑框中修改数据，点击"更新显示"即可看到变化
     </div>
 </div>
-
-<!-- Footer -->
-<div class="footer-wrapper">
-    <footer id="footer-container">加载中...</footer>
-</div>
-<script src="/load-footer.js"></script>
-<!-- footer -->
 
 <script>
 (function() {
-    // ---------- 装备图片映射 (全部png) ----------
+    // 装备图片映射
     const EQUIP_IMG_MAP = {
         "43": { "wq": "43_wq.png", "jia": "43_jia.png", "zhuo": "43_zhuo.png", "zhi": "43_zhi.png" },
         "44": { "wq": "44_wq.png", "jia": "44_jia.png", "zhuo": "44_zhuo.png", "zhi": "44_zhi.png" },
@@ -541,16 +474,8 @@
         "49": { "wq": "49_wq.png", "jia": "49_jia.png", "zhuo": "49_zhuo.png", "zhi": "49_zhi.png" }
     };
 
-    // 默认数据
-    const DEFAULT_SERVER_DATA = [
-        {server: "131区",missing: ["43_zhuo","46_wq","49_jia","45_jia"]}
-    ];
-
-    // 当前活跃数据
-    let serverData = JSON.parse(JSON.stringify(DEFAULT_SERVER_DATA));
-
-    // 等级和部位常量
-    const LEVELS = [43,44,45,46,47,48,49];
+    // 等级和部位
+    const LEVELS = [43, 44, 45, 46, 47, 48, 49];
     const TYPES = [
         { key: 'wq', label: '武' },
         { key: 'jia', label: '衣' },
@@ -558,233 +483,220 @@
         { key: 'zhi', label: '指' }
     ];
 
-    // ---------- 渲染左侧预览图 ----------
+    // 默认示例数据
+    const DEFAULT_DATA = `131区·战神+43镯、45衣服、46武器、49衣服`;
+
+    // ---------- 解析文本数据 ----------
+    function parseData(text) {
+        const lines = text.split('\n');
+        const serverData = [];
+
+        lines.forEach(line => {
+            line = line.trim();
+            if (!line) return;
+
+            // 解析格式：区服+装备
+            if (line.includes('+')) {
+                const [serverName, itemsStr] = line.split('+').map(s => s.trim());
+                if (!serverName || !itemsStr) return;
+
+                // 解析装备项
+                const items = itemsStr.split(/[、，\s]+/).filter(item => item.trim());
+                const missing = [];
+
+                items.forEach(item => {
+                    // 匹配数字+中文部位
+                    const match = item.match(/(\d+)([镯指衣武器武])/);
+                    if (match) {
+                        const level = match[1];
+                        const partChar = match[2];
+                        
+                        // 转换部位
+                        const partMap = {
+                            '武': 'wq', '武器': 'wq',
+                            '衣': 'jia', '衣服': 'jia',
+                            '镯': 'zhuo',
+                            '指': 'zhi'
+                        };
+                        
+                        if (partMap[partChar]) {
+                            missing.push(level + '_' + partMap[partChar]);
+                        }
+                    }
+                });
+
+                if (missing.length > 0) {
+                    serverData.push({
+                        server: serverName,
+                        missing: missing
+                    });
+                }
+            }
+        });
+
+        return serverData;
+    }
+
+    // ---------- 渲染左侧装备图库 ----------
     function renderPreviewGrid() {
         const grid = document.getElementById('previewGrid');
         if (!grid) return;
+        
         grid.innerHTML = '';
         
         LEVELS.forEach(level => {
             const levelStr = level.toString();
-            const levelData = EQUIP_IMG_MAP[levelStr];
-            if (!levelData) return;
-
+            const levelData = EQUIP_IMG_MAP[levelStr] || {};
+            
             const row = document.createElement('div');
             row.className = 'preview-row';
-
+            
+            // 等级徽章
             const badge = document.createElement('div');
             badge.className = 'preview-level-badge';
             badge.textContent = level;
             row.appendChild(badge);
-
+            
+            // 图标行
             const iconsRow = document.createElement('div');
             iconsRow.className = 'preview-icons-row';
-
+            
             TYPES.forEach(type => {
                 const imgFile = levelData[type.key] || '';
                 const item = document.createElement('div');
                 item.className = 'preview-icon';
-
+                
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'mini-img';
-                if (imgFile) imgDiv.style.backgroundImage = `url('${imgFile}')`;
-
+                if (imgFile) {
+                    imgDiv.style.backgroundImage = `url('${imgFile}')`;
+                } else {
+                    imgDiv.style.backgroundColor = '#2d4f3e';
+                }
+                
                 const label = document.createElement('div');
                 label.className = 'mini-label';
                 label.textContent = type.label;
-
+                
                 item.appendChild(imgDiv);
                 item.appendChild(label);
                 iconsRow.appendChild(item);
             });
-
+            
             row.appendChild(iconsRow);
             grid.appendChild(row);
         });
     }
 
-    // ---------- 渲染右侧卡片：等级在上，装备在下，所有等级块一行内换行 ----------
-    function renderRightCards() {
-        const container = document.getElementById('serverCardContainer');
+    // ---------- 渲染右侧卡片 ----------
+    function renderServerCards(serverData) {
+        const container = document.getElementById('serverCardsContainer');
         if (!container) return;
-        container.innerHTML = '';
-
-        if (!serverData.length) {
-            container.innerHTML = '<div class="empty-note">✨ 暂无缺失数据</div>';
+        
+        if (!serverData || serverData.length === 0) {
+            container.innerHTML = '<div class="empty-note">✨ 暂无缺失数据，请在下方添加</div>';
             return;
         }
-
-        serverData.forEach((section, sIndex) => {
-            const serverName = section.server || '未命名';
+        
+        let html = '';
+        
+        serverData.forEach(section => {
+            const serverName = section.server;
             const missingList = section.missing || [];
             if (missingList.length === 0) return;
-
-            const card = document.createElement('div');
-            card.className = 'server-card';
-
-            const header = document.createElement('div');
-            header.className = 'server-header';
-            header.innerHTML = `
-                <span class="server-name">${serverName}</span>
-                <span class="missing-badge">缺失 ${missingList.length}</span>
-            `;
-            card.appendChild(header);
-
+            
             // 按等级分组
             const missingByLevel = {};
             missingList.forEach(key => {
                 const [level, part] = key.split('_');
-                if (!missingByLevel[level]) missingByLevel[level] = [];
+                if (!missingByLevel[level]) {
+                    missingByLevel[level] = [];
+                }
                 missingByLevel[level].push(part);
             });
-
-            // 等级块容器 - flex-wrap实现自动换行
-            const levelsContainer = document.createElement('div');
-            levelsContainer.className = 'missing-levels-container';
-
-            const sortedLevels = Object.keys(missingByLevel).sort((a,b) => a - b);
             
+            // 排序等级
+            const sortedLevels = Object.keys(missingByLevel).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            let levelsHtml = '';
             sortedLevels.forEach(level => {
-                const parts = missingByLevel[level];
+                const parts = missingByLevel[level].sort();
                 
-                // 单个等级块
-                const levelBlock = document.createElement('div');
-                levelBlock.className = 'missing-level-block';
-
-                // 等级标题
-                const levelTitle = document.createElement('div');
-                levelTitle.className = 'level-title-compact';
-                levelTitle.textContent = level + '级';
-                levelBlock.appendChild(levelTitle);
-
-                // 装备容器
-                const equipCompact = document.createElement('div');
-                equipCompact.className = 'missing-equip-compact';
-
+                let partsHtml = '';
                 parts.forEach(part => {
-                    const equipKey = `${level}_${part}`;
-                    const imgFile = EQUIP_IMG_MAP[level]?.[part] || '';
-
-                    const equipItem = document.createElement('div');
-                    equipItem.className = 'missing-equip-item';
-                    equipItem.dataset.serverIndex = sIndex;
-                    equipItem.dataset.equipKey = equipKey;
-
-                    const imgDiv = document.createElement('div');
-                    imgDiv.className = 'equip-img';
-                    if (imgFile) imgDiv.style.backgroundImage = `url('${imgFile}')`;
-
-                    const labelSpan = document.createElement('div');
-                    labelSpan.className = 'equip-label';
+                    const imgFile = EQUIP_IMG_MAP[level] ? EQUIP_IMG_MAP[level][part] : '';
                     const typeObj = TYPES.find(t => t.key === part);
-                    labelSpan.textContent = typeObj ? typeObj.label : part;
-
-                    equipItem.appendChild(imgDiv);
-                    equipItem.appendChild(labelSpan);
-                    equipItem.title = `${level}级 ${labelSpan.textContent} (缺失) 点击移除`;
-
-                    equipItem.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        removeMissingItem(sIndex, equipKey);
-                    });
-
-                    equipCompact.appendChild(equipItem);
+                    const typeLabel = typeObj ? typeObj.label : part;
+                    
+                    partsHtml += `
+                        <div class="missing-equip-item">
+                            <div class="equip-img" style="background-image: url('${imgFile}');"></div>
+                            <div class="equip-label">${typeLabel}</div>
+                        </div>
+                    `;
                 });
-
-                levelBlock.appendChild(equipCompact);
-                levelsContainer.appendChild(levelBlock);
+                
+                levelsHtml += `
+                    <div class="missing-level-block">
+                        <div class="level-title-compact">${level}级</div>
+                        <div class="missing-equip-compact">
+                            ${partsHtml}
+                        </div>
+                    </div>
+                `;
             });
-
-            card.appendChild(levelsContainer);
-            container.appendChild(card);
-        });
-    }
-
-    // ---------- 移除缺失 ----------
-    function removeMissingItem(serverIdx, equipKey) {
-        if (!serverData[serverIdx]) return;
-        let missingArr = serverData[serverIdx].missing;
-        const index = missingArr.indexOf(equipKey);
-        if (index !== -1) {
-            missingArr.splice(index, 1);
-            renderRightCards();
-            document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
-        }
-    }
-
-    // ---------- 添加缺失 ----------
-    function addMissing() {
-        const serverName = document.getElementById('serverNameInput').value.trim();
-        if (!serverName) { alert('请输入区服名称'); return; }
-        const level = document.getElementById('levelSelect').value;
-        const part = document.getElementById('partSelect').value;
-        const equipKey = `${level}_${part}`;
-
-        let serverIndex = serverData.findIndex(s => s.server === serverName);
-        if (serverIndex === -1) {
-            serverData.push({ server: serverName, missing: [equipKey] });
-        } else {
-            if (serverData[serverIndex].missing.includes(equipKey)) {
-                alert('该装备已在此区服缺失列表中');
-                return;
-            }
-            serverData[serverIndex].missing.push(equipKey);
-        }
-
-        renderRightCards();
-        document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
-    }
-
-    // ---------- 应用JSON数据 ----------
-    function applyJson() {
-        const raw = document.getElementById('globalJsonInput').value.trim();
-        if (!raw) { alert('JSON不能为空'); return; }
-        try {
-            const parsed = JSON.parse(raw);
-            if (!Array.isArray(parsed)) {
-                alert('JSON必须是数组格式');
-                return;
-            }
-            parsed.forEach((item, idx) => {
-                if (!item.server) item.server = `区服${idx+1}`;
-                if (!Array.isArray(item.missing)) item.missing = [];
-            });
-            serverData = parsed;
-            renderRightCards();
-            document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
-        } catch (e) {
-            alert('JSON解析失败: ' + e.message);
-        }
-    }
-
-    function resetJson() {
-        serverData = JSON.parse(JSON.stringify(DEFAULT_SERVER_DATA));
-        renderRightCards();
-        document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
-    }
-
-    // 绑定事件
-    document.addEventListener('DOMContentLoaded', function() {
-        renderPreviewGrid();
-        renderRightCards();
-        document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
-
-        document.getElementById('addMissingBtn').addEventListener('click', addMissing);
-        document.getElementById('applyJsonBtn').addEventListener('click', applyJson);
-        document.getElementById('resetJsonBtn').addEventListener('click', resetJson);
-        document.getElementById('serverNameInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addMissing();
+            
+            html += `
+                <div class="server-card">
+                    <div class="server-header">
+                        <span class="server-name">${escapeHtml(serverName)}</span>
+                        <span class="missing-badge">缺失 ${missingList.length}</span>
+                    </div>
+                    <div class="missing-levels-container">
+                        ${levelsHtml}
+                    </div>
+                </div>
+            `;
         });
         
-        // 页脚备用
-        const footerEl = document.getElementById('footer-container');
-        if (footerEl && footerEl.innerHTML === '加载中...') {
-            setTimeout(() => {
-                if (footerEl.innerHTML === '加载中...') {
-                    footerEl.innerHTML = '© 钻石回收管理系统 · 外部页脚加载失败，使用备用内容';
-                }
-            }, 3000);
-        }
+        container.innerHTML = html || '<div class="empty-note">✨ 暂无缺失数据，请在下方添加</div>';
+    }
+
+    // HTML转义
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ---------- 更新数据 ----------
+    function updateData() {
+        const input = document.getElementById('dataInput').value;
+        const serverData = parseData(input);
+        renderServerCards(serverData);
+    }
+
+    // ---------- 重置为默认数据 ----------
+    function resetData() {
+        document.getElementById('dataInput').value = DEFAULT_DATA;
+        updateData();
+    }
+
+    // ---------- 清空所有数据 ----------
+    function clearData() {
+        document.getElementById('dataInput').value = '';
+        renderServerCards([]);
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        renderPreviewGrid();
+        document.getElementById('dataInput').value = DEFAULT_DATA;
+        updateData();
+        
+        document.getElementById('updateBtn').addEventListener('click', updateData);
+        document.getElementById('resetBtn').addEventListener('click', resetData);
+        document.getElementById('clearBtn').addEventListener('click', clearData);
     });
 
 })();
