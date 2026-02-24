@@ -438,9 +438,7 @@
     <!-- 数据编辑区域 -->
     <div class="data-editor">
         <h3>📝 编辑区服缺失数据</h3>
-        <textarea id="dataInput" rows="8" placeholder="每行一个区服，格式：区服名称+装备1、装备2、装备3">131区·战神+43镯、45衣服、46武器、49衣服
-S2·虎啸+43武器、43衣服、44镯、45指、47武器、48衣服、49镯
-S3·凤凰+45武器、45衣服、46镯、46指、48镯、49指、43镯</textarea>
+        <textarea id="dataInput" rows="8" placeholder="每行一个区服，格式：区服名称+装备1、装备2、装备3">131区·战神+43镯、45衣服、46武器、49衣服</textarea>
         <div class="btn-group">
             <button class="btn" id="updateBtn">🔄 更新显示</button>
             <button class="btn btn-warning" id="resetBtn">↩️ 重置示例</button>
@@ -484,7 +482,8 @@ S3·凤凰+45武器、45衣服、46镯、46指、48镯、49指、43镯</textarea
     ];
 
     // 默认示例数据
-    const DEFAULT_DATA = `131区·战神+43镯、45衣服、46武器、49衣服`;
+    const DEFAULT_DATA = `131区+46武器、49衣服
+132区+43指、45衣服、46武器、49镯`;
 
     // ---------- 解析文本数据 ----------
     function parseData(text) {
