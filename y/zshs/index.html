@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>钻石回收 · 双JSON装备缺失表</title>
+    <title>💎钻石回收💎</title>
     <style>
         * {
             box-sizing: border-box;
@@ -243,13 +243,13 @@
         <div class="json-card">
             <h3>📦 装备库JSON (图片映射)</h3>
             <textarea id="equipJsonInput" rows="6">{
-  "43": { "wq": "43_wq.png", "jia": "43_jia.php", "zhuo": "43_zhuo.php", "zhi": "43_zhi.php" },
-  "44": { "wq": "44_wq.png", "jia": "44_jia.php", "zhuo": "44_zhuo.php", "zhi": "44_zhi.php" },
-  "45": { "wq": "45_wq.png", "jia": "45_jia.php", "zhuo": "45_zhuo.php", "zhi": "45_zhi.php" },
-  "46": { "wq": "46_wq.png", "jia": "46_jia.php", "zhuo": "46_zhuo.php", "zhi": "46_zhi.php" },
-  "47": { "wq": "47_wq.png", "jia": "47_jia.php", "zhuo": "47_zhuo.php", "zhi": "47_zhi.php" },
-  "48": { "wq": "48_wq.png", "jia": "48_jia.php", "zhuo": "48_zhuo.php", "zhi": "48_zhi.php" },
-  "49": { "wq": "49_wq.png", "jia": "49_jia.php", "zhuo": "49_zhuo.php", "zhi": "49_zhi.php" }
+  "43": { "wq": "43_wq.png", "jia": "43_jia.png", "zhuo": "43_zhuo.png", "zhi": "43_zhi.png" },
+  "44": { "wq": "44_wq.png", "jia": "44_jia.png", "zhuo": "44_zhuo.png", "zhi": "44_zhi.png" },
+  "45": { "wq": "45_wq.png", "jia": "45_jia.png", "zhuo": "45_zhuo.png", "zhi": "45_zhi.png" },
+  "46": { "wq": "46_wq.png", "jia": "46_jia.png", "zhuo": "46_zhuo.png", "zhi": "46_zhi.png" },
+  "47": { "wq": "47_wq.png", "jia": "47_jia.png", "zhuo": "47_zhuo.png", "zhi": "47_zhi.png" },
+  "48": { "wq": "48_wq.png", "jia": "48_jia.png", "zhuo": "48_zhuo.png", "zhi": "48_zhi.png" },
+  "49": { "wq": "49_wq.png", "jia": "49_jia.png", "zhuo": "49_zhuo.png", "zhi": "49_zhi.png" }
 }</textarea>
             <div class="btn-group">
                 <button class="btn" id="applyEquipJson">📥 应用装备库</button>
@@ -294,13 +294,13 @@
 (function() {
     // ---------- 默认装备库JSON (和textarea初始一致) ----------
     const DEFAULT_EQUIP_JSON = {
-        "43": { "wq": "43_wq.png", "jia": "43_jia.php", "zhuo": "43_zhuo.php", "zhi": "43_zhi.php" },
-        "44": { "wq": "44_wq.png", "jia": "44_jia.php", "zhuo": "44_zhuo.php", "zhi": "44_zhi.php" },
-        "45": { "wq": "45_wq.png", "jia": "45_jia.php", "zhuo": "45_zhuo.php", "zhi": "45_zhi.php" },
-        "46": { "wq": "46_wq.png", "jia": "46_jia.php", "zhuo": "46_zhuo.php", "zhi": "46_zhi.php" },
-        "47": { "wq": "47_wq.png", "jia": "47_jia.php", "zhuo": "47_zhuo.php", "zhi": "47_zhi.php" },
-        "48": { "wq": "48_wq.png", "jia": "48_jia.php", "zhuo": "48_zhuo.php", "zhi": "48_zhi.php" },
-        "49": { "wq": "49_wq.png", "jia": "49_jia.php", "zhuo": "49_zhuo.php", "zhi": "49_zhi.php" }
+        "43": { "wq": "43_wq.png", "jia": "43_jia.png", "zhuo": "43_zhuo.png", "zhi": "43_zhi.png" },
+        "44": { "wq": "44_wq.png", "jia": "44_jia.png", "zhuo": "44_zhuo.png", "zhi": "44_zhi.png" },
+        "45": { "wq": "45_wq.png", "jia": "45_jia.png", "zhuo": "45_zhuo.png", "zhi": "45_zhi.png" },
+        "46": { "wq": "46_wq.png", "jia": "46_jia.png", "zhuo": "46_zhuo.png", "zhi": "46_zhi.png" },
+        "47": { "wq": "47_wq.png", "jia": "47_jia.png", "zhuo": "47_zhuo.png", "zhi": "47_zhi.png" },
+        "48": { "wq": "48_wq.png", "jia": "48_jia.png", "zhuo": "48_zhuo.png", "zhi": "48_zhi.png" },
+        "49": { "wq": "49_wq.png", "jia": "49_jia.png", "zhuo": "49_zhuo.png", "zhi": "49_zhi.png" }
     };
 
     // 默认区服缺失JSON
