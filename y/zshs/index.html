@@ -61,7 +61,7 @@
             padding: 28px 22px;
             box-shadow: 0 15px 20px -10px #0d1f1a;
         }
-        /* 右侧面板 - 只显示缺失 */
+        /* 右侧面板 */
         .right-panel {
             flex: 2;
             min-width: 500px;
@@ -80,8 +80,8 @@
         @media screen and (max-width: 600px) {
             body { padding: 15px 10px; }
             .left-panel, .right-panel { padding: 20px 15px; border-radius: 40px; }
-            .preview-row { gap: 8px; }
-            .preview-level-badge { min-width: 45px; font-size: 1rem; }
+            .preview-row { padding: 6px 10px; }
+            .preview-level-badge { min-width: 45px; font-size: 1.1rem; }
             .preview-icon { width: 55px; }
             .preview-icon .mini-img { width: 40px; height: 40px; }
             .form-row { flex-direction: column; gap: 10px; }
@@ -97,11 +97,11 @@
             word-break: break-word;
         }
         
-        /* 装备图库：等级纵向，武器衣服镯指横向 */
+        /* 左侧装备图库 - 一行一个等级 */
         .preview-grid {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin-bottom: 35px;
             background: #244137;
             border-radius: 60px;
@@ -114,8 +114,9 @@
             gap: 15px;
             background: #1f3a30;
             border-radius: 50px;
-            padding: 8px 15px;
+            padding: 8px 20px;
             border: 1px solid #5e8e72;
+            flex-wrap: wrap;
         }
         .preview-level-badge {
             min-width: 60px;
@@ -127,12 +128,13 @@
             font-size: 1.3rem;
             text-align: center;
             border: 1px solid #9ebe8e;
+            box-shadow: inset 0 2px 5px #2b4d38;
         }
         .preview-icons-row {
             display: flex;
             flex: 1;
-            gap: 15px;
-            justify-content: space-around;
+            gap: 20px;
+            justify-content: flex-start;
             flex-wrap: wrap;
         }
         .preview-icon {
@@ -238,7 +240,7 @@
             box-shadow: 0 3px 0 #35633e;
         }
         
-        /* JSON 编辑区 - 新增 */
+        /* JSON 编辑区 */
         .json-editor-section {
             margin-top: 25px;
             background: #1b3b2e;
@@ -291,7 +293,7 @@
             border-color: #ebbc7e;
         }
 
-        /* 右侧 - 只显示缺失的卡片样式 */
+        /* ===== 重新设计的右侧卡片：等级在上，装备在下，所有等级块一行内换行 ===== */
         .server-cards {
             display: flex;
             flex-direction: column;
@@ -303,7 +305,7 @@
         .server-card {
             background: #25473b;
             border-radius: 48px;
-            border: 2px solid #b87e3e;  /* 高亮边框表示缺失区服 */
+            border: 2px solid #b87e3e;
             padding: 20px 22px;
             box-shadow: 0 8px 0 #1b352b;
         }
@@ -332,32 +334,47 @@
             border: 1px solid #ffad6b;
             white-space: nowrap;
         }
-        /* 只显示缺失的装备行 */
-        .missing-only-section {
-            margin-bottom: 12px;
+        
+        /* 等级块容器 - 使用flex-wrap实现自动换行 */
+        .missing-levels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
         }
-        .missing-level-title {
-            background: #5f4a2b;
-            display: inline-block;
-            padding: 4px 20px;
+        
+        /* 单个等级块 - 垂直结构：等级在上，装备在下 */
+        .missing-level-block {
+            background: #2d4f3e;
             border-radius: 30px;
+            padding: 12px 12px 8px 12px;
+            border: 1px solid #7aa982;
+            min-width: 110px;
+            flex: 0 1 auto;
+        }
+        .missing-level-block .level-title-compact {
+            text-align: center;
+            background: #5f4a2b;
             color: #ffeaa2;
             font-weight: 700;
+            font-size: 1.1rem;
+            padding: 5px 0;
+            border-radius: 25px;
             margin-bottom: 10px;
             border: 1px solid #e2b86b;
         }
-        .missing-equip-group {
+        .missing-equip-compact {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            padding-left: 10px;
+            gap: 8px;
+            justify-content: center;
         }
         .missing-equip-item {
-            width: 85px;
+            width: 70px;
             background: #654728;
-            border-radius: 20px;
+            border-radius: 18px;
             border: 2px solid #d7943a;
-            padding: 6px 0 4px 0;
+            padding: 4px 0 2px 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -365,13 +382,13 @@
             box-shadow: 0 0 0 2px #efc158;
         }
         .missing-equip-item .equip-img {
-            width: 56px;
-            height: 56px;
+            width: 46px;
+            height: 46px;
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #4f3f28;
-            border-radius: 16px;
+            border-radius: 14px;
             border: 1px solid #efb060;
         }
         .missing-equip-item .equip-label {
@@ -379,11 +396,12 @@
             text-align: center;
             background: #a8682b;
             color: #211500;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             padding: 3px 0;
-            border-radius: 0 0 16px 16px;
+            border-radius: 0 0 14px 14px;
             font-weight: 600;
         }
+        
         .empty-note {
             color: #afcaad;
             text-align: center;
@@ -415,17 +433,17 @@
 </head>
 <body>
 <div class="container">
-    <h1>💎 钻石回收 · 仅显示缺失</h1>
+    <h1>💎 钻石回收 · 右侧紧凑换行版</h1>
     <div class="sub">
         <span>武器·衣服·镯·指 43~49级 (全PNG)</span>
-        <span>左侧添加 · 右侧只显示缺失</span>
+        <span>左侧添加 · 右侧等级在上、装备在下</span>
     </div>
 
     <div class="double-col">
         <!-- ========= 左侧面板 ========= -->
         <div class="left-panel">
             <h2>📋 装备图库 & 登记</h2>
-            <!-- 等级纵向预览 -->
+            <!-- 一行一个等级 -->
             <div class="preview-grid" id="previewGrid"></div>
 
             <!-- 录入表单 -->
@@ -460,9 +478,9 @@
                 <button class="btn-add" id="addMissingBtn">➕ 添加缺失装备</button>
             </div>
 
-            <!-- ===== 新增：集中JSON编辑区 ===== -->
+            <!-- 集中JSON编辑区 -->
             <div class="json-editor-section">
-                <h3>📦 集中JSON数据 (直接修改替换)</h3>
+                <h3>📦 集中JSON数据</h3>
                 <textarea id="globalJsonInput" class="json-textarea" rows="8">[
   { "server": "131区·战神", "missing": ["43_zhuo", "45_jia", "46_wq", "49_jia"] },
   { "server": "S2·虎啸", "missing": ["43_wq", "43_jia", "44_zhuo", "45_zhi", "47_wq", "48_jia", "49_zhuo"] },
@@ -476,16 +494,16 @@
             </div>
         </div>
 
-        <!-- ========= 右侧面板：只显示缺失装备 ========= -->
+        <!-- ========= 右侧面板：重新设计 - 等级在上，装备在下，一行内换行 ========= -->
         <div class="right-panel">
             <h2>📦 各区服缺失装备</h2>
             <div id="serverCardContainer" class="server-cards">
-                <!-- 动态渲染 - 只显示缺失 -->
+                <!-- 动态渲染 -->
             </div>
         </div>
     </div>
     <div class="footer-note">
-        ⚡ 右侧只显示缺失的装备，点击红色装备可移除。
+        ⚡ 右侧每个等级块：等级在上，装备在下，所有等级块自动换行。
     </div>
 </div>
 
@@ -507,7 +525,7 @@
         "49": { "wq": "49_wq.png", "jia": "49_jia.png", "zhuo": "49_zhuo.png", "zhi": "49_zhi.png" }
     };
 
-    // 默认数据 (与textarea默认一致)
+    // 默认数据
     const DEFAULT_SERVER_DATA = [
         { server: "131区·战神", missing: ["43_zhuo", "45_jia", "46_wq", "49_jia"] },
         { server: "S2·虎啸", missing: ["43_wq", "43_jia", "44_zhuo", "45_zhi", "47_wq", "48_jia", "49_zhuo"] },
@@ -531,38 +549,47 @@
         const grid = document.getElementById('previewGrid');
         if (!grid) return;
         grid.innerHTML = '';
+        
         LEVELS.forEach(level => {
             const levelStr = level.toString();
             const levelData = EQUIP_IMG_MAP[levelStr];
             if (!levelData) return;
+
             const row = document.createElement('div');
             row.className = 'preview-row';
+
             const badge = document.createElement('div');
             badge.className = 'preview-level-badge';
             badge.textContent = level;
             row.appendChild(badge);
+
             const iconsRow = document.createElement('div');
             iconsRow.className = 'preview-icons-row';
+
             TYPES.forEach(type => {
                 const imgFile = levelData[type.key] || '';
                 const item = document.createElement('div');
                 item.className = 'preview-icon';
+
                 const imgDiv = document.createElement('div');
                 imgDiv.className = 'mini-img';
                 if (imgFile) imgDiv.style.backgroundImage = `url('${imgFile}')`;
+
                 const label = document.createElement('div');
                 label.className = 'mini-label';
                 label.textContent = type.label;
+
                 item.appendChild(imgDiv);
                 item.appendChild(label);
                 iconsRow.appendChild(item);
             });
+
             row.appendChild(iconsRow);
             grid.appendChild(row);
         });
     }
 
-    // ---------- 渲染右侧卡片 (只显示缺失装备) ----------
+    // ---------- 渲染右侧卡片：等级在上，装备在下，所有等级块一行内换行 ----------
     function renderRightCards() {
         const container = document.getElementById('serverCardContainer');
         if (!container) return;
@@ -576,12 +603,11 @@
         serverData.forEach((section, sIndex) => {
             const serverName = section.server || '未命名';
             const missingList = section.missing || [];
-            if (missingList.length === 0) return; // 无缺失则不显示该区服卡片
+            if (missingList.length === 0) return;
 
             const card = document.createElement('div');
             card.className = 'server-card';
 
-            // header
             const header = document.createElement('div');
             header.className = 'server-header';
             header.innerHTML = `
@@ -590,7 +616,7 @@
             `;
             card.appendChild(header);
 
-            // 按等级分组显示缺失装备
+            // 按等级分组
             const missingByLevel = {};
             missingList.forEach(key => {
                 const [level, part] = key.split('_');
@@ -598,22 +624,29 @@
                 missingByLevel[level].push(part);
             });
 
-            // 遍历等级（排序）
+            // 等级块容器 - flex-wrap实现自动换行
+            const levelsContainer = document.createElement('div');
+            levelsContainer.className = 'missing-levels-container';
+
             const sortedLevels = Object.keys(missingByLevel).sort((a,b) => a - b);
+            
             sortedLevels.forEach(level => {
                 const parts = missingByLevel[level];
-                const levelDiv = document.createElement('div');
-                levelDiv.className = 'missing-only-section';
+                
+                // 单个等级块
+                const levelBlock = document.createElement('div');
+                levelBlock.className = 'missing-level-block';
 
+                // 等级标题
                 const levelTitle = document.createElement('div');
-                levelTitle.className = 'missing-level-title';
+                levelTitle.className = 'level-title-compact';
                 levelTitle.textContent = level + '级';
-                levelDiv.appendChild(levelTitle);
+                levelBlock.appendChild(levelTitle);
 
-                const equipGroup = document.createElement('div');
-                equipGroup.className = 'missing-equip-group';
+                // 装备容器
+                const equipCompact = document.createElement('div');
+                equipCompact.className = 'missing-equip-compact';
 
-                // 对每个缺失部位生成装备块
                 parts.forEach(part => {
                     const equipKey = `${level}_${part}`;
                     const imgFile = EQUIP_IMG_MAP[level]?.[part] || '';
@@ -629,7 +662,6 @@
 
                     const labelSpan = document.createElement('div');
                     labelSpan.className = 'equip-label';
-                    // 部位中文
                     const typeObj = TYPES.find(t => t.key === part);
                     labelSpan.textContent = typeObj ? typeObj.label : part;
 
@@ -642,13 +674,14 @@
                         removeMissingItem(sIndex, equipKey);
                     });
 
-                    equipGroup.appendChild(equipItem);
+                    equipCompact.appendChild(equipItem);
                 });
 
-                levelDiv.appendChild(equipGroup);
-                card.appendChild(levelDiv);
+                levelBlock.appendChild(equipCompact);
+                levelsContainer.appendChild(levelBlock);
             });
 
+            card.appendChild(levelsContainer);
             container.appendChild(card);
         });
     }
@@ -660,9 +693,7 @@
         const index = missingArr.indexOf(equipKey);
         if (index !== -1) {
             missingArr.splice(index, 1);
-            // 如果该区服missing为空，可以选择保留或移除卡片，这里保留空区服但右侧不会显示（因为长度为0不渲染）
             renderRightCards();
-            // 同步更新textarea内容
             document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
         }
     }
@@ -697,10 +728,9 @@
         try {
             const parsed = JSON.parse(raw);
             if (!Array.isArray(parsed)) {
-                alert('JSON必须是数组格式 [{ "server": "...", "missing": [...] }]');
+                alert('JSON必须是数组格式');
                 return;
             }
-            // 简单清洗
             parsed.forEach((item, idx) => {
                 if (!item.server) item.server = `区服${idx+1}`;
                 if (!Array.isArray(item.missing)) item.missing = [];
@@ -719,10 +749,9 @@
         document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
     }
 
-    // 初始化footer
     function initFooter() {
         const footerEl = document.getElementById('footer-container');
-        if (footerEl) footerEl.innerHTML = '© 钻石回收 · 仅显示缺失版 · 所有装备图片均为PNG';
+        if (footerEl) footerEl.innerHTML = '© 钻石回收 · 右侧紧凑换行版 · 所有装备图片均为PNG';
     }
 
     // 绑定事件
