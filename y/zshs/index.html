@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>💎钻石回收💎</title>
     <style>
         * {
@@ -16,11 +16,13 @@
             padding: 25px 20px;
             min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
         }
         .container {
             max-width: 1600px;
             width: 100%;
+            flex: 1 0 auto;
         }
         h1 {
             color: #fad57e;
@@ -29,6 +31,7 @@
             font-weight: 700;
             text-align: center;
             margin-bottom: 8px;
+            line-height: 1.2;
         }
         .sub {
             color: #b0cfb1;
@@ -38,12 +41,15 @@
             display: flex;
             justify-content: center;
             gap: 20px;
+            flex-wrap: wrap;
+            padding: 0 10px;
         }
-        /* 双栏布局 */
+        /* 双栏布局 - 增强自适应 */
         .double-col {
             display: flex;
             gap: 28px;
-            align-items: flex-start;
+            align-items: stretch;  /* 改为stretch让两侧高度自适应 */
+            flex-wrap: wrap;       /* 小屏幕自动折行 */
         }
         /* 左侧面板：装备预览+录入 */
         .left-panel {
@@ -54,13 +60,48 @@
             border: 1px solid #5b8a74;
             padding: 28px 22px;
             box-shadow: 0 15px 20px -10px #0d1f1a;
+            transition: all 0.2s;
         }
-        .left-panel h2 {
+        /* 右侧面板：区服卡片 */
+        .right-panel {
+            flex: 2;
+            min-width: 500px;      /* 保证右侧也有最小宽度，防止过窄 */
+            background: #1a332c;
+            border-radius: 60px;
+            border: 1px solid #618b74;
+            padding: 28px 22px;
+            box-shadow: 0 15px 20px -10px #0d1f1a;
+        }
+        /* 小屏幕适配 */
+        @media screen and (max-width: 1100px) {
+            .double-col {
+                flex-direction: column;
+            }
+            .left-panel, .right-panel {
+                min-width: auto;
+                width: 100%;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            body { padding: 15px 10px; }
+            .left-panel, .right-panel { padding: 20px 15px; border-radius: 40px; }
+            .preview-grid { gap: 5px; padding: 15px 5px; }
+            .preview-icon { width: 55px; }
+            .preview-icon .mini-img { width: 40px; height: 40px; }
+            .form-row { flex-direction: column; gap: 10px; }
+            .btn-add { padding: 12px 20px; }
+        }
+
+        .left-panel h2, .right-panel h2 {
             color: #ffd98c;
             font-size: 2rem;
             margin-bottom: 20px;
             border-left: 8px solid #b98f4a;
             padding-left: 20px;
+            word-break: break-word;
         }
         /* 装备缩略图网格 (43-49) */
         .preview-grid {
@@ -230,22 +271,7 @@
             padding: 0 5px;
         }
 
-        /* 右侧面板：区服卡片 */
-        .right-panel {
-            flex: 2;
-            background: #1a332c;
-            border-radius: 60px;
-            border: 1px solid #618b74;
-            padding: 28px 22px;
-            box-shadow: 0 15px 20px -10px #0d1f1a;
-        }
-        .right-panel h2 {
-            color: #ffd88a;
-            font-size: 2rem;
-            margin-bottom: 20px;
-            border-left: 8px solid #b98f4a;
-            padding-left: 20px;
-        }
+        /* 右侧卡片容器 滚动 */
         .server-cards {
             display: flex;
             flex-direction: column;
@@ -268,11 +294,14 @@
             border-bottom: 2px solid #4e8067;
             padding-bottom: 12px;
             margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .server-name {
             font-size: 2rem;
             font-weight: 700;
             color: #fbdd9d;
+            word-break: break-word;
         }
         .missing-badge {
             background: #b9523a;
@@ -281,6 +310,7 @@
             padding: 4px 18px;
             font-weight: 600;
             border: 1px solid #ffad6b;
+            white-space: nowrap;
         }
         .level-row {
             margin-bottom: 16px;
@@ -310,11 +340,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: 0.1s;
         }
         .equip-item.missing {
             border-color: #d7943a;
             background: #654728;
             box-shadow: 0 0 0 2px #efc158;
+            cursor: pointer;
         }
         .equip-img {
             width: 56px;
@@ -350,13 +382,29 @@
             color: #689177;
             text-align: center;
         }
+        /* footer区域 */
+        .footer-wrapper {
+            width: 100%;
+            margin-top: 40px;
+            background: #1a2f28;
+            border-radius: 60px 60px 0 0;
+            padding: 30px 20px 20px;
+            border-top: 2px solid #5d8771;
+            color: #bdd0b0;
+            text-align: center;
+        }
+        #footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>💎 钻石回收 · 双栏快捷管理</h1>
+    <h1>💎 钻石回收 · 双栏自适应</h1>
     <div class="sub">
-        <span>武器·衣服·镯·指 43~49级</span>
+        <span>武器·衣服·镯·指 43~49级 (全PNG)</span>
         <span>左侧添加缺失 · 右侧实时展示</span>
     </div>
 
@@ -364,7 +412,7 @@
         <!-- ========= 左侧面板：图片预览 + 录入 ========= -->
         <div class="left-panel">
             <h2>📋 装备图库 & 登记</h2>
-            <!-- 等级图片预览 43-49 -->
+            <!-- 等级图片预览 43-49 (全部png) -->
             <div class="preview-grid" id="previewGrid"></div>
 
             <!-- 录入表单 -->
@@ -399,7 +447,7 @@
                 <button class="btn-add" id="addMissingBtn">➕ 添加缺失装备</button>
             </div>
 
-            <!-- 当前待添加预览 (方便查看已选) -->
+            <!-- 当前缺失预览 (方便查看已选) -->
             <div class="curr-list">
                 <h3>📌 当前已登记的缺失</h3>
                 <div id="currentMissingList" class="curr-items">
@@ -418,21 +466,27 @@
         </div>
     </div>
     <div class="footer-note">
-        ⚡ 左侧选择区服+等级+部位，点击添加；右侧点击红色装备可移除此条缺失。
+        ⚡ 所有装备图片均为PNG格式（包括衣服、镯、指）。左侧选择区服+等级+部位，点击添加；右侧点击红色装备可移除。
     </div>
 </div>
 
+<!-- Footer 区域（按您的要求） -->
+<div class="footer-wrapper">
+    <footer id="footer-container">加载中...</footer>
+</div>
+
+<!-- 所有JavaScript代码内联，无需外部文件 -->
 <script>
 (function() {
-    // ---------- 装备图片映射 (同默认) ----------
+    // ---------- 装备图片映射 (全部使用png) ----------
     const EQUIP_IMG_MAP = {
-        "43": { "wq": "43_wq.png", "jia": "43_jia.php", "zhuo": "43_zhuo.php", "zhi": "43_zhi.php" },
-        "44": { "wq": "44_wq.png", "jia": "44_jia.php", "zhuo": "44_zhuo.php", "zhi": "44_zhi.php" },
-        "45": { "wq": "45_wq.png", "jia": "45_jia.php", "zhuo": "45_zhuo.php", "zhi": "45_zhi.php" },
-        "46": { "wq": "46_wq.png", "jia": "46_jia.php", "zhuo": "46_zhuo.php", "zhi": "46_zhi.php" },
-        "47": { "wq": "47_wq.png", "jia": "47_jia.php", "zhuo": "47_zhuo.php", "zhi": "47_zhi.php" },
-        "48": { "wq": "48_wq.png", "jia": "48_jia.php", "zhuo": "48_zhuo.php", "zhi": "48_zhi.php" },
-        "49": { "wq": "49_wq.png", "jia": "49_jia.php", "zhuo": "49_zhuo.php", "zhi": "49_zhi.php" }
+        "43": { "wq": "43_wq.png", "jia": "43_jia.png", "zhuo": "43_zhuo.png", "zhi": "43_zhi.png" },
+        "44": { "wq": "44_wq.png", "jia": "44_jia.png", "zhuo": "44_zhuo.png", "zhi": "44_zhi.png" },
+        "45": { "wq": "45_wq.png", "jia": "45_jia.png", "zhuo": "45_zhuo.png", "zhi": "45_zhi.png" },
+        "46": { "wq": "46_wq.png", "jia": "46_jia.png", "zhuo": "46_zhuo.png", "zhi": "46_zhi.png" },
+        "47": { "wq": "47_wq.png", "jia": "47_jia.png", "zhuo": "47_zhuo.png", "zhi": "47_zhi.png" },
+        "48": { "wq": "48_wq.png", "jia": "48_jia.png", "zhuo": "48_zhuo.png", "zhi": "48_zhi.png" },
+        "49": { "wq": "49_wq.png", "jia": "49_jia.png", "zhuo": "49_zhuo.png", "zhi": "49_zhi.png" }
     };
 
     // 默认初始数据：包含131区缺失示例 (43镯,45衣,46武,49衣)
@@ -455,6 +509,7 @@
     // ---------- 渲染左侧预览图 (43-49所有部位) ----------
     function renderPreviewGrid() {
         const grid = document.getElementById('previewGrid');
+        if (!grid) return;
         grid.innerHTML = '';
         LEVELS.forEach(level => {
             const levelStr = level.toString();
@@ -494,6 +549,7 @@
     // ---------- 根据serverData渲染右侧所有区服卡片 ----------
     function renderRightCards() {
         const container = document.getElementById('serverCardContainer');
+        if (!container) return;
         container.innerHTML = '';
 
         if (!serverData.length) {
@@ -589,9 +645,10 @@
         }
     }
 
-    // ---------- 渲染左下角的“当前已登记的缺失”chips (方便查看所有区服所有缺失) ----------
+    // ---------- 渲染左下角的“当前已登记的缺失”chips ----------
     function renderCurrentMissingChips() {
         const container = document.getElementById('currentMissingList');
+        if (!container) return;
         container.innerHTML = '';
         let total = 0;
         serverData.forEach((section, sIdx) => {
@@ -650,17 +707,28 @@
         renderCurrentMissingChips();
     }
 
-    // ---------- 绑定添加按钮 ----------
-    document.getElementById('addMissingBtn').addEventListener('click', addMissing);
+    // ---------- 模拟footer加载 (原load-footer.js内容可放在这里) ----------
+    function initFooter() {
+        const footerEl = document.getElementById('footer-container');
+        if (footerEl) {
+            // 这里可以替换成您需要的页脚内容或异步请求
+            footerEl.innerHTML = '© 钻石回收管理系统 · 双栏自适应版 · 所有装备图片均为PNG';
+        }
+    }
 
-    // 初始化渲染
-    renderPreviewGrid();
-    renderRightCards();
-    renderCurrentMissingChips();
+    // ---------- 绑定事件&初始化 ----------
+    document.addEventListener('DOMContentLoaded', function() {
+        renderPreviewGrid();
+        renderRightCards();
+        renderCurrentMissingChips();
+        initFooter();
 
-    // 可选: 输入框支持回车添加
-    document.getElementById('serverNameInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addMissing();
+        // 绑定添加按钮
+        document.getElementById('addMissingBtn').addEventListener('click', addMissing);
+        // 输入框支持回车添加
+        document.getElementById('serverNameInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addMissing();
+        });
     });
 
 })();
