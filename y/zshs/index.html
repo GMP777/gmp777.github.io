@@ -48,8 +48,8 @@
         .double-col {
             display: flex;
             gap: 28px;
-            align-items: stretch;  /* 改为stretch让两侧高度自适应 */
-            flex-wrap: wrap;       /* 小屏幕自动折行 */
+            align-items: stretch;
+            flex-wrap: wrap;
         }
         /* 左侧面板：装备预览+录入 */
         .left-panel {
@@ -65,7 +65,7 @@
         /* 右侧面板：区服卡片 */
         .right-panel {
             flex: 2;
-            min-width: 500px;      /* 保证右侧也有最小宽度，防止过窄 */
+            min-width: 500px;
             background: #1a332c;
             border-radius: 60px;
             border: 1px solid #618b74;
@@ -88,7 +88,9 @@
         @media screen and (max-width: 600px) {
             body { padding: 15px 10px; }
             .left-panel, .right-panel { padding: 20px 15px; border-radius: 40px; }
-            .preview-grid { gap: 5px; padding: 15px 5px; }
+            .preview-grid { gap: 8px; padding: 15px; }
+            .preview-row { gap: 8px; }
+            .preview-level-badge { min-width: 45px; font-size: 1rem; }
             .preview-icon { width: 55px; }
             .preview-icon .mini-img { width: 40px; height: 40px; }
             .form-row { flex-direction: column; gap: 10px; }
@@ -103,37 +105,48 @@
             padding-left: 20px;
             word-break: break-word;
         }
-        /* 装备缩略图网格 (43-49) */
+        
+        /* ========= 重新设计的装备图库：等级纵向，武器衣服镯指横向 ========= */
         .preview-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             margin-bottom: 35px;
             background: #244137;
             border-radius: 60px;
-            padding: 25px 15px;
+            padding: 25px 20px;
             border: 1px solid #608a73;
         }
-        .preview-level {
-            text-align: center;
+        .preview-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #1f3a30;
+            border-radius: 50px;
+            padding: 8px 15px;
+            border: 1px solid #5e8e72;
         }
-        .preview-level .level-badge {
+        .preview-level-badge {
+            min-width: 60px;
             background: #3a604e;
             color: #fbeba7;
-            border-radius: 30px;
-            padding: 4px 0;
+            border-radius: 40px;
+            padding: 8px 0;
             font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 1.3rem;
+            text-align: center;
             border: 1px solid #9ebe8e;
+            box-shadow: inset 0 2px 5px #2b4d38;
         }
-        .preview-icons {
+        .preview-icons-row {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
+            flex: 1;
+            gap: 15px;
+            justify-content: space-around;
+            flex-wrap: wrap;
         }
         .preview-icon {
-            width: 70px;
+            width: 75px;
             background: #2d4f3e;
             border-radius: 20px;
             border: 2px solid #5d8d72;
@@ -141,10 +154,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: 0.1s;
         }
         .preview-icon .mini-img {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
@@ -153,12 +167,14 @@
             border: 1px solid #86b692;
         }
         .preview-icon .mini-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             background: #1e3d2e;
             color: #eddba5;
             width: 100%;
             text-align: center;
             border-radius: 0 0 16px 16px;
+            font-weight: 600;
+            padding: 3px 0;
         }
 
         /* 录入表单 */
@@ -402,17 +418,17 @@
 </head>
 <body>
 <div class="container">
-    <h1>💎 钻石回收 · 双栏自适应</h1>
+    <h1>💎 钻石回收 · 等级纵列版</h1>
     <div class="sub">
         <span>武器·衣服·镯·指 43~49级 (全PNG)</span>
         <span>左侧添加缺失 · 右侧实时展示</span>
     </div>
 
     <div class="double-col">
-        <!-- ========= 左侧面板：图片预览 + 录入 ========= -->
+        <!-- ========= 左侧面板：重新设计的装备图库 + 录入 ========= -->
         <div class="left-panel">
             <h2>📋 装备图库 & 登记</h2>
-            <!-- 等级图片预览 43-49 (全部png) -->
+            <!-- 等级纵向排列，每种等级右侧依次是武器、衣服、镯、指 -->
             <div class="preview-grid" id="previewGrid"></div>
 
             <!-- 录入表单 -->
@@ -470,12 +486,12 @@
     </div>
 </div>
 
-<!-- Footer 区域（按您的要求） -->
+<!-- Footer 区域 -->
 <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
 </div>
 
-<!-- 所有JavaScript代码内联，无需外部文件 -->
+<!-- 所有JavaScript代码内联 -->
 <script>
 (function() {
     // ---------- 装备图片映射 (全部使用png) ----------
@@ -506,26 +522,33 @@
         { key: 'zhi', label: '指' }
     ];
 
-    // ---------- 渲染左侧预览图 (43-49所有部位) ----------
+    // ---------- 渲染左侧预览图 (等级纵向，武器衣服镯指横向) ----------
     function renderPreviewGrid() {
         const grid = document.getElementById('previewGrid');
         if (!grid) return;
         grid.innerHTML = '';
+        
         LEVELS.forEach(level => {
             const levelStr = level.toString();
-            const levelDiv = document.createElement('div');
-            levelDiv.className = 'preview-level';
+            const levelData = EQUIP_IMG_MAP[levelStr];
+            if (!levelData) return;
 
+            // 创建一行
+            const row = document.createElement('div');
+            row.className = 'preview-row';
+
+            // 等级徽章
             const badge = document.createElement('div');
-            badge.className = 'level-badge';
+            badge.className = 'preview-level-badge';
             badge.textContent = level;
-            levelDiv.appendChild(badge);
+            row.appendChild(badge);
 
-            const iconsDiv = document.createElement('div');
-            iconsDiv.className = 'preview-icons';
+            // 四个图标的行
+            const iconsRow = document.createElement('div');
+            iconsRow.className = 'preview-icons-row';
 
             TYPES.forEach(type => {
-                const imgFile = EQUIP_IMG_MAP[levelStr]?.[type.key] || '';
+                const imgFile = levelData[type.key] || '';
                 const item = document.createElement('div');
                 item.className = 'preview-icon';
 
@@ -539,10 +562,11 @@
 
                 item.appendChild(imgDiv);
                 item.appendChild(label);
-                iconsDiv.appendChild(item);
+                iconsRow.appendChild(item);
             });
-            levelDiv.appendChild(iconsDiv);
-            grid.appendChild(levelDiv);
+
+            row.appendChild(iconsRow);
+            grid.appendChild(row);
         });
     }
 
@@ -707,12 +731,11 @@
         renderCurrentMissingChips();
     }
 
-    // ---------- 模拟footer加载 (原load-footer.js内容可放在这里) ----------
+    // ---------- 模拟footer加载 ----------
     function initFooter() {
         const footerEl = document.getElementById('footer-container');
         if (footerEl) {
-            // 这里可以替换成您需要的页脚内容或异步请求
-            footerEl.innerHTML = '© 钻石回收管理系统 · 双栏自适应版 · 所有装备图片均为PNG';
+            footerEl.innerHTML = '© 钻石回收管理系统 · 等级纵列版 · 所有装备图片均为PNG';
         }
     }
 
