@@ -44,14 +44,14 @@
             flex-wrap: wrap;
             padding: 0 10px;
         }
-        /* 双栏布局 */
+        /* 双栏布局 - 使用align-items: stretch确保等高 */
         .double-col {
             display: flex;
             gap: 28px;
             align-items: stretch;
             flex-wrap: wrap;
         }
-        /* 左侧面板 - 重新排列：表单在上，图库在下 */
+        /* 左侧面板 */
         .left-panel {
             flex: 1.1;
             min-width: 460px;
@@ -63,7 +63,7 @@
             display: flex;
             flex-direction: column;
         }
-        /* 右侧面板 */
+        /* 右侧面板 - 与左侧等高 */
         .right-panel {
             flex: 2;
             min-width: 500px;
@@ -72,6 +72,8 @@
             border: 1px solid #618b74;
             padding: 28px 22px;
             box-shadow: 0 15px 20px -10px #0d1f1a;
+            display: flex;
+            flex-direction: column;
         }
         /* 小屏幕适配 */
         @media screen and (max-width: 1100px) {
@@ -99,13 +101,13 @@
             word-break: break-word;
         }
         
-        /* 录入表单 - 现在放在上面 */
+        /* 录入表单 */
         .input-form {
             background: #1f3d33;
             border-radius: 50px;
             padding: 26px 24px;
             border: 1px solid #669479;
-            margin-bottom: 25px; /* 与图库的间距 */
+            margin-bottom: 25px;
         }
         .form-row {
             display: flex;
@@ -172,12 +174,64 @@
             box-shadow: 0 3px 0 #35633e;
         }
         
-        /* 装备图库 - 现在放在下面 */
+        /* JSON 编辑区 - 现在放在中间位置（表单下面，图库上面） */
+        .json-editor-section {
+            margin-bottom: 25px;
+            background: #1b3b2e;
+            border-radius: 50px;
+            padding: 22px;
+            border: 2px solid #aa8e4c;
+        }
+        .json-editor-section h3 {
+            color: #f7cf89;
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .json-textarea {
+            width: 100%;
+            background: #253b34;
+            border: 1px solid #c9af6b;
+            color: #fcf0c7;
+            padding: 18px;
+            border-radius: 36px;
+            font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        .json-textarea:focus {
+            border-color: #f3b35e;
+            outline: none;
+        }
+        .json-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn-json {
+            background: #426454;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 25px;
+            font-weight: 600;
+            color: #fbefc7;
+            border: 1px solid #97ba8c;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1f3a30;
+        }
+        .btn-json-warning {
+            background: #8f623b;
+            border-color: #ebbc7e;
+        }
+
+        /* 装备图库 - 现在放在最下面 */
         .preview-grid {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 0; /* 移除底部边距，因为已经在底部 */
             background: #244137;
             border-radius: 60px;
             padding: 25px 20px;
@@ -243,66 +297,14 @@
             padding: 3px 0;
         }
 
-        /* JSON 编辑区 */
-        .json-editor-section {
-            margin-top: 25px;
-            background: #1b3b2e;
-            border-radius: 50px;
-            padding: 22px;
-            border: 2px solid #aa8e4c;
-        }
-        .json-editor-section h3 {
-            color: #f7cf89;
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .json-textarea {
-            width: 100%;
-            background: #253b34;
-            border: 1px solid #c9af6b;
-            color: #fcf0c7;
-            padding: 18px;
-            border-radius: 36px;
-            font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
-            font-size: 0.9rem;
-            resize: vertical;
-            margin-bottom: 15px;
-        }
-        .json-textarea:focus {
-            border-color: #f3b35e;
-            outline: none;
-        }
-        .json-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        .btn-json {
-            background: #426454;
-            border: none;
-            border-radius: 40px;
-            padding: 12px 25px;
-            font-weight: 600;
-            color: #fbefc7;
-            border: 1px solid #97ba8c;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #1f3a30;
-        }
-        .btn-json-warning {
-            background: #8f623b;
-            border-color: #ebbc7e;
-        }
-
         /* ===== 右侧卡片：等级在上，装备在下，所有等级块一行内换行 ===== */
         .server-cards {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            max-height: 800px;
+            flex: 1; /* 让卡片容器填充剩余空间 */
             overflow-y: auto;
+            max-height: 700px; /* 限制最大高度，但会根据内容调整 */
             padding-right: 8px;
         }
         .server-card {
@@ -416,38 +418,45 @@
             color: #689177;
             text-align: center;
         }
-        /* footer区域 */
+        
+        /* footer样式 */
         .footer-wrapper {
             width: 100%;
-            margin-top: 40px;
+            margin-top: 50px;
             background: #1a2f28;
             border-radius: 60px 60px 0 0;
-            padding: 30px 20px 20px;
-            border-top: 2px solid #5d8771;
+            padding: 30px 20px 25px;
+            border-top: 3px solid #b87e3e;
             color: #bdd0b0;
             text-align: center;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
         }
         #footer-container {
             max-width: 1200px;
             margin: 0 auto;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            color: #fbdd9d;
+            font-weight: 500;
+        }
+        .footer-wrapper footer {
+            width: 100%;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>💎 钻石回收 · 表单上图库下</h1>
+    <h1>💎 钻石回收 · 优化布局 · 等高双栏</h1>
     <div class="sub">
         <span>武器·衣服·镯·指 43~49级 (全PNG)</span>
-        <span>先登记 · 后看图 · 右侧紧凑显示缺失</span>
+        <span>登记 → JSON → 图库 · 右侧等高</span>
     </div>
 
     <div class="double-col">
-        <!-- ========= 左侧面板：重新排列 - 表单在上，图库在下 ========= -->
+        <!-- ========= 左侧面板：表单 → JSON → 图库 ========= -->
         <div class="left-panel">
             <h2>📋 装备登记</h2>
             
-            <!-- 录入表单 - 放在上面 -->
+            <!-- 录入表单 -->
             <div class="input-form">
                 <div class="form-row">
                     <div class="form-group">
@@ -479,14 +488,10 @@
                 <button class="btn-add" id="addMissingBtn">➕ 添加缺失装备</button>
             </div>
 
-            <!-- 装备图库 - 放在下面 -->
-            <h2 style="margin-top: 10px;">📋 装备图库</h2>
-            <div class="preview-grid" id="previewGrid"></div>
-
-            <!-- 集中JSON编辑区 - 放在最下面 -->
+            <!-- 集中JSON数据 - 现在放在中间 -->
             <div class="json-editor-section">
                 <h3>📦 集中JSON数据</h3>
-                <textarea id="globalJsonInput" class="json-textarea" rows="8">[
+                <textarea id="globalJsonInput" class="json-textarea" rows="6">[
   { "server": "131区·战神", "missing": ["43_zhuo", "45_jia", "46_wq", "49_jia"] },
   { "server": "S2·虎啸", "missing": ["43_wq", "43_jia", "44_zhuo", "45_zhi", "47_wq", "48_jia", "49_zhuo"] },
   { "server": "S3·凤凰", "missing": ["45_wq", "45_jia", "46_zhuo", "46_zhi", "48_zhuo", "49_zhi", "43_zhuo"] }
@@ -497,9 +502,13 @@
                 </div>
                 <p style="color: #aac9b2; margin-top: 10px; font-size:0.9rem;">格式: [{ "server":"区名", "missing":["43_wq","45_jia"...] }]</p>
             </div>
+
+            <!-- 装备图库 - 放在最下面 -->
+            <h2 style="margin-top: 0;">📋 装备图库</h2>
+            <div class="preview-grid" id="previewGrid"></div>
         </div>
 
-        <!-- ========= 右侧面板：紧凑显示缺失 ========= -->
+        <!-- ========= 右侧面板：紧凑显示缺失，与左侧等高 ========= -->
         <div class="right-panel">
             <h2>📦 各区服缺失装备</h2>
             <div id="serverCardContainer" class="server-cards">
@@ -516,6 +525,8 @@
 <div class="footer-wrapper">
     <footer id="footer-container">加载中...</footer>
 </div>
+<script src="/load-footer.js"></script>
+<!-- footer -->
 
 <script>
 (function() {
@@ -532,8 +543,6 @@
 
     // 默认数据
     const DEFAULT_SERVER_DATA = [
-        { server: "131区·战神", missing: ["43_zhuo", "45_jia", "46_wq", "49_jia"] },
-        { server: "S2·虎啸", missing: ["43_wq", "43_jia", "44_zhuo", "45_zhi", "47_wq", "48_jia", "49_zhuo"] },
         { server: "S3·凤凰", missing: ["45_wq", "45_jia", "46_zhuo", "46_zhi", "48_zhuo", "49_zhi", "43_zhuo"] }
     ];
 
@@ -754,17 +763,11 @@
         document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
     }
 
-    function initFooter() {
-        const footerEl = document.getElementById('footer-container');
-        if (footerEl) footerEl.innerHTML = '© 钻石回收 · 表单上图库下 · 所有装备图片均为PNG';
-    }
-
     // 绑定事件
     document.addEventListener('DOMContentLoaded', function() {
         renderPreviewGrid();
         renderRightCards();
         document.getElementById('globalJsonInput').value = JSON.stringify(serverData, null, 2);
-        initFooter();
 
         document.getElementById('addMissingBtn').addEventListener('click', addMissing);
         document.getElementById('applyJsonBtn').addEventListener('click', applyJson);
@@ -772,6 +775,16 @@
         document.getElementById('serverNameInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addMissing();
         });
+        
+        // 页脚备用
+        const footerEl = document.getElementById('footer-container');
+        if (footerEl && footerEl.innerHTML === '加载中...') {
+            setTimeout(() => {
+                if (footerEl.innerHTML === '加载中...') {
+                    footerEl.innerHTML = '© 钻石回收管理系统 · 外部页脚加载失败，使用备用内容';
+                }
+            }, 3000);
+        }
     });
 
 })();
