@@ -3,6 +3,8 @@ function getFooterFile() {
   const path = window.location.pathname;
   if (path.includes('/y/')) {
     return '/footer.html';
+  } else if (path.includes('/y/zshs/')) {
+    return '/footer.html';
   } else if (path.includes('/q/')) {
     return '/footer.html';
   } else if (path.includes('/c/')) {
